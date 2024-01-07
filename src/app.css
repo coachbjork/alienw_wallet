@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+header {
+	width: 100%;
+	/* z-index: 1000; */
+	/* position: fixed; */
+	box-shadow: rgb(165, 236, 248, 0.4) 1px 1px 2px 1px;
+}
+
+body {
+    background-color: #060C27;
+    color: #b1bac7;
+}
