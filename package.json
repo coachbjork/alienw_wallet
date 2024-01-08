@@ -46,6 +46,7 @@
 		"@wharfkit/wallet-plugin-tokenpocket": "^1.1.0",
 		"@wharfkit/wallet-plugin-wombat": "^1.1.0",
 		"@wharfkit/web-renderer": "^1.1.2",
-		"svelte-awesome": "^3.3.1"
+		"svelte-awesome": "^3.3.1",
+		"tippy.js": "^6.3.7"
 	}
 }

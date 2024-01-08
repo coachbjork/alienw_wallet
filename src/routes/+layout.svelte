@@ -4,6 +4,8 @@
 	import Header from '$lib/components/Header.svelte';
 </script>
 
-<Header />
+<div class="fullpage">
+	<Header />
 
-<slot />
+	<slot />
+</div>

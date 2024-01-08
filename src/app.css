@@ -2,14 +2,83 @@
 @tailwind components;
 @tailwind utilities;
 
-header {
-	width: 100%;
-	/* z-index: 1000; */
-	/* position: fixed; */
-	box-shadow: rgb(165, 236, 248, 0.4) 1px 1px 2px 1px;
-}
-
 body {
     background-color: #060C27;
     color: #b1bac7;
 }
+
+/* Header */
+
+.menu-grid {
+	display: grid;
+	width: 100%;
+	grid-template-columns: 1fr;
+	grid-template-rows: 55px 60px;
+	background-color: #060C27;
+	gap: 0px 0px;
+	z-index: 1000;
+	grid-auto-flow: row;
+	position:fixed;
+	box-shadow: rgb(165, 236, 248, 0.4) 1px 1px 2px 1px;
+}
+
+.Header {
+	align-self: stretch; 
+	justify-self: center;
+	width: 100%;
+	min-height: 55px;
+}
+
+
+/* The Main Content */
+
+.fullpage {  
+	display: grid;
+	grid-template-columns: 0.3fr 1fr 0.3fr ;
+	grid-template-rows: 110px 6fr 60px;
+	min-height: 100vh;
+	gap: 0px 20px;
+	grid-auto-flow: row;
+	grid-template-areas:
+	  "menu-grid menu-grid menu-grid"
+	  "left-side main-content right-side"
+	  "footer footer footer";
+}
+
+.right-side { 
+	grid-area: right-side; 
+	justify-self: center;
+	align-self: start;
+	padding: 20px 20px 0 20px;
+	gap: 10px 10px;
+}
+
+.left-side { 
+	grid-area: left-side; 
+	justify-self: center;
+	left:0;
+	align-self: start;
+	padding: 20px 20px 0 20px;
+	gap: 10px 10px;
+}
+
+.side-column {
+	display: flex;
+	flex-direction: column;
+	min-width:150px;
+	gap: 20px 0px;
+}
+
+.main-content {
+	display: grid; 
+	grid-template-columns: auto auto auto; 
+  	grid-template-rows: auto auto auto auto; 
+  	gap: 30px 10px; 
+  	justify-self: center; 
+  	align-self: start; 
+  	grid-area: main-content; 
+  	min-height: 100vh; 
+	width: 100%;
+}
+
+

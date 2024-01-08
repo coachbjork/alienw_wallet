@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { allSessions, session } from '$lib/stores';
-	import { Chains, Session, SessionKit } from '@wharfkit/session';
+	import { allSessions, blockchain_rpc, session } from '$lib/stores';
+	import { Session, SessionKit } from '@wharfkit/session';
 	import { TransactPluginAutoCorrect } from '@wharfkit/transact-plugin-autocorrect';
 	import { WalletPluginAnchor } from '@wharfkit/wallet-plugin-anchor';
 	import { WalletPluginCleos } from '@wharfkit/wallet-plugin-cleos';
@@ -9,15 +9,22 @@
 	import WebRenderer from '@wharfkit/web-renderer';
 	import { onMount } from 'svelte';
 	import Icon from 'svelte-awesome';
+	import caretDown from 'svelte-awesome/icons/caretDown';
 	import trash from 'svelte-awesome/icons/trash';
 
 	let sessionKit: SessionKit;
+	let showDropdown = false;
 
 	if (browser) {
 		sessionKit = new SessionKit(
 			{
 				appName: 'alienwallet',
-				chains: [Chains.WAX],
+				chains: [
+					{
+						id: '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4',
+						url: $blockchain_rpc
+					}
+				],
 				ui: new WebRenderer(),
 				walletPlugins: [
 					new WalletPluginCloudWallet(),
@@ -27,13 +34,10 @@
 			},
 			{ transactPlugins: [new TransactPluginAutoCorrect()] }
 		);
-
 		onMount(async () => {
 			try {
 				const restored = await sessionKit.restore();
 				const allRestoreds = await sessionKit.restoreAll();
-				console.log('restored', restored);
-				console.log('allRestoreds', allRestoreds);
 
 				if (restored) {
 					session.set(restored);
@@ -66,14 +70,23 @@
 		allSessions.set([]);
 	}
 
-	let showDropdown = false;
-
-	function toggleDropdown() {
+	function activeDropdown() {
 		showDropdown = !showDropdown;
+		if (showDropdown) {
+			// When the dropdown is shown, add an event listener to the window
+			window.addEventListener('click', handleWindowClick);
+		}
+	}
+
+	function handleWindowClick(event: any) {
+		// If the clicked element is not part of the dropdown, hide the dropdown
+		if (!event.target.closest('.wallet-dropdown-container')) {
+			showDropdown = false;
+			window.removeEventListener('click', handleWindowClick);
+		}
 	}
 
 	async function selectUser(account: Session) {
-		// await sessionKit.persistSession(account, true);
 		session.set(account);
 	}
 
@@ -84,21 +97,22 @@
 			await logout();
 		}
 	}
-
-	// function preventClose(event:any) {
-	// 	event.stopPropagation();
-	// }
 </script>
 
 <div class="p-2">
 	{#if $session}
-		<div class="dropdown-container">
-			<span on:click={toggleDropdown}>{$session.actor}</span>
+		<div class="wallet-dropdown-container">
+			<button on:click={activeDropdown}>
+				<span class=" rounded-lg border-2 border-solid border-indigo-800 px-4 py-1"
+					>{$session.actor}
+					<Icon data={caretDown} />
+				</span>
+			</button>
 			{#if showDropdown}
 				<div class="dropdown">
 					{#each $allSessions as account}
 						<div class="flex flex-row">
-							<button on:click={() => selectUser(account)}>{account.actor}</button>
+							<button on:click={() => selectUser(account)}>{account.actor} </button>
 							<button
 								on:click={() => {
 									console.log('here');
@@ -109,28 +123,45 @@
 							</button>
 						</div>
 					{/each}
-					<button on:click={addAccount}>Add Account</button>
-					<button on:click={logout}>Logout</button>
+					<button
+						on:click={addAccount}
+						class="rounded-none border-t-2 border-solid"
+						style="border-color: rgb(165, 236, 248, 0.4);">Add Account</button
+					>
+					<button on:click={logout} class="text-red-500">Logout</button>
 				</div>
 			{/if}
 		</div>
 	{:else}
-		<button class="mr-2 hidden text-base font-bold md:inline" on:click={login}>Login</button>
+		<button
+			class="transform rounded-lg border-2 border-solid border-indigo-800 px-4 py-1 transition duration-500 ease-in-out hover:bg-gradient-to-r hover:from-indigo-950 hover:to-blue-800"
+			on:click={login}>Login</button
+		>
 	{/if}
 </div>
 
 <style>
-	.dropdown-container {
+	.wallet-dropdown-container {
 		position: relative;
 		display: inline-block;
 	}
 	.dropdown {
-		display: none;
 		position: absolute;
-		/* Additional styles for positioning and appearance */
+		margin-top: 20px; /* Adjusted for padding */
+		background-color: #13215b; /* Light background for the dropdown */
+		box-shadow: 0px 8px 16px 0px rgba(114, 112, 207, 0.2); /* Add some shadow for depth */
+		z-index: 1; /* Ensure it's above other items */
+		border-radius: 5px; /* Rounded corners */
+		width: 200px; /* Set a fixed width */
 	}
-	.dropdown-container:hover .dropdown,
-	.dropdown-container:focus-within .dropdown {
+
+	.dropdown button {
 		display: block;
+		width: 100%; /* Make buttons expand to the full width */
+		text-align: left; /* Align text to the left */
+
+		background-color: transparent; /* Transparent background */
+		padding: 4px 20px; /* Padding inside buttons */
+		cursor: pointer; /* Change mouse cursor on hover */
 	}
 </style>
