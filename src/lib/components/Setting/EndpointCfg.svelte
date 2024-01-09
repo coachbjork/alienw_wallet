@@ -27,7 +27,7 @@
 	}
 </script>
 
-<slot name="xyz" class="epcfg-dropdown-container">
+<div class="epcfg-dropdown-container">
 	<button
 		on:click={() => {
 			activeDropdown();
@@ -52,7 +52,7 @@
 			</select>
 		</div>
 	{/if}
-</slot>
+</div>
 
 <style>
 	.epcfg-dropdown-container {
