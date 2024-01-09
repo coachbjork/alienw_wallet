@@ -133,9 +133,11 @@
 			{/if}
 		</div>
 	{:else}
-		<button
-			class="transform rounded-lg border-2 border-solid border-indigo-800 px-4 py-1 transition duration-500 ease-in-out hover:bg-gradient-to-r hover:from-indigo-950 hover:to-blue-800"
-			on:click={login}>Login</button
+		<button on:click={login}>
+			<span
+				class=" rounded-lg border-2 border-solid border-indigo-800 px-4 py-1 hover:bg-gradient-to-r hover:from-indigo-950 hover:to-blue-800"
+				>Login</span
+			></button
 		>
 	{/if}
 </div>
@@ -147,6 +149,7 @@
 	}
 	.dropdown {
 		position: absolute;
+		left: -10px;
 		margin-top: 20px; /* Adjusted for padding */
 		background-color: #13215b; /* Light background for the dropdown */
 		box-shadow: 0px 8px 16px 0px rgba(114, 112, 207, 0.2); /* Add some shadow for depth */
@@ -159,7 +162,6 @@
 		display: block;
 		width: 100%; /* Make buttons expand to the full width */
 		text-align: left; /* Align text to the left */
-
 		background-color: transparent; /* Transparent background */
 		padding: 4px 20px; /* Padding inside buttons */
 		cursor: pointer; /* Change mouse cursor on hover */

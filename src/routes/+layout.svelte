@@ -6,6 +6,13 @@
 
 <div class="fullpage">
 	<Header />
-
-	<slot />
+	<div class="left-side">
+		<!-- <EndpointCfg>
+			<slot name="xyz" />
+		</EndpointCfg> -->
+	</div>
+	<div class="right-side"></div>
+	<div class="main-content">
+		<slot />
+	</div>
 </div>

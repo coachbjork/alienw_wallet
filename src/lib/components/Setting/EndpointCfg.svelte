@@ -27,7 +27,7 @@
 	}
 </script>
 
-<div class="epcfg-dropdown-container">
+<slot name="xyz" class="epcfg-dropdown-container">
 	<button
 		on:click={() => {
 			activeDropdown();
@@ -52,7 +52,7 @@
 			</select>
 		</div>
 	{/if}
-</div>
+</slot>
 
 <style>
 	.epcfg-dropdown-container {
@@ -61,13 +61,13 @@
 	}
 	.dropdown {
 		position: absolute;
-		right: -20px; /* Align the dropdown to the right edge of its container */
+		right: -15px; /* Align the dropdown to the right edge of its container */
 		margin-top: 20px;
 		background-color: #13215b;
 		box-shadow: 0px 8px 16px 0px rgba(114, 112, 207, 0.2);
 		z-index: 1;
 		border-radius: 5px;
-		width: 200px;
+		width: 300px;
 		padding: 4px 20px; /* Padding inside buttons */
 	}
 
@@ -76,7 +76,6 @@
 		width: 100%; /* Make buttons expand to the full width */
 		text-align: left; /* Align text to the left */
 		background-color: transparent; /* Transparent background */
-		padding: 4px 20px; /* Padding inside buttons */
 		cursor: pointer; /* Change mouse cursor on hover */
 	}
 </style>
