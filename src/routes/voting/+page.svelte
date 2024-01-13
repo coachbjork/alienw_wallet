@@ -18,6 +18,7 @@
 	let selectedCandidates: any = [];
 
 	onMount(async () => {
+		console.log($session);
 		await fetchCandidates($activePlanet);
 		loading = false;
 		await fetchDacglobals($activePlanet);
@@ -45,7 +46,6 @@
 	async function fetchCandidates(planet: any) {
 		const response = await fetch(`/api/daoaw/candidates?activePlanet=${planet}`);
 		candidates = await response.json();
-		console.log(candidates);
 	}
 
 	async function fetchDacglobals(planet: any) {
@@ -175,11 +175,12 @@
 							<td>
 								<input
 									type="checkbox"
-									class="rounded-md"
+									class={`rounded-md ${$session === null ? 'cursor-not-allowed bg-gray-500' : ''}`}
 									on:change={(e) => {
 										selectCandidate(e);
 									}}
 									value={candidate.candidate_name}
+									disabled={$session === null}
 								/>
 							</td>
 							<td>
