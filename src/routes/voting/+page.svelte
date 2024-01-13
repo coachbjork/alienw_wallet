@@ -6,8 +6,10 @@
 	import { voteDecayFormula } from '$lib/utils';
 	import { Spinner } from 'flowbite-svelte';
 	import { afterUpdate, onMount } from 'svelte';
+	import CrownSolid from 'svelte-awesome-icons/CrownSolid.svelte';
 
 	let candidates: any = [];
+	let maxvotes: any = 1;
 	let selectedPlanet = $activePlanet;
 	let loading = true;
 	let selectedCandidates: any = [];
@@ -15,44 +17,43 @@
 	onMount(async () => {
 		await fetchCandidates($activePlanet);
 		loading = false;
-		toastStore.add(
-			'SuccesSuccesSuccesSuccesSuccesSuccesSuccesSuccesSuccesSuccesSucces',
-			TOAST_TYPES.SUCCESS
-		);
-		toastStore.add('Warning', TOAST_TYPES.WARNING);
-		toastStore.add('Info', TOAST_TYPES.INFO);
-		toastStore.add('Error', TOAST_TYPES.ERROR);
+		await fetchDacglobals($activePlanet);
 	});
 
 	afterUpdate(async () => {
 		if (selectedPlanet !== $activePlanet) {
 			selectedPlanet = $activePlanet;
 			loading = true;
+			selectedCandidates = [];
 			await fetchCandidates($activePlanet);
 			loading = false;
+			await fetchDacglobals($activePlanet);
 		}
 	});
 
 	async function fetchCandidates(planet: any) {
-		const response = await fetch(`/api/candidates?activePlanet=${planet}`);
-		const data = await response.json();
-		candidates = data.candidates;
-		console.log('data', data);
+		const response = await fetch(`/api/daoaw/candidates?activePlanet=${planet}`);
+		candidates = await response.json();
 	}
 
-	function selectCandidate(e: any) {
+	async function fetchDacglobals(planet: any) {
+		const response = await fetch(`/api/daoaw/dacglobals?activePlanet=${planet}`);
+		const dacglobals = await response.json();
+		maxvotes = dacglobals.find((dacglobal: any) => dacglobal.key === 'maxvotes').value[1] || 1;
+	}
+
+	async function selectCandidate(e: any) {
 		const { checked, value } = e.target;
-		if (selectedCandidates.length == 2 && checked) {
-			toastStore.add('Max 2 candidates');
+		if (selectedCandidates.length >= maxvotes && checked) {
+			toastStore.add(`Max vote is ${maxvotes}`, TOAST_TYPES.WARNING);
 			e.target.checked = false;
 			return;
 		}
 		if (checked) {
-			selectedCandidates.push(value);
+			selectedCandidates = [...selectedCandidates, value];
 		} else {
 			selectedCandidates = selectedCandidates.filter((candidate: any) => candidate !== value);
 		}
-		console.log('selectedCandidates', selectedCandidates);
 	}
 </script>
 
@@ -80,7 +81,7 @@
 				</tr>
 			{:else}
 				{#each candidates as candidate, i}
-					<tr>
+					<tr class={i % 2 === 0 ? 'bg-blue-900 bg-opacity-30' : ''}>
 						<td>
 							<input
 								type="checkbox"
@@ -91,7 +92,13 @@
 								value={candidate.candidate_name}
 							/>
 						</td>
-						<td>{i + 1}</td>
+						<td>
+							{#if i <= 4}
+								<CrownSolid color="white" />
+							{:else}
+								{i + 1}
+							{/if}</td
+						>
 						<td>{candidate.name}</td>
 						<td>{candidate.candidate_name}</td>
 						<td>{new Intl.NumberFormat('en-US').format(candidate.total_vote_power.toFixed(0))}</td>
@@ -109,6 +116,20 @@
 			{/if}
 		</tbody>
 	</table>
+	{#if !loading}
+		<!-- Vote button -->
+		<div class="mt-5 flex justify-center">
+			<button
+				class="text-default rounded bg-purple-600 px-4 py-2 font-bold opacity-100 disabled:cursor-not-allowed disabled:opacity-50"
+				disabled={selectedCandidates.length === 0}
+				on:click={() => {
+					console.log(selectedCandidates);
+				}}
+			>
+				Vote
+			</button>
+		</div>
+	{/if}
 </div>
 
 <style>

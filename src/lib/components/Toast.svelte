@@ -29,69 +29,72 @@
 			toastStore.set(newToast.id, newToast.counter);
 			return setTimeout(() => timeout(newToast), 1000);
 		}
-		toastStore.remove(toast.id);
+		toastStore.set(toast.id, 0, false);
+
+		await setTimeout(() => toastStore.remove(toast.id), 500);
+	}
+
+	async function onClose(toast: any) {
+		toastStore.set(toast.id, 0, false);
+
+		await setTimeout(() => toastStore.remove(toast.id), 500);
 	}
 </script>
 
 <div class="toast flex flex-col">
 	{#each $toastStore as toast}
 		{#if toast.type === TOAST_TYPES.SUCCESS}
-			<button transition:slide={{ delay: 250, duration: 300 }}>
-				<Toast
-					dismissable={true}
-					transition={slide}
-					bind:open={toast.open}
-					color="green"
-					divClass="w-full max-w-xs min-w-64 p-4 text-white bg-green-500 gap-3 break-all"
-					on:close={() => toastStore.remove(toast.id)}
-				>
-					<ThumbsUpSolid slot="icon" class="h-4 w-4" />
-
-					{toast.message}
-				</Toast>
-			</button>
+			<Toast
+				dismissable={true}
+				transition={slide}
+				params={{ delay: 250, duration: 500 }}
+				bind:open={toast.open}
+				color="green"
+				divClass="w-full max-w-xs min-w-64 p-2 text-white bg-green-500 gap-2 break-all"
+				on:close={() => onClose(toast)}
+			>
+				<ThumbsUpSolid slot="icon" class="h-4 w-4" />
+				{toast.message}
+			</Toast>
 		{:else if toast.type === TOAST_TYPES.ERROR}
-			<button transition:slide={{ delay: 250, duration: 300 }}>
-				<Toast
-					dismissable={true}
-					transition={slide}
-					bind:open={toast.open}
-					color="red"
-					divClass="w-full max-w-xs min-w-64 p-4 text-white bg-red-500 gap-3 break-all"
-					on:close={() => toastStore.remove(toast.id)}
-				>
-					<ThumbsDownSolid slot="icon" class="h-4 w-4" />
-					{toast.message}
-				</Toast>
-			</button>
+			<Toast
+				dismissable={true}
+				transition={slide}
+				params={{ delay: 250, duration: 500 }}
+				bind:open={toast.open}
+				color="red"
+				divClass="w-full max-w-xs min-w-64 p-2 text-white bg-red-500 gap-2 break-all"
+				on:close={() => onClose(toast)}
+			>
+				<ThumbsDownSolid slot="icon" class="h-4 w-4" />
+				{toast.message}
+			</Toast>
 		{:else if toast.type === TOAST_TYPES.WARNING}
-			<button transition:slide={{ delay: 250, duration: 300 }}>
-				<Toast
-					dismissable={true}
-					transition={slide}
-					bind:open={toast.open}
-					color="yellow"
-					divClass="w-full max-w-xs min-w-64 p-4 text-white bg-yellow-400 gap-3 break-all"
-					on:close={() => toastStore.remove(toast.id)}
-				>
-					<ShieldSolid slot="icon" class="h-4 w-4" />
-					{toast.message}
-				</Toast>
-			</button>
+			<Toast
+				dismissable={true}
+				transition={slide}
+				params={{ delay: 250, duration: 500 }}
+				bind:open={toast.open}
+				color="yellow"
+				divClass="w-full max-w-xs min-w-64 p-2 text-white bg-yellow-400 gap-2 break-all"
+				on:close={() => onClose(toast)}
+			>
+				<ShieldSolid slot="icon" class="h-4 w-4" />
+				{toast.message}
+			</Toast>
 		{:else if toast.type === TOAST_TYPES.INFO}
-			<button transition:slide={{ delay: 250, duration: 300 }}>
-				<Toast
-					dismissable={true}
-					transition={slide}
-					bind:open={toast.open}
-					color="blue"
-					divClass="w-full max-w-xs min-w-64 p-4 text-white bg-blue-500 gap-3 break-all"
-					on:close={() => toastStore.remove(toast.id)}
-				>
-					<InfoCircleSolid slot="icon" class="h-4 w-4" />
-					{toast.message}
-				</Toast>
-			</button>
+			<Toast
+				dismissable={true}
+				transition={slide}
+				params={{ delay: 250, duration: 500 }}
+				bind:open={toast.open}
+				color="blue"
+				divClass="w-full max-w-xs min-w-64 p-2 text-white bg-blue-500 gap-2 break-all"
+				on:close={() => onClose(toast)}
+			>
+				<InfoCircleSolid slot="icon" class="h-4 w-4" />
+				{toast.message}
+			</Toast>
 		{/if}
 	{/each}
 </div>
@@ -99,10 +102,9 @@
 <style>
 	.toast {
 		z-index: 1000;
-		gap: 10px;
+		gap: 5px;
 		position: fixed;
 		top: 0;
-		right: 0;
-		padding: 10px;
+		right: 2%;
 	}
 </style>

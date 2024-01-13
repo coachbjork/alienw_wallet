@@ -10,7 +10,7 @@ function createToastStore() {
         subscribe,
         add: (message: any, type: string = TOAST_TYPES.INFO) => update(toasts => [...toasts, { id: id++, message, counter: 5, open: true, type }]),
         remove: (id: any) => update(toasts => toasts.filter(t => t.id !== id)),
-        set: (id: any, counter: any) => update(toasts => toasts.map(t => t.id === id ? { ...t, counter } : t)),
+        set: (id: any, counter: any, open: boolean = true) => update(toasts => toasts.map(t => t.id === id ? { ...t, counter, open } : t)),
     };
 }
 

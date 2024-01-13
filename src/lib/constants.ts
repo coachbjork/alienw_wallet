@@ -19,6 +19,7 @@ const AW = {
     PLANETS: ["Kavian", "Eyeke", "Neri", "Veles", "Naron", "Magor"],
     CONTRACT_NAME: "dao.worlds",
     CANDIDATES_TABLE: "candidates",
+    DACGLOBALS_TABLE: "dacglobals",
 };
 
 const TOAST_TYPES = {

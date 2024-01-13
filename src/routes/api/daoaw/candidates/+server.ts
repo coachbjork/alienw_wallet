@@ -25,14 +25,14 @@ export async function GET(req) {
             number_voters: parseInt(item.number_voters),
             avg_vote_time_stamp: `${String(item.avg_vote_time_stamp)}Z`,
             running_weight_time: parseInt(item.running_weight_time),
-            description: custodians_data.data[String(item.candidate_name)].description,
-            image: custodians_data.data[String(item.candidate_name)].image,
-            name: custodians_data.data[String(item.candidate_name)].name,
+            description: custodians_data.data[String(item.candidate_name)]?.description || "",
+            image: custodians_data.data[String(item.candidate_name)]?.image || "",
+            name: custodians_data.data[String(item.candidate_name)]?.name || String(item.candidate_name),
         }
     }).sort((a: any, b: any) => {
         return b.rank - a.rank;
     });
 
-    return json({ candidates: serializedCandidates });
+    return json(serializedCandidates);
 
 }
