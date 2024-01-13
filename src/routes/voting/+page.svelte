@@ -18,7 +18,6 @@
 	let selectedCandidates: any = [];
 
 	onMount(async () => {
-		console.log($session);
 		await fetchCandidates($activePlanet);
 		loading = false;
 		await fetchDacglobals($activePlanet);
