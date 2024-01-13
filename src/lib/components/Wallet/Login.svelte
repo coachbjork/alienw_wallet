@@ -25,7 +25,7 @@
 						url: $blockchain_rpc
 					}
 				],
-				ui: new WebRenderer(),
+				ui: new WebRenderer({ minimal: true }),
 				walletPlugins: [
 					new WalletPluginCloudWallet(),
 					new WalletPluginAnchor(),

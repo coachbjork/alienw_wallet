@@ -20,6 +20,10 @@ const AW = {
     CONTRACT_NAME: "dao.worlds",
     CANDIDATES_TABLE: "candidates",
     DACGLOBALS_TABLE: "dacglobals",
+    VOTES_TABLE: "votes",
+    ACTIONS: {
+        VOTE_CUSTODIANS: "votecust",
+    }
 };
 
 const TOAST_TYPES = {

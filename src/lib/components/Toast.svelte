@@ -54,7 +54,7 @@
 				on:close={() => onClose(toast)}
 			>
 				<ThumbsUpSolid slot="icon" class="h-4 w-4" />
-				{toast.message}
+				{@html toast.message}
 			</Toast>
 		{:else if toast.type === TOAST_TYPES.ERROR}
 			<Toast
@@ -67,7 +67,7 @@
 				on:close={() => onClose(toast)}
 			>
 				<ThumbsDownSolid slot="icon" class="h-4 w-4" />
-				{toast.message}
+				{@html toast.message}
 			</Toast>
 		{:else if toast.type === TOAST_TYPES.WARNING}
 			<Toast
@@ -80,7 +80,7 @@
 				on:close={() => onClose(toast)}
 			>
 				<ShieldSolid slot="icon" class="h-4 w-4" />
-				{toast.message}
+				{@html toast.message}
 			</Toast>
 		{:else if toast.type === TOAST_TYPES.INFO}
 			<Toast
@@ -93,7 +93,7 @@
 				on:close={() => onClose(toast)}
 			>
 				<InfoCircleSolid slot="icon" class="h-4 w-4" />
-				{toast.message}
+				{@html toast.message}
 			</Toast>
 		{/if}
 	{/each}
@@ -104,7 +104,7 @@
 		z-index: 1000;
 		gap: 5px;
 		position: fixed;
-		top: 0;
+		top: 15px;
 		right: 2%;
 	}
 </style>
