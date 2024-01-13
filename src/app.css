@@ -70,15 +70,10 @@ body {
 }
 
 .main-content {
-	display: grid; 
-	grid-template-columns: auto auto auto; 
-  	grid-template-rows: auto auto auto auto; 
-  	gap: 30px 10px; 
+	display: grid;   
   	justify-self: center; 
   	align-self: start; 
   	grid-area: main-content; 
   	min-height: 100vh; 
 	width: 100%;
 }
-
-

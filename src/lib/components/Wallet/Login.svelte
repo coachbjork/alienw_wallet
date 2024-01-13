@@ -103,7 +103,7 @@
 	{#if $session}
 		<div class="wallet-dropdown-container">
 			<button on:click={activeDropdown}>
-				<span class=" rounded-lg border-2 border-solid border-indigo-800 px-4 py-1"
+				<span class=" rounded-lg border border-indigo-500 px-4 py-1"
 					>{$session.actor}
 					<Icon data={caretDown} />
 				</span>
@@ -135,7 +135,7 @@
 	{:else}
 		<button on:click={login}>
 			<span
-				class=" rounded-lg border-2 border-solid border-indigo-800 px-4 py-1 hover:bg-gradient-to-r hover:from-indigo-950 hover:to-blue-800"
+				class=" hover:from-indigo-950 rounded-lg border-2 border-solid border-indigo-800 px-4 py-1 hover:bg-gradient-to-r hover:to-blue-800"
 				>Login</span
 			></button
 		>

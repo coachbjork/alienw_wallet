@@ -10,12 +10,12 @@
 			<div class="basis-1/4" />
 			<div class="basis-1/4" />
 			<div class="basis-1/2">
+				<div class="flex items-center justify-end">
+					<NavBar />
+				</div>
 				<div class="mr-5 flex items-center justify-end">
 					<Login />
 					<EndpointCfg />
-				</div>
-				<div class="flex items-center justify-end">
-					<NavBar />
 				</div>
 			</div>
 		</div>
