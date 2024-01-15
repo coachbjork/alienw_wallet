@@ -11,19 +11,17 @@ export const activePlanet = writable<Planet>(defaultValue);
 // If running in the browser, try to load the active planet from localStorage again
 // This is to ensure that the active planet is updated if it was changed in another tab
 if (browser) {
-    const stored = window.localStorage.getItem('activePlanet');
-    if (stored) {
-        activePlanet.set(JSON.parse(stored));
-    }
-
     // Subscribe to changes in the active planet, and save them to localStorage
     activePlanet.subscribe((value) => {
-        if (browser) {
-            try {
-                window.localStorage.setItem('activePlanet', JSON.stringify(value));
-            } catch (error) {
-                console.error('Error saving activePlanet to localStorage', error);
-            }
-        }
+        window.localStorage.setItem('activePlanet', JSON.stringify(value));
     });
+
+
+    const stored = window.localStorage.getItem('activePlanet');
+    if (stored) {
+        if (JSON.parse(stored)) {
+            activePlanet.set(JSON.parse(stored));
+        }
+    }
+
 }
