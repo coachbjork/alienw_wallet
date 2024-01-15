@@ -2,7 +2,9 @@
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import VotedFor from '$lib/components/RightSide/VotedFor.svelte';
 	import { AW, TOAST_TYPES } from '$lib/constants';
+	import { get_candidates, get_dacglobals, get_votes_by_user } from '$lib/services/awdaoService';
 	import { activePlanet, session, toastStore } from '$lib/stores';
+	import type { Planet } from '$lib/types';
 	import { voteDecayFormula } from '$lib/utils';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { Spinner } from 'flowbite-svelte';
@@ -13,7 +15,7 @@
 	let candidates: any = [];
 	let votedForCandidates: any = [];
 	let maxvotes: any = 1;
-	let selectedPlanet = $activePlanet;
+	let selectedPlanet: Planet = $activePlanet;
 	let loading = true;
 	let selectedCandidates: any = [];
 
@@ -42,31 +44,40 @@
 		}
 	});
 
-	async function fetchCandidates(planet: any) {
-		const response = await fetch(`/api/daoaw/candidates?activePlanet=${planet}`);
-		candidates = await response.json();
+	async function fetchCandidates(planet: Planet) {
+		let response = await get_candidates(planet.name);
+		if (!response) return;
+		let api_response: any = await fetch(`/api/daoaw/candidates?activePlanet=${planet.name}`);
+		api_response = await api_response.json();
+		if (api_response) {
+			response = response.map((item: any) => {
+				return {
+					...item,
+					description: api_response[String(item.candidate_name)]?.description || '',
+					image: api_response[String(item.candidate_name)]?.image || '',
+					name: api_response[String(item.candidate_name)]?.name || String(item.candidate_name)
+				};
+			});
+		}
+		candidates = response;
 	}
 
-	async function fetchDacglobals(planet: any) {
-		const response = await fetch(`/api/daoaw/dacglobals?activePlanet=${planet}`);
-		const dacglobals = await response.json();
-		maxvotes = dacglobals.find((dacglobal: any) => dacglobal.key === 'maxvotes').value[1] || 1;
+	async function fetchDacglobals(planet: Planet) {
+		const response = await get_dacglobals(planet.name);
+		if (!response) return;
+		maxvotes = response.find((dacglobal: any) => dacglobal.key === 'maxvotes').value[1] || 1;
 	}
 
-	async function fetchVotedFor(planet: any) {
+	async function fetchVotedFor(planet: Planet) {
 		if ($session) {
-			const response = await fetch(
-				`/api/daoaw/votes?activePlanet=${planet}&voter=${$session?.actor}`
-			);
-			let data = await response.json();
-			console.log(data);
-			data = data.candidates.map((candidate: any) => {
+			let response = await get_votes_by_user(planet.name, String($session?.actor));
+			if (!response) return;
+			response = response.candidates.map((candidate: any) => {
 				return candidates.find((c: any) => {
 					return c.candidate_name === candidate;
 				});
 			});
-			votedForCandidates = data.filter((candidate: any) => candidate !== undefined);
-			console.log(votedForCandidates);
+			votedForCandidates = response.filter((candidate: any) => candidate !== undefined);
 		}
 	}
 
@@ -101,48 +112,12 @@
 				],
 				data: {
 					voter: $session.actor,
-					dac_id: selectedPlanet.toLowerCase(),
+					dac_id: selectedPlanet.scope,
 					newvotes: selectedCandidates
 				}
 			}
 		];
 		await pushActions($session, actions);
-
-		// await $session
-		// 	.transact(
-		// 		{
-		// 			actions: [
-		// 				{
-		// 					account: AW.CONTRACT_NAME,
-		// 					name: AW.ACTIONS.VOTE_CUSTODIANS,
-		// 					authorization: [
-		// 						{
-		// 							actor: $session.actor,
-		// 							permission: 'active'
-		// 						}
-		// 					],
-		// 					data: {
-		// 						voter: $session.actor,
-		// 						dac_id: selectedPlanet.toLowerCase(),
-		// 						newvotes: selectedCandidates
-		// 					}
-		// 				}
-		// 			]
-		// 		},
-		// 		{
-		// 			broadcast: true,
-		// 			expireSeconds: 120
-		// 		}
-		// 	)
-		// 	.then((res: any) => {
-		// 		toastStore.add(
-		// 			`<div>Executed: <a class="underline underline-offset-2" href="https://wax.bloks.io/transaction/${res.response.transaction_id}" target={"_blank"}>View Tx</a></div>`,
-		// 			TOAST_TYPES.SUCCESS
-		// 		);
-		// 	})
-		// 	.catch((error: any) => {
-		// 		toastStore.add(error.message, TOAST_TYPES.ERROR);
-		// 	});
 	}
 </script>
 

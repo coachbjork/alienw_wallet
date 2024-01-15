@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { AW } from '$lib/constants';
 	import { activePlanet } from '$lib/stores';
+	import type { Planet } from '$lib/types';
 	import { onMount } from 'svelte';
 
 	if (browser) {
@@ -12,7 +13,7 @@
 		});
 	}
 
-	function handleClick(planet: string) {
+	function handleClick(planet: Planet) {
 		return () => {
 			activePlanet.set(planet);
 		};
@@ -22,8 +23,8 @@
 <div class="planet_menu rounded-xl border border-indigo-500">
 	<ul>
 		{#each AW.PLANETS as planet}
-			<li class={$activePlanet === planet ? 'active' : ''}>
-				<span class="text-default" on:click={handleClick(planet)}>{planet}</span>
+			<li class={$activePlanet.name === planet.name ? 'active' : ''}>
+				<span class="text-default" on:click={handleClick(planet)}>{planet.name}</span>
 			</li>
 		{/each}
 	</ul>

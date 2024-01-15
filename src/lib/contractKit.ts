@@ -6,7 +6,6 @@ import { get } from 'svelte/store';
 
 const getSingleData = async (contract: string, scope: string, table: string, key_value: any = undefined, params: any = {}) => {
     try {
-
         const contractKit = new ContractKit({
             client: new APIClient({ url: get(blockchain_rpc) }),
         });

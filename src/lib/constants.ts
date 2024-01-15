@@ -13,10 +13,15 @@ const blockchain_endpoints = [
     "https://api.wax.alohaeos.com",
 ];
 
-const AW_planets = ["Kavian", "Eyeke", "Neri", "Veles", "Naron", "Magor"];
-
 const AW = {
-    PLANETS: ["Kavian", "Eyeke", "Neri", "Veles", "Naron", "Magor"],
+    PLANETS: [
+        { name: "Kavian", scope: "kavian" },
+        { name: "Eyeke", scope: "eyeke" },
+        { name: "Neri", scope: "nerix" },
+        { name: "Veles", scope: "veles" },
+        { name: "Naron", scope: "naron" },
+        { name: "Magor", scope: "magor" },
+    ],
     CONTRACT_NAME: "dao.worlds",
     CANDIDATES_TABLE: "candidates",
     DACGLOBALS_TABLE: "dacglobals",
@@ -33,5 +38,5 @@ const TOAST_TYPES = {
     WARNING: "warning",
 };
 
-export { AW, AW_planets, TOAST_TYPES, blockchain_endpoints };
+export { AW, TOAST_TYPES, blockchain_endpoints };
 
