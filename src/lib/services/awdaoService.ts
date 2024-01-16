@@ -13,7 +13,6 @@ export async function get_votes_by_user(activePlanet: string, voter: string) {
     // const voter = "hznmm.c.wam";
     const planetScope = _.find(AW.PLANETS, (planet: any) => { return planet.name === activePlanet })?.scope || "";
     const res: any = await getSingleData(AW.CONTRACT_NAME, planetScope, AW.VOTES_TABLE, voter);
-
     return res;
 }
 

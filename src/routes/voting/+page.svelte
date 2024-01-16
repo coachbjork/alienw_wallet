@@ -8,6 +8,7 @@
 	import { voteDecayFormula } from '$lib/utils';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { Spinner } from 'flowbite-svelte';
+	import _ from 'lodash';
 	import { afterUpdate, onMount } from 'svelte';
 	import CrownSolid from 'svelte-awesome-icons/CrownSolid.svelte';
 	import ShareFromSquareRegular from 'svelte-awesome-icons/ShareFromSquareRegular.svelte';
@@ -74,10 +75,12 @@
 			if (!response) return;
 			response = response.candidates.map((candidate: any) => {
 				return candidates.find((c: any) => {
-					return c.candidate_name === candidate;
+					return c.candidate_name === String(candidate);
 				});
 			});
+
 			votedForCandidates = response.filter((candidate: any) => candidate !== undefined);
+			selectedCandidates = votedForCandidates.map((candidate: any) => candidate.candidate_name);
 		}
 	}
 
@@ -155,6 +158,7 @@
 									}}
 									value={candidate.candidate_name}
 									disabled={$session === null}
+									checked={_.find(votedForCandidates, { candidate_name: candidate.candidate_name })}
 								/>
 							</td>
 							<td>
