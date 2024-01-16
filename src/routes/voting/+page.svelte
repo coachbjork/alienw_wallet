@@ -135,8 +135,8 @@
 					<th>User</th>
 					<th>Account</th>
 					<th>Vote power</th>
-					<th>Voters</th>
-					<th>Vote Decay</th>
+					<th class="hidden md:table-cell">Voters</th>
+					<th class="hidden md:table-cell">Vote Decay</th>
 				</tr>
 			</thead>
 			<tbody class="text-2xl">
@@ -177,8 +177,8 @@
 							<td>{candidate.candidate_name}</td>
 							<td>{new Intl.NumberFormat('en-US').format(candidate.total_vote_power.toFixed(0))}</td
 							>
-							<td>{candidate.number_voters}</td>
-							<td
+							<td class="hidden md:table-cell">{candidate.number_voters}</td>
+							<td class="hidden md:table-cell"
 								>{(
 									100 -
 									(voteDecayFormula(candidate.avg_vote_time_stamp, candidate.total_vote_power) /

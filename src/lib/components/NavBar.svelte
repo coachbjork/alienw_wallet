@@ -11,10 +11,10 @@
 			<NavUl {activeUrl} nonActiveClass="text-default">
 				<NavLi href="/">Home</NavLi>
 				<NavLi href="/voting">Voting</NavLi>
+				<!-- <NavLi href="/voting">Voting</NavLi>
 				<NavLi href="/voting">Voting</NavLi>
 				<NavLi href="/voting">Voting</NavLi>
-				<NavLi href="/voting">Voting</NavLi>
-				<NavLi href="/voting">Voting</NavLi>
+				<NavLi href="/voting">Voting</NavLi> -->
 			</NavUl>
 		</NavContainer>
 	</Navbar>

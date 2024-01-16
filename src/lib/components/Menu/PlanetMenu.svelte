@@ -67,8 +67,17 @@
 		border-bottom: 1px solid rgb(221, 244, 248, 0.2);
 		text-shadow:
 			0 0 20px rgb(165, 236, 248),
-			0 0 20px rgb(165, 236, 248),
-			0 0 0px rgb(165, 236, 248);
+			0 0 30px rgb(165, 236, 248),
+			0 0 50px rgb(165, 236, 248);
 		font-weight: 700;
+	}
+
+	span:hover {
+		cursor: pointer;
+		text-decoration: none;
+		text-shadow:
+			0 0 20px rgb(165, 236, 248),
+			0 0 30px rgb(165, 236, 248),
+			0 0 50px rgb(165, 236, 248);
 	}
 </style>
