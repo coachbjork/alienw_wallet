@@ -1,8 +1,13 @@
 <script lang="ts">
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
-	import VotedFor from '$lib/components/RightSide/VotedFor.svelte';
+	import VotedFor from '$lib/components/SidePanel/VotedFor.svelte';
 	import { AW, TOAST_TYPES } from '$lib/constants';
-	import { get_candidates, get_dacglobals, get_votes_by_user } from '$lib/services/awdaoService';
+	import {
+		get_candidates,
+		get_dacglobals,
+		get_staked_by_user,
+		get_votes_by_user
+	} from '$lib/services/awdaoService';
 	import { activePlanet, session, toastStore } from '$lib/stores';
 	import type { Planet } from '$lib/types';
 	import { pushActions } from '$lib/utils/wharfkit/session';
@@ -18,15 +23,18 @@
 	let selectedPlanet: Planet = $activePlanet;
 	let loading = true;
 	let selectedCandidates: any = [];
+	let staked: string = '';
 
 	onMount(async () => {
 		await fetchCandidates($activePlanet);
 		loading = false;
-		await fetchDacglobals($activePlanet);
 
 		if ($session) {
 			await fetchVotedFor($activePlanet);
+			await fetchStaked($activePlanet);
 		}
+
+		await fetchDacglobals($activePlanet);
 	});
 
 	afterUpdate(async () => {
@@ -34,13 +42,14 @@
 			selectedPlanet = $activePlanet;
 			loading = true;
 			selectedCandidates = [];
+			votedForCandidates = [];
 			await fetchCandidates($activePlanet);
 			loading = false;
-			await fetchDacglobals($activePlanet);
-
 			if ($session) {
 				await fetchVotedFor($activePlanet);
+				await fetchStaked($activePlanet);
 			}
+			await fetchDacglobals($activePlanet);
 		}
 	});
 
@@ -77,9 +86,17 @@
 					return c.candidate_name === String(candidate);
 				});
 			});
-
 			votedForCandidates = response.filter((candidate: any) => candidate !== undefined);
 			selectedCandidates = votedForCandidates.map((candidate: any) => candidate.candidate_name);
+		}
+	}
+
+	async function fetchStaked(planet: Planet) {
+		if ($session) {
+			let response = await get_staked_by_user(planet.name, String($session?.actor));
+			if (!response) return;
+			staked = String(response.stake);
+			console.log(staked);
 		}
 	}
 
@@ -170,7 +187,7 @@
 							<td class="flex items-center"
 								>{candidate.name}
 								<a href={`https://waxblock.io/account/${candidate.candidate_name}`} target="_blank"
-									><ShareFromSquareRegular class="ml-2" color="white" /></a
+									><ShareFromSquareRegular class="ml-2" /></a
 								>
 							</td>
 							<td>{candidate.candidate_name}</td>
@@ -216,9 +233,12 @@
 </div>
 <div class="left-side">
 	<!-- <Custodians custodians={candidates} /> -->
+	{#if $session}
+		<VotedFor custodians={votedForCandidates} {staked} />
+	{/if}
 </div>
 <div class="right-side">
-	<VotedFor custodians={votedForCandidates} />
+	<!-- <VotedFor custodians={votedForCandidates} /> -->
 </div>
 
 <style>

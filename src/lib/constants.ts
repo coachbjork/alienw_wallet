@@ -28,7 +28,11 @@ const AW = {
     VOTES_TABLE: "votes",
     ACTIONS: {
         VOTE_CUSTODIANS: "votecust",
-    }
+    },
+    TOKEN: {
+        CONTRACT_NAME: "token.worlds",
+        STAKES_TABLE: "stakes",
+    },
 };
 
 const TOAST_TYPES = {

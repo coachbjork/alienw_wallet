@@ -14,6 +14,16 @@ export async function get_votes_by_user(activePlanet: string, voter: string) {
     // const voter = "hznmm.c.wam";
     const planetScope = _.find(AW.PLANETS, (planet: any) => { return planet.name === activePlanet })?.scope || "";
     const res: any = await getSingleData(AW.CONTRACT_NAME, planetScope, AW.VOTES_TABLE, voter);
+    // const res: any = await getSingleData(AW.CONTRACT_NAME, planetScope, AW.VOTES_TABLE, "hznmm.c.wam");
+    return res;
+}
+
+export async function get_staked_by_user(activePlanet: string, user: string) {
+    // const voter = "hznmm.c.wam";
+    const planetScope = _.find(AW.PLANETS, (planet: any) => { return planet.name === activePlanet })?.scope || "";
+    const res: any = await getSingleData(AW.TOKEN.CONTRACT_NAME, planetScope, AW.TOKEN.STAKES_TABLE, user);
+    // const res: any = await getSingleData(AW.TOKEN.CONTRACT_NAME, planetScope, AW.TOKEN.STAKES_TABLE, "..sgu.wam");
+
     return res;
 }
 
