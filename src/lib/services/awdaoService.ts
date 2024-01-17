@@ -1,5 +1,6 @@
 import { AW } from '$lib/constants';
 import { cursorAll, getMultiDataCursor, getSingleData } from '$lib/contractKit';
+import { voteDecayFormula } from '$lib/utils';
 import _ from "lodash";
 
 export async function get_dacglobals(activePlanet: string) {
@@ -23,6 +24,14 @@ export async function get_candidates(activePlanet: string) {
     const data: any = await cursorAll(cursor);
 
     const serializedCandidates = data.filter((item: any) => { return parseInt(item.is_active.value) === 1 }).map((item: any) => {
+        let vote_decay: number = voteDecayFormula(item.avg_vote_time_stamp, item.total_vote_power);
+
+        if (vote_decay <= 0) {
+            vote_decay = 0;
+        } else {
+            vote_decay = 100 - (vote_decay / item.total_vote_power) * 100
+        }
+
         return {
             candidate_name: String(item.candidate_name),
             requestedpay: String(item.requestedpay),
@@ -33,6 +42,7 @@ export async function get_candidates(activePlanet: string) {
             number_voters: parseInt(item.number_voters),
             avg_vote_time_stamp: `${String(item.avg_vote_time_stamp)}Z`,
             running_weight_time: parseInt(item.running_weight_time),
+            vote_decay
         }
     }).sort((a: any, b: any) => {
         return b.rank - a.rank;

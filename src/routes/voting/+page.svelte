@@ -5,7 +5,6 @@
 	import { get_candidates, get_dacglobals, get_votes_by_user } from '$lib/services/awdaoService';
 	import { activePlanet, session, toastStore } from '$lib/stores';
 	import type { Planet } from '$lib/types';
-	import { voteDecayFormula } from '$lib/utils';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { Spinner } from 'flowbite-svelte';
 	import _ from 'lodash';
@@ -178,14 +177,7 @@
 							<td>{new Intl.NumberFormat('en-US').format(candidate.total_vote_power.toFixed(0))}</td
 							>
 							<td class="hidden md:table-cell">{candidate.number_voters}</td>
-							<td class="hidden md:table-cell"
-								>{(
-									100 -
-									(voteDecayFormula(candidate.avg_vote_time_stamp, candidate.total_vote_power) /
-										candidate.total_vote_power) *
-										100
-								).toFixed(2)}</td
-							>
+							<td class="hidden md:table-cell">{candidate.vote_decay.toFixed(2)}</td>
 						</tr>
 					{/each}
 				{/if}
