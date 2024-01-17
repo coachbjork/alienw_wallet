@@ -210,7 +210,7 @@
 														: candidate.vote_decay > 0
 															? 'vote1'
 															: ''
-								}`}>{candidate.vote_decay}%</td
+								}`}>-{candidate.vote_decay}%</td
 							>
 						</tr>
 					{/each}
@@ -232,14 +232,11 @@
 	</div>
 </div>
 <div class="left-side">
-	<!-- <Custodians custodians={candidates} /> -->
 	{#if $session}
 		<VotedFor custodians={votedForCandidates} {staked} />
 	{/if}
 </div>
-<div class="right-side">
-	<!-- <VotedFor custodians={votedForCandidates} /> -->
-</div>
+<div class="right-side"></div>
 
 <style>
 </style>
