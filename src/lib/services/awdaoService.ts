@@ -24,12 +24,13 @@ export async function get_candidates(activePlanet: string) {
     const data: any = await cursorAll(cursor);
 
     const serializedCandidates = data.filter((item: any) => { return parseInt(item.is_active.value) === 1 }).map((item: any) => {
-        let vote_decay: number = voteDecayFormula(item.avg_vote_time_stamp, item.total_vote_power);
+        let vote_decay: number = voteDecayFormula(`${String(item.avg_vote_time_stamp)}Z`, item.total_vote_power);
 
         if (vote_decay <= 0) {
             vote_decay = 0;
         } else {
-            vote_decay = 100 - (vote_decay / item.total_vote_power) * 100
+            vote_decay = (100 - (vote_decay / item.total_vote_power) * 100)
+            vote_decay = Math.round(vote_decay * 100) / 100;
         }
 
         return {

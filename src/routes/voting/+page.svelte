@@ -147,7 +147,7 @@
 					</tr>
 				{:else}
 					{#each candidates as candidate, i}
-						<tr class={i % 2 === 0 ? 'bg-blue-900 bg-opacity-30' : ''}>
+						<tr>
 							<td>
 								<input
 									type="checkbox"
@@ -177,7 +177,24 @@
 							<td>{new Intl.NumberFormat('en-US').format(candidate.total_vote_power.toFixed(0))}</td
 							>
 							<td class="hidden md:table-cell">{candidate.number_voters}</td>
-							<td class="hidden md:table-cell">{candidate.vote_decay.toFixed(2)}</td>
+							<td
+								class="hidden md:table-cell"
+								id={`${
+									candidate.vote_decay > 50
+										? 'vote6'
+										: candidate.vote_decay > 40
+											? 'vote5'
+											: candidate.vote_decay > 30
+												? 'vote4'
+												: candidate.vote_decay > 20
+													? 'vote3'
+													: candidate.vote_decay > 10
+														? 'vote2'
+														: candidate.vote_decay > 0
+															? 'vote1'
+															: ''
+								}`}>{candidate.vote_decay}%</td
+							>
 						</tr>
 					{/each}
 				{/if}
