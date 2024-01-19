@@ -14,7 +14,7 @@ export async function get_votes_by_user(activePlanet: string, voter: string) {
     // const voter = "hznmm.c.wam";
     const planetScope = _.find(AW.PLANETS, (planet: any) => { return planet.name === activePlanet })?.scope || "";
     const res: any = await getSingleData(AW.CONTRACT_NAME, planetScope, AW.VOTES_TABLE, voter);
-    // const res: any = await getSingleData(AW.CONTRACT_NAME, planetScope, AW.VOTES_TABLE, "hznmm.c.wam");
+    // const res: any = await getSingleData(AW.CONTRACT_NAME, planetScope, AW.VOTES_TABLE, "um.i2.wam");
     return res;
 }
 
@@ -22,7 +22,7 @@ export async function get_staked_by_user(activePlanet: string, user: string) {
     // const voter = "hznmm.c.wam";
     const planetScope = _.find(AW.PLANETS, (planet: any) => { return planet.name === activePlanet })?.scope || "";
     const res: any = await getSingleData(AW.TOKEN.CONTRACT_NAME, planetScope, AW.TOKEN.STAKES_TABLE, user);
-    // const res: any = await getSingleData(AW.TOKEN.CONTRACT_NAME, planetScope, AW.TOKEN.STAKES_TABLE, "..sgu.wam");
+    // const res: any = await getSingleData(AW.TOKEN.CONTRACT_NAME, planetScope, AW.TOKEN.STAKES_TABLE, "um.i2.wam");
 
     return res;
 }
@@ -35,29 +35,38 @@ export async function get_candidates(activePlanet: string) {
 
     const serializedCandidates = data.filter((item: any) => { return parseInt(item.is_active.value) === 1 }).map((item: any) => {
         let vote_decay: number = voteDecayFormula(`${String(item.avg_vote_time_stamp)}Z`, item.total_vote_power);
+        const total_vote_power = parseInt(item.total_vote_power) / 10000;
+        let current_vote_power: any = total_vote_power;
+
 
         if (vote_decay <= 0) {
             vote_decay = 0;
         } else {
             vote_decay = (100 - (vote_decay / item.total_vote_power) * 100)
             vote_decay = Math.round(vote_decay * 100) / 100;
+            current_vote_power = total_vote_power - total_vote_power * vote_decay / 100;
         }
+        // current_vote_power = current_vote_power.toFixed(0);
+        current_vote_power = new Intl.NumberFormat('en-US').format(current_vote_power.toFixed(0))
 
         return {
             candidate_name: String(item.candidate_name),
             requestedpay: String(item.requestedpay),
             rank: parseInt(item.rank),
             gap_filler: parseInt(item.gap_filler),
-            total_vote_power: parseInt(item.total_vote_power) / 10000,
+            total_vote_power,
             is_active: parseInt(item.is_active),
             number_voters: parseInt(item.number_voters),
             avg_vote_time_stamp: `${String(item.avg_vote_time_stamp)}Z`,
             running_weight_time: parseInt(item.running_weight_time),
-            vote_decay
+            vote_decay,
+            current_vote_power
         }
     }).sort((a: any, b: any) => {
         return b.rank - a.rank;
     });
+
+
 
     return serializedCandidates;
 

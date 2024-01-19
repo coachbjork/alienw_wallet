@@ -11,6 +11,7 @@
 	import { activePlanet, session, toastStore } from '$lib/stores';
 	import type { Planet } from '$lib/types';
 	import { pushActions } from '$lib/utils/wharfkit/session';
+	import { tooltip } from '@svelte-plugins/tooltips';
 	import { Spinner } from 'flowbite-svelte';
 	import _ from 'lodash';
 	import { afterUpdate, onMount } from 'svelte';
@@ -43,6 +44,7 @@
 			loading = true;
 			selectedCandidates = [];
 			votedForCandidates = [];
+			staked = '';
 			await fetchCandidates($activePlanet);
 			loading = false;
 			if ($session) {
@@ -96,7 +98,6 @@
 			let response = await get_staked_by_user(planet.name, String($session?.actor));
 			if (!response) return;
 			staked = String(response.stake);
-			console.log(staked);
 		}
 	}
 
@@ -195,8 +196,7 @@
 							>
 							<td class="hidden md:table-cell">{candidate.number_voters}</td>
 							<td
-								class="hidden md:table-cell"
-								id={`${
+								class={`hidden md:table-cell ${
 									candidate.vote_decay > 50
 										? 'vote6'
 										: candidate.vote_decay > 40
@@ -210,7 +210,13 @@
 														: candidate.vote_decay > 0
 															? 'vote1'
 															: ''
-								}`}>-{candidate.vote_decay}%</td
+								}`}
+								use:tooltip={{
+									content: `${candidate.current_vote_power}`,
+									position: 'right',
+									style: { 'background-color': '#1f2937', 'border-radius': '5px' },
+									animation: 'puff'
+								}}>-{candidate.vote_decay}%</td
 							>
 						</tr>
 					{/each}
@@ -239,4 +245,22 @@
 <div class="right-side"></div>
 
 <style>
+	.vote1 {
+		color: #69b34c;
+	}
+	.vote2 {
+		color: #acb334;
+	}
+	.vote3 {
+		color: #fab733;
+	}
+	.vote4 {
+		color: #ff8e15;
+	}
+	.vote5 {
+		color: #ff4e11;
+	}
+	.vote6 {
+		color: #ff0d0d;
+	}
 </style>

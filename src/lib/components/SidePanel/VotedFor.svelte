@@ -4,7 +4,6 @@
 
 	export let custodians: any = [];
 	export let staked: string = '';
-	console.log(staked);
 </script>
 
 <div class="council_side_panel" transition:fade={{ duration: 500 }}>
