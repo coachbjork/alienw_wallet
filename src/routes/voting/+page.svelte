@@ -212,7 +212,9 @@
 															: ''
 								}`}
 								use:tooltip={{
-									content: `${candidate.current_vote_power}`,
+									content: `${new Intl.NumberFormat('en-US').format(
+										candidate.current_vote_power.toFixed(0)
+									)}`,
 									position: 'right',
 									style: { 'background-color': '#1f2937', 'border-radius': '5px' },
 									animation: 'puff'

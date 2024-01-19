@@ -47,7 +47,7 @@ export async function get_candidates(activePlanet: string) {
             current_vote_power = total_vote_power - total_vote_power * vote_decay / 100;
         }
         // current_vote_power = current_vote_power.toFixed(0);
-        current_vote_power = new Intl.NumberFormat('en-US').format(current_vote_power.toFixed(0))
+        // current_vote_power = new Intl.NumberFormat('en-US').format(current_vote_power.toFixed(0))
 
         return {
             candidate_name: String(item.candidate_name),
