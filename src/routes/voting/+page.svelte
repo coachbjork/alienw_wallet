@@ -1,14 +1,14 @@
 <script lang="ts">
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import VotedFor from '$lib/components/SidePanel/VotedFor.svelte';
-	import { AW, TOAST_TYPES } from '$lib/constants';
+	import { AW_DAO, TOAST_TYPES } from '$lib/constants';
 	import {
 		get_candidates,
 		get_dacglobals,
 		get_staked_by_user,
 		get_votes_by_user
 	} from '$lib/services/awdaoService';
-	import { activePlanet, session, toastStore } from '$lib/stores';
+	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import type { Planet } from '$lib/types';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { tooltip } from '@svelte-plugins/tooltips';
@@ -21,44 +21,46 @@
 	let candidates: any = [];
 	let votedForCandidates: any = [];
 	let maxvotes: any = 1;
-	let selectedPlanet: Planet = $activePlanet;
+	let selectedPlanet: Planet = $activePlanetStore;
 	let loading = true;
 	let selectedCandidates: any = [];
 	let staked: string = '';
 
 	onMount(async () => {
-		await fetchCandidates($activePlanet);
+		await fetchCandidates();
 		loading = false;
 
 		if ($session) {
-			await fetchVotedFor($activePlanet);
-			await fetchStaked($activePlanet);
+			await fetchVotedFor();
+			await fetchStaked();
 		}
 
-		await fetchDacglobals($activePlanet);
+		await fetchDacglobals();
 	});
 
 	afterUpdate(async () => {
-		if (selectedPlanet !== $activePlanet) {
-			selectedPlanet = $activePlanet;
+		if (selectedPlanet !== $activePlanetStore) {
+			selectedPlanet = $activePlanetStore;
 			loading = true;
 			selectedCandidates = [];
 			votedForCandidates = [];
 			staked = '';
-			await fetchCandidates($activePlanet);
+			await fetchCandidates();
 			loading = false;
 			if ($session) {
-				await fetchVotedFor($activePlanet);
-				await fetchStaked($activePlanet);
+				await fetchVotedFor();
+				await fetchStaked();
 			}
-			await fetchDacglobals($activePlanet);
+			await fetchDacglobals();
 		}
 	});
 
-	async function fetchCandidates(planet: Planet) {
-		let response = await get_candidates(planet.name);
+	async function fetchCandidates() {
+		let response = await get_candidates($activePlanetStore.name);
 		if (!response) return;
-		let api_response: any = await fetch(`/api/daoaw/candidates?activePlanet=${planet.name}`);
+		let api_response: any = await fetch(
+			`/api/daoaw/candidates?activePlanetStore=${$activePlanetStore.name}`
+		);
 		api_response = await api_response.json();
 		if (api_response) {
 			response = response.map((item: any) => {
@@ -73,15 +75,15 @@
 		candidates = response;
 	}
 
-	async function fetchDacglobals(planet: Planet) {
-		const response = await get_dacglobals(planet.name);
+	async function fetchDacglobals() {
+		const response = await get_dacglobals($activePlanetStore.name);
 		if (!response) return;
 		maxvotes = response.find((dacglobal: any) => dacglobal.key === 'maxvotes').value[1] || 1;
 	}
 
-	async function fetchVotedFor(planet: Planet) {
+	async function fetchVotedFor() {
 		if ($session) {
-			let response = await get_votes_by_user(planet.name, String($session?.actor));
+			let response = await get_votes_by_user($activePlanetStore.name, String($session?.actor));
 			if (!response) return;
 			response = response.candidates.map((candidate: any) => {
 				return candidates.find((c: any) => {
@@ -93,9 +95,9 @@
 		}
 	}
 
-	async function fetchStaked(planet: Planet) {
+	async function fetchStaked() {
 		if ($session) {
-			let response = await get_staked_by_user(planet.name, String($session?.actor));
+			let response = await get_staked_by_user($activePlanetStore.name, String($session?.actor));
 			if (!response) return;
 			staked = String(response.stake);
 		}
@@ -122,8 +124,8 @@
 		}
 		let actions = [
 			{
-				account: AW.CONTRACT_NAME,
-				name: AW.ACTIONS.VOTE_CUSTODIANS,
+				account: AW_DAO.CONTRACT_NAME,
+				name: AW_DAO.ACTIONS.VOTE_CUSTODIANS,
 				authorization: [
 					{
 						actor: $session.actor,

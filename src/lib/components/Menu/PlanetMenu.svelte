@@ -1,29 +1,38 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { AW } from '$lib/constants';
-	import { activePlanet } from '$lib/stores';
+	import { AW_PLANETS } from '$lib/constants';
+	import { get_custodians } from '$lib/services/awdaoService';
+	import { activePlanetStore, custodiansStore } from '$lib/stores';
 	import type { Planet } from '$lib/types';
 	import { onMount } from 'svelte';
 
 	if (browser) {
-		onMount(() => {
-			if (!$activePlanet) {
-				activePlanet.set(AW.PLANETS[0]);
+		onMount(async () => {
+			if (!$activePlanetStore) {
+				activePlanetStore.set(AW_PLANETS[0]);
+				const custodiansData = await get_custodians(AW_PLANETS[0].name);
+				custodiansStore.set(custodiansData);
+			} else {
+				const custodiansData = await get_custodians($activePlanetStore.name);
+				custodiansStore.set(custodiansData);
 			}
 		});
 	}
 
 	function handleClick(planet: Planet) {
-		return () => {
-			activePlanet.set(planet);
+		return async () => {
+			activePlanetStore.set(planet);
+			// await tick();
+			const custodiansData = await get_custodians(planet.name);
+			custodiansStore.set(custodiansData);
 		};
 	}
 </script>
 
 <div class="planet_menu rounded-xl border border-indigo-500">
 	<ul>
-		{#each AW.PLANETS as planet}
-			<li class={$activePlanet.name === planet.name ? 'active' : ''}>
+		{#each AW_PLANETS as planet}
+			<li class={$activePlanetStore.name === planet.name ? 'active' : ''}>
 				<span class="text-default" on:click={handleClick(planet)}>{planet.name}</span>
 			</li>
 		{/each}

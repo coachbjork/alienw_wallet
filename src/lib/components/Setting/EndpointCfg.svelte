@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { blockchain_endpoints } from '$lib/constants';
-	import { blockchain_rpc } from '$lib/stores';
+	import { bpRPCStore } from '$lib/stores';
 	import Icon from 'svelte-awesome';
 	import gear from 'svelte-awesome/icons/gear';
 
@@ -23,7 +23,7 @@
 	}
 
 	function changeEndpoint(rpc: string) {
-		blockchain_rpc.set(rpc);
+		bpRPCStore.set(rpc);
 	}
 </script>
 
@@ -44,7 +44,7 @@
 						changeEndpoint(event.target.value);
 					}
 				}}
-				bind:value={$blockchain_rpc}
+				bind:value={$bpRPCStore}
 			>
 				{#each blockchain_endpoints as rpc}
 					<option value={rpc}>{rpc}</option>

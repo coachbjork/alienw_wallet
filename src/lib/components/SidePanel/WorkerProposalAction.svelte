@@ -1,0 +1,453 @@
+<script lang="ts">
+	import { AW_WORKER_PROPOSALS, TOAST_TYPES } from '$lib/constants';
+	import { activePlanetStore, session, toastStore } from '$lib/stores';
+	import { pushActions } from '$lib/utils/wharfkit/session';
+	import { afterUpdate, onMount } from 'svelte';
+
+	export let selectedProposal: any = {};
+	let enableActions: any = [];
+
+	onMount(async () => {
+		setEnableActions();
+	});
+
+	afterUpdate(async () => {
+		setEnableActions();
+	});
+
+	function setEnableActions() {
+		if (selectedProposal && $session) {
+			enableActions = [];
+			switch (selectedProposal.state) {
+				case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value:
+				case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value:
+					enableActions = [AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL];
+					if (selectedProposal.proposer == $session.actor) {
+						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_PROPOSAL);
+						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.START_WORK);
+					}
+					break;
+				case AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value:
+					if (selectedProposal.proposer == $session.actor) {
+						enableActions = [
+							AW_WORKER_PROPOSALS.ACTIONS.COMPLETE_WORK,
+							AW_WORKER_PROPOSALS.ACTIONS.CANCEL_WIP_PROPOSAL
+						];
+					}
+					break;
+				case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value:
+					enableActions = [
+						AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL,
+						AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL
+					];
+					if (selectedProposal.proposer == $session.actor) {
+						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_WIP_PROPOSAL);
+						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.DISPUTE_UNAPPROVED_PROPOSAL);
+					}
+					break;
+				case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value:
+					enableActions = [
+						AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL,
+						AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL
+					];
+					break;
+				case AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value:
+					if (selectedProposal.arbitrator == $session.actor) {
+						enableActions = [AW_WORKER_PROPOSALS.ACTIONS.ARBIRATOR_VOTE];
+					}
+					break;
+				case AW_WORKER_PROPOSALS.PROP_STATE.EXPIRED.value:
+					enableActions = [AW_WORKER_PROPOSALS.ACTIONS.CLEAR_EXPIRED_PROPOSAL];
+					break;
+				default:
+					enableActions = [];
+					break;
+			}
+		} else {
+			enableActions = [];
+		}
+	}
+
+	async function onVote(vote: string) {
+		if (!$session) {
+			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
+			return;
+		}
+		let action_name = '';
+		switch (selectedProposal.state) {
+			case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value:
+			case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value:
+				action_name = AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL;
+				break;
+			case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value:
+			case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value:
+				action_name = AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL;
+				break;
+			default:
+				toastStore.add('Proposal is not in a state to be voted on', TOAST_TYPES.WARNING);
+				return;
+		}
+		let actions = [
+			{
+				account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
+				name: action_name,
+				authorization: [
+					{
+						actor: $session.actor,
+						permission: 'active'
+					}
+				],
+				data: {
+					custodian: $session.actor,
+					proposal_id: selectedProposal.proposal_id,
+					vote,
+					dac_id: $activePlanetStore.scope
+				}
+			}
+		];
+		await pushActions($session, actions);
+	}
+
+	async function onArbitorVote(vote: string) {
+		if (!$session) {
+			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
+			return;
+		}
+		let action_name = '';
+		switch (vote) {
+			case AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value:
+				action_name = AW_WORKER_PROPOSALS.ACTIONS.ARBIRATOR_APPROVE;
+				break;
+			case AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value:
+				action_name = AW_WORKER_PROPOSALS.ACTIONS.ARBIRATOR_DENY;
+				break;
+			default:
+				toastStore.add('Error', TOAST_TYPES.WARNING);
+				return;
+		}
+		let actions = [
+			{
+				account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
+				name: action_name,
+				authorization: [
+					{
+						actor: $session.actor,
+						permission: 'active'
+					}
+				],
+				data: {
+					arbitrator: $session.actor,
+					proposal_id: selectedProposal.proposal_id,
+					dac_id: $activePlanetStore.scope
+				}
+			}
+		];
+		await pushActions($session, actions);
+	}
+
+	async function onCancel() {
+		if (!$session) {
+			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
+			return;
+		}
+		let action_name = '';
+		switch (selectedProposal.state) {
+			case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value:
+			case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value:
+				action_name = AW_WORKER_PROPOSALS.ACTIONS.CANCEL_PROPOSAL;
+				break;
+			case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value:
+			case AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value:
+				action_name = AW_WORKER_PROPOSALS.ACTIONS.CANCEL_WIP_PROPOSAL;
+				break;
+			default:
+				toastStore.add('Proposal is not in a state to be canceled on', TOAST_TYPES.WARNING);
+				return;
+		}
+		let actions = [
+			{
+				account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
+				name: action_name,
+				authorization: [
+					{
+						actor: $session.actor,
+						permission: 'active'
+					}
+				],
+				data: {
+					proposal_id: selectedProposal.proposal_id,
+					dac_id: $activePlanetStore.scope
+				}
+			}
+		];
+		await pushActions($session, actions);
+	}
+
+	async function onStartWork() {
+		if (!$session) {
+			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
+			return;
+		}
+		let action_name = '';
+		switch (selectedProposal.state) {
+			case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value:
+			case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value:
+				action_name = AW_WORKER_PROPOSALS.ACTIONS.START_WORK;
+				break;
+			default:
+				toastStore.add('Proposal is not in a state to start work', TOAST_TYPES.WARNING);
+				return;
+		}
+		let actions = [
+			{
+				account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
+				name: action_name,
+				authorization: [
+					{
+						actor: $session.actor,
+						permission: 'active'
+					}
+				],
+				data: {
+					proposal_id: selectedProposal.proposal_id,
+					dac_id: $activePlanetStore.scope
+				}
+			}
+		];
+		await pushActions($session, actions);
+	}
+
+	async function onCompleteWork() {
+		if (!$session) {
+			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
+			return;
+		}
+		let action_name = '';
+		switch (selectedProposal.state) {
+			case AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value:
+				action_name = AW_WORKER_PROPOSALS.ACTIONS.COMPLETE_WORK;
+				break;
+			default:
+				toastStore.add('Proposal is not in a state to complete work', TOAST_TYPES.WARNING);
+				return;
+		}
+		let actions = [
+			{
+				account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
+				name: action_name,
+				authorization: [
+					{
+						actor: $session.actor,
+						permission: 'active'
+					}
+				],
+				data: {
+					proposal_id: selectedProposal.proposal_id,
+					dac_id: $activePlanetStore.scope
+				}
+			}
+		];
+		await pushActions($session, actions);
+	}
+
+	async function onDispute() {
+		if (!$session) {
+			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
+			return;
+		}
+		let action_name = '';
+		switch (selectedProposal.state) {
+			case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value:
+				action_name = AW_WORKER_PROPOSALS.ACTIONS.DISPUTE_UNAPPROVED_PROPOSAL;
+				break;
+			default:
+				toastStore.add('Proposal is not in a state to dispute', TOAST_TYPES.WARNING);
+				return;
+		}
+		let actions = [
+			{
+				account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
+				name: action_name,
+				authorization: [
+					{
+						actor: $session.actor,
+						permission: 'active'
+					}
+				],
+				data: {
+					proposal_id: selectedProposal.proposal_id,
+					dac_id: $activePlanetStore.scope
+				}
+			}
+		];
+		await pushActions($session, actions);
+	}
+
+	async function onFinalize() {
+		if (!$session) {
+			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
+			return;
+		}
+		let action_name = '';
+		switch (selectedProposal.state) {
+			case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value:
+			case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value:
+				action_name = AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL;
+				break;
+			default:
+				toastStore.add('Proposal is not in a state to finalize', TOAST_TYPES.WARNING);
+				return;
+		}
+		let actions = [
+			{
+				account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
+				name: action_name,
+				authorization: [
+					{
+						actor: $session.actor,
+						permission: 'active'
+					}
+				],
+				data: {
+					proposal_id: selectedProposal.proposal_id,
+					dac_id: $activePlanetStore.scope
+				}
+			}
+		];
+		await pushActions($session, actions);
+	}
+
+	async function onClearExpired() {
+		if (!$session) {
+			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
+			return;
+		}
+		let action_name = '';
+		switch (selectedProposal.state) {
+			case AW_WORKER_PROPOSALS.PROP_STATE.EXPIRED.value:
+				action_name = AW_WORKER_PROPOSALS.ACTIONS.CLEAR_EXPIRED_PROPOSAL;
+				break;
+			default:
+				toastStore.add('Proposal is not in a state to finalize', TOAST_TYPES.WARNING);
+				return;
+		}
+		let actions = [
+			{
+				account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
+				name: action_name,
+				authorization: [
+					{
+						actor: $session.actor,
+						permission: 'active'
+					}
+				],
+				data: {
+					proposal_id: selectedProposal.proposal_id,
+					dac_id: $activePlanetStore.scope
+				}
+			}
+		];
+		await pushActions($session, actions);
+	}
+</script>
+
+<div class="flex flex-col">
+	<p class=" text-center text-2xl underline underline-offset-4">Actions</p>
+
+	<div class="mt-5 grid grid-cols-2 gap-2">
+		<button
+			class="min-w-32 rounded-xl bg-indigo-500 px-3 py-2 font-bold text-white hover:bg-indigo-700"
+			on:click={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
+		>
+			New Proposal
+		</button>
+		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL) || enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL)}
+			<button
+				class="min-w-32 rounded-xl bg-green-500 px-3 py-2 font-bold text-white hover:bg-green-700"
+				on:click={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
+			>
+				Approve
+			</button>
+			<button
+				class="min-w-32 rounded-xl bg-red-500 px-3 py-2 font-bold text-white hover:bg-red-700"
+				on:click={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value)}
+			>
+				Deny
+			</button>
+		{/if}
+		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.ARBIRATOR_VOTE)}
+			<button
+				class="min-w-32 rounded-xl bg-green-500 px-3 py-2 font-bold text-white hover:bg-green-700"
+				on:click={() => onArbitorVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
+			>
+				Approve
+			</button>
+			<button
+				class="min-w-32 rounded-xl bg-red-500 px-3 py-2 font-bold text-white hover:bg-red-700"
+				on:click={() => onArbitorVote(AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value)}
+			>
+				Deny
+			</button>
+		{/if}
+
+		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_PROPOSAL) || enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_WIP_PROPOSAL)}
+			<button
+				class=" min-w-32 rounded-xl bg-gray-500 px-3 py-2 font-bold text-white hover:bg-gray-700"
+				on:click={() => onCancel()}
+			>
+				Cancel
+			</button>
+		{/if}
+
+		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.START_WORK)}
+			<button
+				class=" min-w-32 rounded-xl bg-blue-500 px-3 py-2 font-bold text-white hover:bg-blue-700"
+				on:click={() => onStartWork()}
+			>
+				Start Work
+			</button>
+		{/if}
+		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.COMPLETE_WORK)}
+			<button
+				class="min-w-32 rounded-xl bg-teal-500 px-3 py-2 font-bold text-white hover:bg-teal-700"
+				on:click={() => onCompleteWork()}
+			>
+				Complete Work
+			</button>
+		{/if}
+
+		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.DISPUTE_UNAPPROVED_PROPOSAL)}
+			<button
+				class="min-w-32 rounded-xl bg-purple-500 px-3 py-2 font-bold text-white hover:bg-purple-700"
+				on:click={() => onDispute()}
+			>
+				Dispute
+			</button>
+		{/if}
+
+		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL)}
+			<button
+				class="min-w-32 rounded-xl bg-yellow-500 px-3 py-2 font-bold text-white hover:bg-yellow-700"
+				on:click={() => onFinalize()}
+			>
+				Finalize
+			</button>
+		{/if}
+		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CLEAR_EXPIRED_PROPOSAL)}
+			<button
+				class="min-w-32 rounded-xl bg-red-500 px-3 py-2 font-bold text-white hover:bg-red-700"
+				on:click={() => onClearExpired()}
+			>
+				Clear
+			</button>
+		{/if}
+	</div>
+	<!-- {:else if selectedProposal && enableActions.length == 0}
+		<p class="text-center">No Actions Available</p>
+	{:else}
+		<p class="text-center">No Proposal Selected</p>
+	{/if} -->
+</div>
+
+<style>
+</style>

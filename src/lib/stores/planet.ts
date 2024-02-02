@@ -1,19 +1,31 @@
 import { browser } from '$app/environment';
-import type { Planet } from '$lib/types';
+import type { Custodian, Planet } from '$lib/types';
 import { writable } from 'svelte/store';
 
 const defaultValue: Planet = { name: 'Kavian', scope: 'kavian' };
-export const activePlanet = writable<Planet>(defaultValue);
+export const activePlanetStore = writable<Planet>(defaultValue);
+export const custodiansStore = writable<Custodian[]>([]);
 
 if (browser) {
-    const stored = window.localStorage.getItem('activePlanet');
+    const stored = window.localStorage.getItem('activePlanetStore');
     if (stored) {
         if (JSON.parse(stored)) {
-            activePlanet.set(JSON.parse(stored));
+            activePlanetStore.set(JSON.parse(stored));
         }
     }
 
-    activePlanet.subscribe((value) => {
-        window.localStorage.setItem('activePlanet', JSON.stringify(value));
+    activePlanetStore.subscribe((value) => {
+        window.localStorage.setItem('activePlanetStore', JSON.stringify(value));
+    });
+
+    const storedCustodians = window.localStorage.getItem('custodiansStore');
+    if (storedCustodians) {
+        if (JSON.parse(storedCustodians)) {
+            custodiansStore.set(JSON.parse(storedCustodians));
+        }
+    }
+
+    custodiansStore.subscribe((value) => {
+        window.localStorage.setItem('custodiansStore', JSON.stringify(value));
     });
 }
