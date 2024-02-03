@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { AW_WORKER_PROPOSALS, TOAST_TYPES } from '$lib/constants';
-	import { activePlanetStore, session, toastStore } from '$lib/stores';
+	import { activePlanetStore, custodiansStore, session, toastStore } from '$lib/stores';
 	import { pushActions } from '$lib/utils/wharfkit/session';
-	import { afterUpdate, onMount } from 'svelte';
+	import { afterUpdate, createEventDispatcher, onMount } from 'svelte';
 
 	export let selectedProposal: any = {};
 	let enableActions: any = [];
+	const dispatch = createEventDispatcher();
 
 	onMount(async () => {
 		setEnableActions();
@@ -15,13 +16,24 @@
 		setEnableActions();
 	});
 
+	function onNewProposal() {
+		dispatch('new_proposal', {});
+	}
+
+	function onDelegate(is_delegate: boolean) {
+		dispatch('delegatevote', { is_delegate });
+	}
+
 	function setEnableActions() {
 		if (selectedProposal && $session) {
 			enableActions = [];
 			switch (selectedProposal.state) {
 				case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value:
 				case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value:
-					enableActions = [AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL];
+					enableActions = [];
+					if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
+						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL);
+					}
 					if (selectedProposal.proposer == $session.actor) {
 						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_PROPOSAL);
 						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.START_WORK);
@@ -36,20 +48,21 @@
 					}
 					break;
 				case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value:
-					enableActions = [
-						AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL,
-						AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL
-					];
+					enableActions = [AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL];
+					if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
+						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL);
+					}
+
 					if (selectedProposal.proposer == $session.actor) {
 						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_WIP_PROPOSAL);
 						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.DISPUTE_UNAPPROVED_PROPOSAL);
 					}
 					break;
 				case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value:
-					enableActions = [
-						AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL,
-						AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL
-					];
+					enableActions = [AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL];
+					if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
+						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL);
+					}
 					break;
 				case AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value:
 					if (selectedProposal.arbitrator == $session.actor) {
@@ -352,101 +365,122 @@
 </script>
 
 <div class="flex flex-col">
-	<p class=" text-center text-2xl underline underline-offset-4">Actions</p>
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+	<p
+		class=" text-center text-2xl underline underline-offset-4"
+		on:click={() => dispatch('mockdata', {})}
+	>
+		Actions
+	</p>
+	{#if $session}
+		<div class="mt-5 grid grid-cols-2 gap-2">
+			<div class="w-32"></div>
+			<div class="w-32"></div>
+			<button
+				class="col-span-2 rounded-xl bg-indigo-500 px-3 py-2 font-bold text-white hover:bg-indigo-700"
+				on:click={() => onNewProposal()}
+			>
+				New Proposal
+			</button>
 
-	<div class="mt-5 grid grid-cols-2 gap-2">
-		<button
-			class="min-w-32 rounded-xl bg-indigo-500 px-3 py-2 font-bold text-white hover:bg-indigo-700"
-			on:click={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
-		>
-			New Proposal
-		</button>
-		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL) || enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL)}
 			<button
 				class="min-w-32 rounded-xl bg-green-500 px-3 py-2 font-bold text-white hover:bg-green-700"
-				on:click={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
+				on:click={() => onDelegate(true)}
 			>
-				Approve
+				Delegate
 			</button>
 			<button
 				class="min-w-32 rounded-xl bg-red-500 px-3 py-2 font-bold text-white hover:bg-red-700"
-				on:click={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value)}
+				on:click={() => onDelegate(false)}
 			>
-				Deny
+				Undelegate
 			</button>
-		{/if}
-		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.ARBIRATOR_VOTE)}
-			<button
-				class="min-w-32 rounded-xl bg-green-500 px-3 py-2 font-bold text-white hover:bg-green-700"
-				on:click={() => onArbitorVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
-			>
-				Approve
-			</button>
-			<button
-				class="min-w-32 rounded-xl bg-red-500 px-3 py-2 font-bold text-white hover:bg-red-700"
-				on:click={() => onArbitorVote(AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value)}
-			>
-				Deny
-			</button>
-		{/if}
 
-		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_PROPOSAL) || enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_WIP_PROPOSAL)}
-			<button
-				class=" min-w-32 rounded-xl bg-gray-500 px-3 py-2 font-bold text-white hover:bg-gray-700"
-				on:click={() => onCancel()}
-			>
-				Cancel
-			</button>
-		{/if}
+			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL) || enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL)}
+				<button
+					class="min-w-32 rounded-xl bg-green-500 px-3 py-2 font-bold text-white hover:bg-green-700"
+					on:click={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
+				>
+					Approve
+				</button>
+				<button
+					class="min-w-32 rounded-xl bg-red-500 px-3 py-2 font-bold text-white hover:bg-red-700"
+					on:click={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value)}
+				>
+					Deny
+				</button>
+			{/if}
+			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.ARBIRATOR_VOTE)}
+				<button
+					class="min-w-32 rounded-xl bg-green-500 px-3 py-2 font-bold text-white hover:bg-green-700"
+					on:click={() => onArbitorVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
+				>
+					Approve
+				</button>
+				<button
+					class="min-w-32 rounded-xl bg-red-500 px-3 py-2 font-bold text-white hover:bg-red-700"
+					on:click={() => onArbitorVote(AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value)}
+				>
+					Deny
+				</button>
+			{/if}
 
-		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.START_WORK)}
-			<button
-				class=" min-w-32 rounded-xl bg-blue-500 px-3 py-2 font-bold text-white hover:bg-blue-700"
-				on:click={() => onStartWork()}
-			>
-				Start Work
-			</button>
-		{/if}
-		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.COMPLETE_WORK)}
-			<button
-				class="min-w-32 rounded-xl bg-teal-500 px-3 py-2 font-bold text-white hover:bg-teal-700"
-				on:click={() => onCompleteWork()}
-			>
-				Complete Work
-			</button>
-		{/if}
+			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_PROPOSAL) || enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_WIP_PROPOSAL)}
+				<button
+					class=" min-w-32 rounded-xl bg-gray-500 px-3 py-2 font-bold text-white hover:bg-gray-700"
+					on:click={() => onCancel()}
+				>
+					Cancel
+				</button>
+			{/if}
 
-		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.DISPUTE_UNAPPROVED_PROPOSAL)}
-			<button
-				class="min-w-32 rounded-xl bg-purple-500 px-3 py-2 font-bold text-white hover:bg-purple-700"
-				on:click={() => onDispute()}
-			>
-				Dispute
-			</button>
-		{/if}
+			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.START_WORK)}
+				<button
+					class=" min-w-32 rounded-xl bg-blue-500 px-3 py-2 font-bold text-white hover:bg-blue-700"
+					on:click={() => onStartWork()}
+				>
+					Start Work
+				</button>
+			{/if}
+			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.COMPLETE_WORK)}
+				<button
+					class="min-w-32 rounded-xl bg-teal-500 px-3 py-2 font-bold text-white hover:bg-teal-700"
+					on:click={() => onCompleteWork()}
+				>
+					Complete Work
+				</button>
+			{/if}
 
-		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL)}
-			<button
-				class="min-w-32 rounded-xl bg-yellow-500 px-3 py-2 font-bold text-white hover:bg-yellow-700"
-				on:click={() => onFinalize()}
-			>
-				Finalize
-			</button>
-		{/if}
-		{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CLEAR_EXPIRED_PROPOSAL)}
-			<button
-				class="min-w-32 rounded-xl bg-red-500 px-3 py-2 font-bold text-white hover:bg-red-700"
-				on:click={() => onClearExpired()}
-			>
-				Clear
-			</button>
-		{/if}
-	</div>
-	<!-- {:else if selectedProposal && enableActions.length == 0}
-		<p class="text-center">No Actions Available</p>
+			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.DISPUTE_UNAPPROVED_PROPOSAL)}
+				<button
+					class="min-w-32 rounded-xl bg-purple-500 px-3 py-2 font-bold text-white hover:bg-purple-700"
+					on:click={() => onDispute()}
+				>
+					Dispute
+				</button>
+			{/if}
+
+			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL)}
+				<button
+					class="min-w-32 rounded-xl bg-yellow-500 px-3 py-2 font-bold text-white hover:bg-yellow-700"
+					on:click={() => onFinalize()}
+				>
+					Finalize
+				</button>
+			{/if}
+			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CLEAR_EXPIRED_PROPOSAL)}
+				<button
+					class="min-w-32 rounded-xl bg-red-500 px-3 py-2 font-bold text-white hover:bg-red-700"
+					on:click={() => onClearExpired()}
+				>
+					Clear
+				</button>
+			{/if}
+		</div>
 	{:else}
-		<p class="text-center">No Proposal Selected</p>
-	{/if} -->
+		<p class="mt-5 text-center">Login to call actions</p>
+	{/if}
 </div>
 
 <style>

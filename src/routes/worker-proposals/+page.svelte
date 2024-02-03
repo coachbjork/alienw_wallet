@@ -1,424 +1,434 @@
 <script lang="ts">
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
+	import CreateWorkerProposalModal from '$lib/components/Modal/CreateWorkerProposalModal.svelte';
+	import WPDelegateVoteModal from '$lib/components/Modal/WPDelegateVoteModal.svelte';
 	import WorkerProposalAction from '$lib/components/SidePanel/WorkerProposalAction.svelte';
-	import { AW_WORKER_PROPOSALS } from '$lib/constants';
+	import { AW_WORKER_PROPOSALS, TOAST_TYPES } from '$lib/constants';
 	import {
 		get_worker_proposals,
 		get_worker_proposals_cursor,
 		get_workerprop_cfg
 	} from '$lib/services/awWorkerPropService';
-	import { activePlanetStore, session } from '$lib/stores';
+	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import type { Planet } from '$lib/types';
+	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { Spinner } from 'flowbite-svelte';
 	import LabelSolid from 'flowbite-svelte-icons/LabelSolid.svelte';
 	import { afterUpdate, onMount } from 'svelte';
 
-	let proposals: any = [
-		{
-			proposal_id: 'testprop1',
-			proposer: 'awtesterooo1',
-			arbitrator: 'awtesterooo2',
-			content_hash: '0x23232424',
-			proposal_pay: {
-				contract: 'alien.worlds',
-				quantity: '2.0000 TLM'
-			},
-			arbitrator_pay: {
-				contract: 'alien.worlds',
-				quantity: '1.0000 TLM'
-			},
-			state: 'pendingappr',
-			expiry: '2023-07-28T08:49:10Z',
-			job_duration: 2591000,
-			category: 3,
-			votes: [
-				{
-					vote_id: 0,
-					voter: 'awtesterooo1',
-					proposal_id: 'testprop1',
-					category_id: null,
-					vote: 'propdeny',
-					delegatee: 'null',
-					comment_hash: 'null'
+	let proposals: any = [];
+	function handleMockData() {
+		proposals = [
+			{
+				proposal_id: 'testprop1',
+				proposer: 'awtesterooo1',
+				arbitrator: 'awtesterooo2',
+				content_hash: '0x23232424',
+				proposal_pay: {
+					contract: 'alien.worlds',
+					quantity: '2.0000 TLM'
 				},
-				{
-					vote_id: 2,
-					voter: 'awtesterooo3',
-					proposal_id: 'testprop1',
-					category_id: null,
-					vote: '',
-					delegatee: 'null',
-					comment_hash: 'null'
+				arbitrator_pay: {
+					contract: 'alien.worlds',
+					quantity: '1.0000 TLM'
 				},
-				{
-					vote_id: 1,
-					voter: 'awtesterooo2',
-					proposal_id: 'testprop1',
-					category_id: null,
-					vote: 'propapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
-				}
-			]
-		},
-		{
-			proposal_id: 'testprop11',
-			proposer: 'waximusjazzz',
-			arbitrator: 'awtesterooo2',
-			content_hash: '0x23232424',
-			proposal_pay: {
-				contract: 'alien.worlds',
-				quantity: '2.0000 TLM'
+				state: 'pendingappr',
+				expiry: '2023-07-28T08:49:10Z',
+				job_duration: 2591000,
+				category: 3,
+				votes: [
+					{
+						vote_id: 0,
+						voter: 'awtesterooo1',
+						proposal_id: 'testprop1',
+						category_id: null,
+						vote: 'propdeny',
+						delegatee: 'null',
+						comment_hash: 'null'
+					},
+					{
+						vote_id: 2,
+						voter: 'awtesterooo3',
+						proposal_id: 'testprop1',
+						category_id: null,
+						vote: '',
+						delegatee: 'null',
+						comment_hash: 'null'
+					},
+					{
+						vote_id: 1,
+						voter: 'awtesterooo2',
+						proposal_id: 'testprop1',
+						category_id: null,
+						vote: 'propapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					}
+				]
 			},
-			arbitrator_pay: {
-				contract: 'alien.worlds',
-				quantity: '1.0000 TLM'
-			},
-			state: 'pendingappr',
-			expiry: '2023-07-28T08:49:10Z',
-			job_duration: 2591000,
-			category: 3,
-			votes: [
-				{
-					vote_id: 0,
-					voter: 'awtesterooo1',
-					proposal_id: 'testprop1',
-					category_id: null,
-					vote: 'propdeny',
-					delegatee: 'null',
-					comment_hash: 'null'
+			{
+				proposal_id: 'testprop11',
+				proposer: 'waximusjazzz',
+				arbitrator: 'awtesterooo2',
+				content_hash: '0x23232424',
+				proposal_pay: {
+					contract: 'alien.worlds',
+					quantity: '2.0000 TLM'
 				},
-				{
-					vote_id: 2,
-					voter: 'awtesterooo3',
-					proposal_id: 'testprop1',
-					category_id: null,
-					vote: '',
-					delegatee: 'null',
-					comment_hash: 'null'
+				arbitrator_pay: {
+					contract: 'alien.worlds',
+					quantity: '1.0000 TLM'
 				},
-				{
-					vote_id: 1,
-					voter: 'awtesterooo2',
-					proposal_id: 'testprop1',
-					category_id: null,
-					vote: 'propapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
-				}
-			]
-		},
-		{
-			proposal_id: 'testprop2',
-			proposer: 'awtesterooo1',
-			arbitrator: 'awtesterooo2',
-			content_hash: '0x23232424',
-			proposal_pay: {
-				contract: 'alien.worlds',
-				quantity: '2.0000 TLM'
+				state: 'pendingappr',
+				expiry: '2023-07-28T08:49:10Z',
+				job_duration: 2591000,
+				category: 3,
+				votes: [
+					{
+						vote_id: 0,
+						voter: 'awtesterooo1',
+						proposal_id: 'testprop1',
+						category_id: null,
+						vote: 'propdeny',
+						delegatee: 'null',
+						comment_hash: 'null'
+					},
+					{
+						vote_id: 2,
+						voter: 'awtesterooo3',
+						proposal_id: 'testprop1',
+						category_id: null,
+						vote: '',
+						delegatee: 'null',
+						comment_hash: 'null'
+					},
+					{
+						vote_id: 1,
+						voter: 'awtesterooo2',
+						proposal_id: 'testprop1',
+						category_id: null,
+						vote: 'propapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					}
+				]
 			},
-			arbitrator_pay: {
-				contract: 'alien.worlds',
-				quantity: '1.0000 TLM'
-			},
-			state: 'apprvtes',
-			expiry: '2023-07-28T08:49:10Z',
-			job_duration: 2592000,
-			category: 3,
-			votes: [
-				{
-					vote_id: 0,
-					voter: 'awtesterooo1',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'propapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
+			{
+				proposal_id: 'testprop2',
+				proposer: 'awtesterooo1',
+				arbitrator: 'awtesterooo2',
+				content_hash: '0x23232424',
+				proposal_pay: {
+					contract: 'alien.worlds',
+					quantity: '2.0000 TLM'
 				},
-				{
-					vote_id: 1,
-					voter: 'awtesterooo2',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'propapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
-				}
-			]
-		},
-		{
-			proposal_id: 'testprop22',
-			proposer: 'waximusjazzz',
-			arbitrator: 'awtesterooo2',
-			content_hash: '0x23232424',
-			proposal_pay: {
-				contract: 'alien.worlds',
-				quantity: '2.0000 TLM'
-			},
-			arbitrator_pay: {
-				contract: 'alien.worlds',
-				quantity: '1.0000 TLM'
-			},
-			state: 'apprvtes',
-			expiry: '2023-07-28T08:49:10Z',
-			job_duration: 2592000,
-			category: 3,
-			votes: [
-				{
-					vote_id: 0,
-					voter: 'awtesterooo1',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'propapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
+				arbitrator_pay: {
+					contract: 'alien.worlds',
+					quantity: '1.0000 TLM'
 				},
-				{
-					vote_id: 1,
-					voter: 'awtesterooo2',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'propapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
-				}
-			]
-		},
-		{
-			proposal_id: 'testprop3',
-			proposer: 'awtesterooo1',
-			arbitrator: 'awtesterooo2',
-			content_hash: '0x23232424',
-			proposal_pay: {
-				contract: 'alien.worlds',
-				quantity: '2.0000 TLM'
+				state: 'apprvtes',
+				expiry: '2023-07-28T08:49:10Z',
+				job_duration: 2592000,
+				category: 3,
+				votes: [
+					{
+						vote_id: 0,
+						voter: 'awtesterooo1',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'propapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					},
+					{
+						vote_id: 1,
+						voter: 'awtesterooo2',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'propapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					}
+				]
 			},
-			arbitrator_pay: {
-				contract: 'alien.worlds',
-				quantity: '1.0000 TLM'
-			},
-			state: 'inprogress',
-			expiry: '2023-07-28T08:49:10Z',
-			job_duration: 2592000,
-			category: 3,
-			votes: [
-				{
-					vote_id: 0,
-					voter: 'awtesterooo1',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'propapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
+			{
+				proposal_id: 'testprop22',
+				proposer: 'waximusjazzz',
+				arbitrator: 'awtesterooo2',
+				content_hash: '0x23232424',
+				proposal_pay: {
+					contract: 'alien.worlds',
+					quantity: '2.0000 TLM'
 				},
-				{
-					vote_id: 1,
-					voter: 'awtesterooo2',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'propapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
-				}
-			]
-		},
-		{
-			proposal_id: 'testprop33',
-			proposer: 'waximusjazzz',
-			arbitrator: 'awtesterooo2',
-			content_hash: '0x23232424',
-			proposal_pay: {
-				contract: 'alien.worlds',
-				quantity: '2.0000 TLM'
-			},
-			arbitrator_pay: {
-				contract: 'alien.worlds',
-				quantity: '1.0000 TLM'
-			},
-			state: 'inprogress',
-			expiry: '2023-07-28T08:49:10Z',
-			job_duration: 2592000,
-			category: 3,
-			votes: [
-				{
-					vote_id: 0,
-					voter: 'awtesterooo1',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'propapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
+				arbitrator_pay: {
+					contract: 'alien.worlds',
+					quantity: '1.0000 TLM'
 				},
-				{
-					vote_id: 1,
-					voter: 'awtesterooo2',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'propapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
-				}
-			]
-		},
-		{
-			proposal_id: 'testprop4',
-			proposer: 'awtesterooo1',
-			arbitrator: 'awtesterooo2',
-			content_hash: '0x23232424',
-			proposal_pay: {
-				contract: 'alien.worlds',
-				quantity: '2.0000 TLM'
+				state: 'apprvtes',
+				expiry: '2023-07-28T08:49:10Z',
+				job_duration: 2592000,
+				category: 3,
+				votes: [
+					{
+						vote_id: 0,
+						voter: 'awtesterooo1',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'propapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					},
+					{
+						vote_id: 1,
+						voter: 'awtesterooo2',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'propapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					}
+				]
 			},
-			arbitrator_pay: {
-				contract: 'alien.worlds',
-				quantity: '1.0000 TLM'
-			},
-			state: 'pendingfin',
-			expiry: '2023-07-28T08:49:10Z',
-			job_duration: 2592000,
-			category: 3,
-			votes: [
-				{
-					vote_id: 0,
-					voter: 'awtesterooo1',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'finaldeny',
-					delegatee: 'null',
-					comment_hash: 'null'
+			{
+				proposal_id: 'testprop3',
+				proposer: 'awtesterooo1',
+				arbitrator: 'awtesterooo2',
+				content_hash: '0x23232424',
+				proposal_pay: {
+					contract: 'alien.worlds',
+					quantity: '2.0000 TLM'
 				},
-				{
-					vote_id: 1,
-					voter: 'awtesterooo2',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'finalapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
-				}
-			]
-		},
-		{
-			proposal_id: 'testprop44',
-			proposer: 'waximusjazzz',
-			arbitrator: 'awtesterooo2',
-			content_hash: '0x23232424',
-			proposal_pay: {
-				contract: 'alien.worlds',
-				quantity: '2.0000 TLM'
-			},
-			arbitrator_pay: {
-				contract: 'alien.worlds',
-				quantity: '1.0000 TLM'
-			},
-			state: 'pendingfin',
-			expiry: '2023-07-28T08:49:10Z',
-			job_duration: 2592000,
-			category: 3,
-			votes: [
-				{
-					vote_id: 0,
-					voter: 'awtesterooo1',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'finaldeny',
-					delegatee: 'null',
-					comment_hash: 'null'
+				arbitrator_pay: {
+					contract: 'alien.worlds',
+					quantity: '1.0000 TLM'
 				},
-				{
-					vote_id: 1,
-					voter: 'awtesterooo2',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'finalapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
-				}
-			]
-		},
-		{
-			proposal_id: 'testprop5',
-			proposer: 'awtesterooo1',
-			arbitrator: 'awtesterooo2',
-			content_hash: '0x23232424',
-			proposal_pay: {
-				contract: 'alien.worlds',
-				quantity: '2.0000 TLM'
+				state: 'inprogress',
+				expiry: '2023-07-28T08:49:10Z',
+				job_duration: 2592000,
+				category: 3,
+				votes: [
+					{
+						vote_id: 0,
+						voter: 'awtesterooo1',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'propapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					},
+					{
+						vote_id: 1,
+						voter: 'awtesterooo2',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'propapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					}
+				]
 			},
-			arbitrator_pay: {
-				contract: 'alien.worlds',
-				quantity: '1.0000 TLM'
-			},
-			state: 'apprfinvtes',
-			expiry: '2023-07-28T08:49:10Z',
-			job_duration: 2592000,
-			category: 3,
-			votes: [
-				{
-					vote_id: 0,
-					voter: 'awtesterooo1',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'finalapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
+			{
+				proposal_id: 'testprop33',
+				proposer: 'waximusjazzz',
+				arbitrator: 'awtesterooo2',
+				content_hash: '0x23232424',
+				proposal_pay: {
+					contract: 'alien.worlds',
+					quantity: '2.0000 TLM'
 				},
-				{
-					vote_id: 1,
-					voter: 'awtesterooo2',
-					proposal_id: 'testprop2',
-					category_id: null,
-					vote: 'finalapprove',
-					delegatee: 'null',
-					comment_hash: 'null'
-				}
-			]
-		},
-		{
-			proposal_id: 'testprop6',
-			proposer: 'awtesterooo1',
-			arbitrator: 'awtesterooo2',
-			content_hash: '0x23232424',
-			proposal_pay: {
-				contract: 'alien.worlds',
-				quantity: '2.0000 TLM'
+				arbitrator_pay: {
+					contract: 'alien.worlds',
+					quantity: '1.0000 TLM'
+				},
+				state: 'inprogress',
+				expiry: '2023-07-28T08:49:10Z',
+				job_duration: 2592000,
+				category: 3,
+				votes: [
+					{
+						vote_id: 0,
+						voter: 'awtesterooo1',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'propapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					},
+					{
+						vote_id: 1,
+						voter: 'awtesterooo2',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'propapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					}
+				]
 			},
-			arbitrator_pay: {
-				contract: 'alien.worlds',
-				quantity: '1.0000 TLM'
+			{
+				proposal_id: 'testprop4',
+				proposer: 'awtesterooo1',
+				arbitrator: 'awtesterooo2',
+				content_hash: '0x23232424',
+				proposal_pay: {
+					contract: 'alien.worlds',
+					quantity: '2.0000 TLM'
+				},
+				arbitrator_pay: {
+					contract: 'alien.worlds',
+					quantity: '1.0000 TLM'
+				},
+				state: 'pendingfin',
+				expiry: '2023-07-28T08:49:10Z',
+				job_duration: 2592000,
+				category: 3,
+				votes: [
+					{
+						vote_id: 0,
+						voter: 'awtesterooo1',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'finaldeny',
+						delegatee: 'null',
+						comment_hash: 'null'
+					},
+					{
+						vote_id: 1,
+						voter: 'awtesterooo2',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'finalapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					}
+				]
 			},
-			state: 'expired',
-			expiry: '2023-07-28T08:49:10Z',
-			job_duration: 2592000,
-			category: 3
-		},
-		{
-			proposal_id: 'testprop7',
-			proposer: 'awtesterooo1',
-			arbitrator: 'waximusjazzz',
-			content_hash: '0x23232424',
-			proposal_pay: {
-				contract: 'alien.worlds',
-				quantity: '2.0000 TLM'
+			{
+				proposal_id: 'testprop44',
+				proposer: 'waximusjazzz',
+				arbitrator: 'awtesterooo2',
+				content_hash: '0x23232424',
+				proposal_pay: {
+					contract: 'alien.worlds',
+					quantity: '2.0000 TLM'
+				},
+				arbitrator_pay: {
+					contract: 'alien.worlds',
+					quantity: '1.0000 TLM'
+				},
+				state: 'pendingfin',
+				expiry: '2023-07-28T08:49:10Z',
+				job_duration: 2592000,
+				category: 3,
+				votes: [
+					{
+						vote_id: 0,
+						voter: 'awtesterooo1',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'finaldeny',
+						delegatee: 'null',
+						comment_hash: 'null'
+					},
+					{
+						vote_id: 1,
+						voter: 'awtesterooo2',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'finalapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					}
+				]
 			},
-			arbitrator_pay: {
-				contract: 'alien.worlds',
-				quantity: '1.0000 TLM'
+			{
+				proposal_id: 'testprop5',
+				proposer: 'awtesterooo1',
+				arbitrator: 'awtesterooo2',
+				content_hash: '0x23232424',
+				proposal_pay: {
+					contract: 'alien.worlds',
+					quantity: '2.0000 TLM'
+				},
+				arbitrator_pay: {
+					contract: 'alien.worlds',
+					quantity: '1.0000 TLM'
+				},
+				state: 'apprfinvtes',
+				expiry: '2023-07-28T08:49:10Z',
+				job_duration: 2592000,
+				category: 3,
+				votes: [
+					{
+						vote_id: 0,
+						voter: 'awtesterooo1',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'finalapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					},
+					{
+						vote_id: 1,
+						voter: 'awtesterooo2',
+						proposal_id: 'testprop2',
+						category_id: null,
+						vote: 'finalapprove',
+						delegatee: 'null',
+						comment_hash: 'null'
+					}
+				]
 			},
-			state: 'indispute',
-			expiry: '2023-07-28T08:49:10Z',
-			job_duration: 2592000,
-			category: 3
-		}
-	];
+			{
+				proposal_id: 'testprop6',
+				proposer: 'awtesterooo1',
+				arbitrator: 'awtesterooo2',
+				content_hash: '0x23232424',
+				proposal_pay: {
+					contract: 'alien.worlds',
+					quantity: '2.0000 TLM'
+				},
+				arbitrator_pay: {
+					contract: 'alien.worlds',
+					quantity: '1.0000 TLM'
+				},
+				state: 'expired',
+				expiry: '2023-07-28T08:49:10Z',
+				job_duration: 2592000,
+				category: 3
+			},
+			{
+				proposal_id: 'testprop7',
+				proposer: 'awtesterooo1',
+				arbitrator: 'waximusjazzz',
+				content_hash: '0x23232424',
+				proposal_pay: {
+					contract: 'alien.worlds',
+					quantity: '2.0000 TLM'
+				},
+				arbitrator_pay: {
+					contract: 'alien.worlds',
+					quantity: '1.0000 TLM'
+				},
+				state: 'indispute',
+				expiry: '2023-07-28T08:49:10Z',
+				job_duration: 2592000,
+				category: 3
+			}
+		];
+	}
+
 	let loading = true;
 	let selectedPlanet: Planet = $activePlanetStore;
 	let selectedProposal: any = null;
 	let wpConfig: any = {};
 	let proposalCursor: any = null;
+	let isModalOpen = false;
+	let isDelegateModalOpen = false;
+	let isDelegate = false;
 
 	onMount(async () => {
-		// await fetchWorkerProposals();
+		await fetchWorkerProposals();
 		await fetchWorkerProposalCfgs();
 		loading = false;
 	});
@@ -442,14 +452,12 @@
 		let response = await get_worker_proposals(proposalCursor, $activePlanetStore.name);
 		if (!response) return;
 		proposals = response;
-		console.log('proposals', proposals);
 	}
 
 	async function fetchWorkerProposalCfgs() {
 		let response = await get_workerprop_cfg($activePlanetStore.name);
 		if (!response) return;
 		wpConfig = response;
-		console.log('config', wpConfig);
 	}
 
 	function selectProposal(proposal: any) {
@@ -580,6 +588,116 @@
 			formatted += secondsLeft + 's';
 		}
 		return formatted;
+	}
+
+	function handleNewProposal(event: any) {
+		isModalOpen = true;
+	}
+
+	function handleDelegate(event: any) {
+		isDelegateModalOpen = true;
+		isDelegate = event?.detail?.is_delegate;
+	}
+
+	async function handleCreateProposalAction(proposal: any) {
+		if (!$session) {
+			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
+			return;
+		}
+
+		const {
+			proposer,
+			title,
+			summary,
+			arbitrator,
+			proposal_pay,
+			proposal_pay_token_contract,
+			arbitrator_pay,
+			arbitrator_pay_token_contract,
+			content_hash,
+			id,
+			category,
+			job_duration
+		} = proposal;
+
+		let actions = [
+			{
+				account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
+				name: AW_WORKER_PROPOSALS.ACTIONS.CREATE_PROPOSAL,
+				authorization: [
+					{
+						actor: $session.actor,
+						permission: 'active'
+					}
+				],
+				data: {
+					proposer,
+					title,
+					summary,
+					arbitrator,
+					proposal_pay: {
+						quantity: proposal_pay,
+						contract: proposal_pay_token_contract
+					},
+					arbitrator_pay: {
+						quantity: arbitrator_pay,
+						contract: arbitrator_pay_token_contract
+					},
+					content_hash,
+					id,
+					category,
+					job_duration,
+					dac_id: $activePlanetStore.scope
+				}
+			}
+		];
+		return pushActions($session, actions);
+	}
+
+	function closeModal() {
+		isModalOpen = false;
+	}
+
+	async function handleDelegateAction(data: any) {
+		if (!$session) {
+			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
+			return;
+		}
+
+		const { proposal_id, delegatee_custodian, delegate_mode, category } = data;
+		let action_name = delegate_mode
+			? delegate_mode == AW_WORKER_PROPOSALS.DELEGATE_MODE.PROPOSAL
+				? AW_WORKER_PROPOSALS.ACTIONS.DELEGATE_VOTE
+				: AW_WORKER_PROPOSALS.ACTIONS.DELEGATE_VOTE_CATEGORY
+			: AW_WORKER_PROPOSALS.ACTIONS.UNDELEGATE_VOTE;
+		let actionData = delegate_mode
+			? delegate_mode == AW_WORKER_PROPOSALS.DELEGATE_MODE.PROPOSAL
+				? { proposal_id, delegatee_custodian }
+				: { category, delegatee_custodian }
+			: { category };
+		let actions = [
+			{
+				account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
+				name: action_name,
+				authorization: [
+					{
+						actor: $session.actor,
+						permission: 'active'
+					}
+				],
+				data: {
+					...actionData,
+					custodian: $session.actor,
+					dac_id: $activePlanetStore.scope
+				}
+			}
+		];
+		return pushActions($session, actions);
+	}
+
+	function closeDelegateModal() {
+		isDelegateModalOpen = false;
+		isDelegate = false;
 	}
 	// async function onVote() {
 	// 	if (!$session) {
@@ -715,10 +833,26 @@
 	<!-- {#if $session}{/if} -->
 </div>
 <div class="right-side">
-	{#if $session}
-		<WorkerProposalAction {selectedProposal} />
-	{/if}
+	<WorkerProposalAction
+		{selectedProposal}
+		on:new_proposal={handleNewProposal}
+		on:delegatevote={handleDelegate}
+		on:mockdata={handleMockData}
+	/>
 </div>
+
+<CreateWorkerProposalModal
+	isOpen={isModalOpen}
+	onClose={closeModal}
+	onCreateProposal={handleCreateProposalAction}
+/>
+
+<WPDelegateVoteModal
+	isOpen={isDelegateModalOpen}
+	{isDelegate}
+	onClose={closeDelegateModal}
+	onDelegate={handleDelegateAction}
+/>
 
 <style>
 </style>

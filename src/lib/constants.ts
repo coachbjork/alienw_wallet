@@ -20,6 +20,10 @@ const AW_WORKER_PROPOSALS = {
         PROPOSAL_VOTES: "propvotes",
         CONFIGS: "configs",
     },
+    DELEGATE_MODE: {
+        PROPOSAL: "proposal",
+        CATEGORY: "category",
+    },
     ACTIONS: {
         CREATE_PROPOSAL: "createprop",
         VOTE_PROPOSAL: "voteprop",
@@ -35,6 +39,9 @@ const AW_WORKER_PROPOSALS = {
         ARBIRATOR_DENY: "arbdeny",
         ARBIRATOR_VOTE: "arbirator_vote",
         CLEAR_EXPIRED_PROPOSAL: "clearexpprop",
+        DELEGATE_VOTE: "delegatevote",
+        DELEGATE_VOTE_CATEGORY: "delegatecat",
+        UNDELEGATE_VOTE: "undelegateca",
     },
     PROP_STATE: {
         PENDING_APPROVAL: { name: "Pending Approval", value: "pendingappr" },
