@@ -448,7 +448,7 @@
 					class="min-w-32 rounded-xl bg-teal-500 px-3 py-2 font-bold text-white hover:bg-teal-700"
 					on:click={() => onCompleteWork()}
 				>
-					Complete Work
+					Complete
 				</button>
 			{/if}
 
