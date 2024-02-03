@@ -51,6 +51,9 @@ body {
 	align-self: start;
 	padding: 20px 20px 0 20px;
 	gap: 10px 10px;
+	position: sticky; 
+	position: -webkit-sticky;
+	top: 100px; 
 }
 
 .left-side { 
@@ -60,6 +63,9 @@ body {
 	align-self: start;
 	padding: 20px 20px 0 20px;
 	gap: 10px 10px;
+	position: sticky; 
+	position: -webkit-sticky;
+	top: 100px; 
 }
 
 .side-column {

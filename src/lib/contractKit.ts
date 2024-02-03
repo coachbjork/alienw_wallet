@@ -1,4 +1,4 @@
-import { blockchain_rpc } from '$lib/stores';
+import { bpRPCStore } from '$lib/stores';
 import { APIClient } from "@wharfkit/antelope";
 import { ContractKit } from "@wharfkit/contract";
 import { get } from 'svelte/store';
@@ -7,7 +7,7 @@ import { get } from 'svelte/store';
 const getSingleData = async (contract: string, scope: string, table: string, key_value: any = undefined, params: any = {}) => {
     try {
         const contractKit = new ContractKit({
-            client: new APIClient({ url: get(blockchain_rpc) }),
+            client: new APIClient({ url: get(bpRPCStore) }),
         });
         const contractInstance = await contractKit.load(contract);
         const tableInstance = contractInstance.table(table, scope);
@@ -21,7 +21,7 @@ const getSingleData = async (contract: string, scope: string, table: string, key
 
 const getMultiDataCursor = async (contract: string, scope: string, table: string, params: any = {}) => {
     const contractKit = new ContractKit({
-        client: new APIClient({ url: get(blockchain_rpc) }),
+        client: new APIClient({ url: get(bpRPCStore) }),
     });
     const contractInstance = await contractKit.load(contract);
     return contractInstance.table(table, scope).query(params);

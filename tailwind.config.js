@@ -8,6 +8,7 @@ module.exports = {
     colors: {
       'text-default': '#b1bac7',
       'background-default': '#060C27',
+      'background-default-lighter': '#0c1334',
     },
     screens: {
       xs: '475px',
