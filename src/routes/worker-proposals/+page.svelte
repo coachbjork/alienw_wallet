@@ -68,7 +68,7 @@
 			},
 			{
 				proposal_id: 'testprop11',
-				proposer: 'waximusjazzz',
+				proposer: String($session ? $session.actor : 'waximusjazzz'),
 				arbitrator: 'awtesterooo2',
 				content_hash: '0x23232424',
 				proposal_pay: {
@@ -153,7 +153,7 @@
 			},
 			{
 				proposal_id: 'testprop22',
-				proposer: 'waximusjazzz',
+				proposer: String($session ? $session.actor : 'waximusjazzz'),
 				arbitrator: 'awtesterooo2',
 				content_hash: '0x23232424',
 				proposal_pay: {
@@ -229,7 +229,7 @@
 			},
 			{
 				proposal_id: 'testprop33',
-				proposer: 'waximusjazzz',
+				proposer: String($session ? $session.actor : 'waximusjazzz'),
 				arbitrator: 'awtesterooo2',
 				content_hash: '0x23232424',
 				proposal_pay: {
@@ -305,7 +305,7 @@
 			},
 			{
 				proposal_id: 'testprop44',
-				proposer: 'waximusjazzz',
+				proposer: String($session ? $session.actor : 'waximusjazzz'),
 				arbitrator: 'awtesterooo2',
 				content_hash: '0x23232424',
 				proposal_pay: {
@@ -400,7 +400,7 @@
 			{
 				proposal_id: 'testprop7',
 				proposer: 'awtesterooo1',
-				arbitrator: 'waximusjazzz',
+				arbitrator: String($session ? $session.actor : 'waximusjazzz'),
 				content_hash: '0x23232424',
 				proposal_pay: {
 					contract: 'alien.worlds',
