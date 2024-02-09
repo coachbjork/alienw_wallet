@@ -854,5 +854,7 @@
 	onDelegate={handleDelegateAction}
 />
 
+<!-- TODO: load more function for proposal list -->
+
 <style>
 </style>

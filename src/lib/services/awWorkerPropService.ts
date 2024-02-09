@@ -1,10 +1,11 @@
 import { AW_PLANETS, AW_WORKER_PROPOSALS } from '$lib/constants';
-import { cursorAll, cursorNext, getMultiDataCursor, getSingleData } from '$lib/contractKit';
+import { cursorAll, getMultiDataCursor, getSingleData } from '$lib/contractKit';
 
 import _ from "lodash";
 
 export async function get_worker_proposals(cursor: any, activePlanet: string) {
-    const data: any = await cursorNext(cursor);
+    const data: any = await cursorAll(cursor);
+    console.log(data);
     const deserializedData: any = [];
 
     for (const item of data) {

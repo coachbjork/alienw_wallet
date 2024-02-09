@@ -37,5 +37,17 @@ const cursorReset = async (cursor: any) => {
     return await cursor.reset();
 }
 
+// const data =
+//     "0000402601aca2dac0a6cbd9c58a65cc005480120000000004544c4d000000003732707634732e632e77616d20612e6433752e632e77616d2068776561712e77616d2067796b62342e77616d206f757a346f2e632e77616d"
+
+// const client = new APIClient({ url: "https://wax.greymass.com" })
+// const { abi } = await client.v1.chain.get_abi("alien.worlds")
+
+// const decoded = Serializer.decode({ data, abi, type: "transfer" })
+
+// console.log(decoded)
+// console.log(JSON.stringify(decoded))
+
+
 export { cursorAll, cursorNext, cursorReset, getMultiDataCursor, getSingleData };
 
