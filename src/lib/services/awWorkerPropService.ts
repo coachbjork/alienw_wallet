@@ -5,7 +5,7 @@ import _ from "lodash";
 
 export async function get_worker_proposals(cursor: any, activePlanet: string) {
     const data: any = await cursorAll(cursor);
-    console.log(data);
+
     const deserializedData: any = [];
 
     for (const item of data) {
@@ -31,14 +31,15 @@ export async function get_worker_proposals(cursor: any, activePlanet: string) {
         deserializedData.push({
             proposal_id: String(item.proposal_id),
             proposer: String(item.proposer),
-            arbitrator: String(item.arbitrator),
+            arbiter: String(item.arbiter),
             content_hash: String(item.content_hash),
             proposal_pay: { contract: String(item.proposal_pay.contract), quantity: String(item.proposal_pay.quantity) },
-            arbitrator_pay: { contract: String(item.arbitrator_pay.contract), quantity: String(item.arbitrator_pay.quantity) },
+            arbiter_pay: { contract: String(item.arbiter_pay.contract), quantity: String(item.arbiter_pay.quantity) },
             state: String(item.state),
             expiry: `${String(item.expiry)}Z`,
             job_duration: parseInt(item.job_duration),
             category: parseInt(item.category),
+            arbiter_agreed: item.arbiter_agreed,
             votes: voteData
         });
     }
@@ -49,6 +50,25 @@ export async function get_worker_proposals_cursor(activePlanet: string) {
     const planetScope = _.find(AW_PLANETS, (planet: any) => { return planet.name === activePlanet })?.scope || "";
     const cursor: any = await getMultiDataCursor(AW_WORKER_PROPOSALS.CONTRACT_NAME, planetScope, AW_WORKER_PROPOSALS.TABLES.PROPOSALS);
     return cursor;
+}
+export async function get_worker_proposal_by_id(activePlanet: string, proposal_id: string) {
+    const planetScope = _.find(AW_PLANETS, (planet: any) => { return planet.name === activePlanet })?.scope || "";
+    const data: any = await getSingleData(AW_WORKER_PROPOSALS.CONTRACT_NAME, planetScope, AW_WORKER_PROPOSALS.TABLES.PROPOSALS, proposal_id);
+    if (!data) return {};
+    const deserializedData = {
+        proposal_id: String(data.proposal_id),
+        proposer: String(data.proposer),
+        arbiter: String(data.arbiter),
+        content_hash: String(data.content_hash),
+        proposal_pay: { contract: String(data.proposal_pay.contract), quantity: String(data.proposal_pay.quantity) },
+        arbiter_pay: { contract: String(data.arbiter_pay.contract), quantity: String(data.arbiter_pay.quantity) },
+        state: String(data.state),
+        expiry: `${String(data.expiry)}Z`,
+        job_duration: parseInt(data.job_duration),
+        category: parseInt(data.category),
+        arbiter_agreed: data.arbiter_agreed,
+    };
+    return deserializedData;
 }
 
 export async function get_worker_proposal_votes(activePlanet: string, params: any) {

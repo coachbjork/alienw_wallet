@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { PUBLIC_PINATA_GATEWAY, PUBLIC_PINATA_GATEWAY_KEY } from '$env/static/public';
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import CreateWorkerProposalModal from '$lib/components/Modal/CreateWorkerProposalModal.svelte';
 	import WPDelegateVoteModal from '$lib/components/Modal/WPDelegateVoteModal.svelte';
 	import WorkerProposalAction from '$lib/components/SidePanel/WorkerProposalAction.svelte';
-	import { AW_WORKER_PROPOSALS, TOAST_TYPES } from '$lib/constants';
+	import { AW, AW_WORKER_PROPOSALS, TOAST_TYPES } from '$lib/constants';
 	import {
 		get_worker_proposals,
 		get_worker_proposals_cursor,
@@ -22,16 +23,17 @@
 			{
 				proposal_id: 'testprop1',
 				proposer: 'awtesterooo1',
-				arbitrator: 'awtesterooo2',
-				content_hash: '0x23232424',
+				arbiter: String($session ? $session.actor : 'waximusjazzz'),
+				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
 				proposal_pay: {
 					contract: 'alien.worlds',
 					quantity: '2.0000 TLM'
 				},
-				arbitrator_pay: {
+				arbiter_pay: {
 					contract: 'alien.worlds',
 					quantity: '1.0000 TLM'
 				},
+				arbiter_agreed: false,
 				state: 'pendingappr',
 				expiry: '2023-07-28T08:49:10Z',
 				job_duration: 2591000,
@@ -69,16 +71,17 @@
 			{
 				proposal_id: 'testprop11',
 				proposer: String($session ? $session.actor : 'waximusjazzz'),
-				arbitrator: 'awtesterooo2',
-				content_hash: '0x23232424',
+				arbiter: 'awtesterooo2',
+				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
 				proposal_pay: {
 					contract: 'alien.worlds',
 					quantity: '2.0000 TLM'
 				},
-				arbitrator_pay: {
+				arbiter_pay: {
 					contract: 'alien.worlds',
 					quantity: '1.0000 TLM'
 				},
+				arbiter_agreed: true,
 				state: 'pendingappr',
 				expiry: '2023-07-28T08:49:10Z',
 				job_duration: 2591000,
@@ -116,16 +119,17 @@
 			{
 				proposal_id: 'testprop2',
 				proposer: 'awtesterooo1',
-				arbitrator: 'awtesterooo2',
-				content_hash: '0x23232424',
+				arbiter: 'awtesterooo2',
+				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
 				proposal_pay: {
 					contract: 'alien.worlds',
 					quantity: '2.0000 TLM'
 				},
-				arbitrator_pay: {
+				arbiter_pay: {
 					contract: 'alien.worlds',
 					quantity: '1.0000 TLM'
 				},
+				arbiter_agreed: true,
 				state: 'apprvtes',
 				expiry: '2023-07-28T08:49:10Z',
 				job_duration: 2592000,
@@ -154,16 +158,17 @@
 			{
 				proposal_id: 'testprop22',
 				proposer: String($session ? $session.actor : 'waximusjazzz'),
-				arbitrator: 'awtesterooo2',
-				content_hash: '0x23232424',
+				arbiter: 'awtesterooo2',
+				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
 				proposal_pay: {
 					contract: 'alien.worlds',
 					quantity: '2.0000 TLM'
 				},
-				arbitrator_pay: {
+				arbiter_pay: {
 					contract: 'alien.worlds',
 					quantity: '1.0000 TLM'
 				},
+				arbiter_agreed: false,
 				state: 'apprvtes',
 				expiry: '2023-07-28T08:49:10Z',
 				job_duration: 2592000,
@@ -192,16 +197,17 @@
 			{
 				proposal_id: 'testprop3',
 				proposer: 'awtesterooo1',
-				arbitrator: 'awtesterooo2',
-				content_hash: '0x23232424',
+				arbiter: 'awtesterooo2',
+				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
 				proposal_pay: {
 					contract: 'alien.worlds',
 					quantity: '2.0000 TLM'
 				},
-				arbitrator_pay: {
+				arbiter_pay: {
 					contract: 'alien.worlds',
 					quantity: '1.0000 TLM'
 				},
+				arbiter_agreed: true,
 				state: 'inprogress',
 				expiry: '2023-07-28T08:49:10Z',
 				job_duration: 2592000,
@@ -230,16 +236,17 @@
 			{
 				proposal_id: 'testprop33',
 				proposer: String($session ? $session.actor : 'waximusjazzz'),
-				arbitrator: 'awtesterooo2',
-				content_hash: '0x23232424',
+				arbiter: 'awtesterooo2',
+				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
 				proposal_pay: {
 					contract: 'alien.worlds',
 					quantity: '2.0000 TLM'
 				},
-				arbitrator_pay: {
+				arbiter_pay: {
 					contract: 'alien.worlds',
 					quantity: '1.0000 TLM'
 				},
+				arbiter_agreed: true,
 				state: 'inprogress',
 				expiry: '2023-07-28T08:49:10Z',
 				job_duration: 2592000,
@@ -268,16 +275,17 @@
 			{
 				proposal_id: 'testprop4',
 				proposer: 'awtesterooo1',
-				arbitrator: 'awtesterooo2',
-				content_hash: '0x23232424',
+				arbiter: 'awtesterooo2',
+				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
 				proposal_pay: {
 					contract: 'alien.worlds',
 					quantity: '2.0000 TLM'
 				},
-				arbitrator_pay: {
+				arbiter_pay: {
 					contract: 'alien.worlds',
 					quantity: '1.0000 TLM'
 				},
+				arbiter_agreed: true,
 				state: 'pendingfin',
 				expiry: '2023-07-28T08:49:10Z',
 				job_duration: 2592000,
@@ -306,16 +314,17 @@
 			{
 				proposal_id: 'testprop44',
 				proposer: String($session ? $session.actor : 'waximusjazzz'),
-				arbitrator: 'awtesterooo2',
-				content_hash: '0x23232424',
+				arbiter: 'awtesterooo2',
+				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
 				proposal_pay: {
 					contract: 'alien.worlds',
 					quantity: '2.0000 TLM'
 				},
-				arbitrator_pay: {
+				arbiter_pay: {
 					contract: 'alien.worlds',
 					quantity: '1.0000 TLM'
 				},
+				arbiter_agreed: true,
 				state: 'pendingfin',
 				expiry: '2023-07-28T08:49:10Z',
 				job_duration: 2592000,
@@ -344,16 +353,17 @@
 			{
 				proposal_id: 'testprop5',
 				proposer: 'awtesterooo1',
-				arbitrator: 'awtesterooo2',
-				content_hash: '0x23232424',
+				arbiter: 'awtesterooo2',
+				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
 				proposal_pay: {
 					contract: 'alien.worlds',
 					quantity: '2.0000 TLM'
 				},
-				arbitrator_pay: {
+				arbiter_pay: {
 					contract: 'alien.worlds',
 					quantity: '1.0000 TLM'
 				},
+				arbiter_agreed: true,
 				state: 'apprfinvtes',
 				expiry: '2023-07-28T08:49:10Z',
 				job_duration: 2592000,
@@ -382,16 +392,17 @@
 			{
 				proposal_id: 'testprop6',
 				proposer: 'awtesterooo1',
-				arbitrator: 'awtesterooo2',
-				content_hash: '0x23232424',
+				arbiter: 'awtesterooo2',
+				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
 				proposal_pay: {
 					contract: 'alien.worlds',
 					quantity: '2.0000 TLM'
 				},
-				arbitrator_pay: {
+				arbiter_pay: {
 					contract: 'alien.worlds',
 					quantity: '1.0000 TLM'
 				},
+				arbiter_agreed: true,
 				state: 'expired',
 				expiry: '2023-07-28T08:49:10Z',
 				job_duration: 2592000,
@@ -400,16 +411,17 @@
 			{
 				proposal_id: 'testprop7',
 				proposer: 'awtesterooo1',
-				arbitrator: String($session ? $session.actor : 'waximusjazzz'),
-				content_hash: '0x23232424',
+				arbiter: String($session ? $session.actor : 'waximusjazzz'),
+				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
 				proposal_pay: {
 					contract: 'alien.worlds',
 					quantity: '2.0000 TLM'
 				},
-				arbitrator_pay: {
+				arbiter_pay: {
 					contract: 'alien.worlds',
 					quantity: '1.0000 TLM'
 				},
+				arbiter_agreed: true,
 				state: 'indispute',
 				expiry: '2023-07-28T08:49:10Z',
 				job_duration: 2592000,
@@ -605,20 +617,8 @@
 			return;
 		}
 
-		const {
-			proposer,
-			title,
-			summary,
-			arbitrator,
-			proposal_pay,
-			proposal_pay_token_contract,
-			arbitrator_pay,
-			arbitrator_pay_token_contract,
-			content_hash,
-			id,
-			category,
-			job_duration
-		} = proposal;
+		const { title, summary, arbiter, proposal_pay, arbiter_pay, content_hash, id, job_duration } =
+			proposal;
 
 		let actions = [
 			{
@@ -631,21 +631,21 @@
 					}
 				],
 				data: {
-					proposer,
+					proposer: String($session.actor),
 					title,
 					summary,
-					arbitrator,
+					arbiter,
 					proposal_pay: {
-						quantity: proposal_pay,
-						contract: proposal_pay_token_contract
+						quantity: `${proposal_pay.toFixed(4)} TLM`,
+						contract: AW.CONTRACT_NAME
 					},
-					arbitrator_pay: {
-						quantity: arbitrator_pay,
-						contract: arbitrator_pay_token_contract
+					arbiter_pay: {
+						quantity: `${arbiter_pay.toFixed(4)} TLM`,
+						contract: AW.CONTRACT_NAME
 					},
 					content_hash,
 					id,
-					category,
+					category: 0,
 					job_duration,
 					dac_id: $activePlanetStore.scope
 				}
@@ -794,10 +794,31 @@
 										</div>
 										<div>{getApprovalState(proposal)}</div>
 									</div>
-									<div class="mx-3 flex flex-1 flex-col text-start">
+									<div class="mx-3 flex-none basis-3/12 flex-col text-start">
 										<div>Proposer: <span class="text-white">{proposal.proposer}</span></div>
-										<div>Arbitrator: <span class="text-white">{proposal.arbitrator}</span></div>
-										<div>Content Hash: <span class="text-white">{proposal.content_hash}</span></div>
+										<div>
+											Proposer Pay: <span class="text-white">{proposal.proposal_pay.quantity}</span>
+										</div>
+										<div>
+											Document: <a
+												class="text-blue-400 underline"
+												target="_blank"
+												href={`${PUBLIC_PINATA_GATEWAY}/ipfs/${proposal.content_hash}/?pinataGatewayToken=${PUBLIC_PINATA_GATEWAY_KEY}`}
+												>Get File</a
+											>
+										</div>
+									</div>
+									<div class="mx-3 flex flex-1 flex-col text-start">
+										<div>
+											Arbiter: <span class="text-white">{proposal.arbiter}</span>
+											<span
+												class={`${proposal.arbiter_agreed ? 'text-green-400' : 'text-yellow-400'}`}
+												>({proposal.arbiter_agreed ? 'Agreed' : 'Waiting'})</span
+											>
+										</div>
+										<div>
+											Arbiter Pay: <span class="text-white">{proposal.arbiter_pay.quantity}</span>
+										</div>
 									</div>
 									<div class="flex flex-none basis-3/12 flex-col text-end">
 										<div>Expired At (UTC)</div>
@@ -809,10 +830,23 @@
 										</div>
 									</div>
 								</div>
+								<!-- <div class="flex justify-between">
+									<div>
+										Content Hash: <a
+											class="text-blue-400 underline"
+											target="_blank"
+											href={`${PUBLIC_PINATA_GATEWAY}/ipfs/${proposal.content_hash}/?pinataGatewayToken=${PUBLIC_PINATA_GATEWAY_KEY}`}
+											>{proposal.content_hash}</a
+										>
+									</div>
+									<div>
+										Duration: <span class="text-white">{secondsToHHMM(proposal.job_duration)}</span>
+									</div>
+								</div> -->
 								{#if proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.EXPIRED.value || proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value}
 									<div></div>
 								{:else}
-									<div class="mx-auto mt-5 w-1/2 border-t-2 border-dotted border-gray-500"></div>
+									<div class="mx-auto mt-5 w-2/3 border-t-2 border-dotted border-gray-500"></div>
 									<div class="text-start">
 										<div>
 											Approved by: <span class="text-white">{getApprovedBy(proposal)}</span>

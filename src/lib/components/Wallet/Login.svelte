@@ -115,7 +115,6 @@
 							<button on:click={() => selectUser(account)}>{account.actor} </button>
 							<button
 								on:click={() => {
-									console.log('here');
 									removeUser(account);
 								}}
 							>

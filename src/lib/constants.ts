@@ -38,6 +38,7 @@ const AW_WORKER_PROPOSALS = {
         ARBIRATOR_APPROVE: "arbapprove",
         ARBIRATOR_DENY: "arbdeny",
         ARBIRATOR_VOTE: "arbirator_vote",
+        ARBITATOR_AGREE: "arbagree",
         CLEAR_EXPIRED_PROPOSAL: "clearexpprop",
         DELEGATE_VOTE: "delegatevote",
         DELEGATE_VOTE_CATEGORY: "delegatecat",
@@ -93,6 +94,10 @@ const AW_DAO = {
     },
 };
 
+const AW = {
+    CONTRACT_NAME: "alien.worlds",
+};
+
 const TOAST_TYPES = {
     SUCCESS: "success",
     ERROR: "error",
@@ -113,5 +118,5 @@ const ROUTES = [{
 }
 ];
 
-export { AW_DAO, AW_PLANETS, AW_TOKEN, AW_WORKER_PROPOSALS, ROUTES, TOAST_TYPES, blockchain_endpoints };
+export { AW, AW_DAO, AW_PLANETS, AW_TOKEN, AW_WORKER_PROPOSALS, ROUTES, TOAST_TYPES, blockchain_endpoints };
 

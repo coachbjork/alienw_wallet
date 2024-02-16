@@ -1,59 +1,185 @@
 <script lang="ts">
+	import { TOAST_TYPES } from '$lib/constants';
+	import { get_worker_proposal_by_id } from '$lib/services/awWorkerPropService';
+	import { activePlanetStore, session, toastStore } from '$lib/stores';
+	import { Spinner } from 'flowbite-svelte';
 	import { XSolid } from 'flowbite-svelte-icons';
+	import { onMount } from 'svelte';
 
 	export let isOpen = false;
 	export let onClose: () => void;
 	export let onCreateProposal: (proposal: any) => Promise<void>;
 
+	let isUploading = false;
 	let id = '';
-	let proposer = '';
+	let proposer = String($session?.actor);
 	let title = '';
 	let summary = '';
-	let arbitrator = '';
-	let proposal_pay = '';
-	let proposal_pay_token_contract = '';
-	let arbitrator_pay = '';
-	let arbitrator_pay_token_contract = '';
+	let arbiter = '';
+	let proposal_pay: any = null;
+	let arbiter_pay: any = null;
 	let content_hash = '';
-	let category = '';
-	let job_duration = '';
+	let job_duration: any = null;
+	let file_content: any = null;
+
+	onMount(async () => {
+		await generateRandomProposalId();
+		proposer = String($session?.actor);
+	});
+
+	// afterUpdate(async () => {
+	// 	if (isOpen) {
+	// 		await generateRandomProposalId();
+	// 	}
+	// });
 
 	async function submit() {
-		const proposal = {
+		isUploading = true;
+		let proposal = {
 			proposer,
 			title,
 			summary,
-			arbitrator,
+			arbiter,
 			proposal_pay,
-			proposal_pay_token_contract,
-			arbitrator_pay,
-			arbitrator_pay_token_contract,
+			arbiter_pay,
 			content_hash,
 			id,
-			category,
 			job_duration
 		};
 
-		await onCreateProposal(proposal).then((res: any) => {
-			if (res) {
-				close();
-			}
-		});
+		if (title === '') {
+			toastStore.add('Please enter a title', TOAST_TYPES.WARNING);
+			isUploading = false;
+			return;
+		}
+
+		if (summary === '') {
+			toastStore.add('Please enter a summary', TOAST_TYPES.WARNING);
+			isUploading = false;
+			return;
+		}
+
+		if (arbiter === '') {
+			toastStore.add('Please enter an arbiter', TOAST_TYPES.WARNING);
+			isUploading = false;
+			return;
+		}
+
+		if (job_duration === null) {
+			toastStore.add('Please enter a job duration', TOAST_TYPES.WARNING);
+			isUploading = false;
+			return;
+		}
+
+		if (proposal_pay === null) {
+			proposal.proposal_pay = 0;
+		}
+
+		if (arbiter_pay === null) {
+			proposal.arbiter_pay = 0;
+		}
+
+		await uploadFileToIPFS();
+
+		proposal.content_hash = content_hash;
+
+		await onCreateProposal(proposal)
+			.then(async (res: any) => {
+				isUploading = false;
+				if (res) {
+					// close the modal
+					close();
+				} else {
+					// unpin the file from IPFS
+					await removeFileFromIPFS();
+				}
+			})
+			.catch(async (error: any) => {
+				isUploading = false;
+				// unpin the file from IPFS
+				await removeFileFromIPFS();
+				console.error('Error:', error);
+			});
 	}
-	function close() {
-		id = '';
-		proposer = '';
+	async function close() {
 		title = '';
 		summary = '';
-		arbitrator = '';
-		proposal_pay = '';
-		proposal_pay_token_contract = '';
-		arbitrator_pay = '';
-		arbitrator_pay_token_contract = '';
+		arbiter = '';
+		proposal_pay = null;
+		arbiter_pay = null;
 		content_hash = '';
-		category = '';
-		job_duration = '';
+		job_duration = null;
+		file_content = null;
 		onClose();
+		await generateRandomProposalId();
+	}
+
+	async function generateRandomProposalId() {
+		const characters = '12345abcdefghijklmnopqrstuvwxyz';
+		let proposal_id = '';
+		let proposal_id_exists = false;
+		while (!proposal_id_exists) {
+			proposal_id = '';
+			for (let i = 0; i < 12; i++) {
+				proposal_id += characters.charAt(Math.floor(Math.random() * characters.length));
+			}
+			const res: any = await get_worker_proposal_by_id($activePlanetStore.name, proposal_id);
+
+			// If it does, generate a new one
+			// If it doesn't, set proposal_id_exists to true
+			if (!res?.proposal_id) {
+				proposal_id_exists = true;
+			}
+		}
+		id = proposal_id;
+	}
+
+	async function handleFileChanged(event: any) {
+		const file = event.target.files[0];
+		if (!file) return;
+		file_content = file;
+	}
+
+	async function uploadFileToIPFS() {
+		try {
+			if (!file_content) {
+				toastStore.add('Please select a file to upload', TOAST_TYPES.ERROR);
+			}
+			let formData = new FormData();
+			formData.append('file', file_content);
+			const response = await fetch('/api/ipfs/pin', {
+				method: 'POST',
+				body: formData
+			});
+
+			const { ipfsHash } = await response.json();
+			if (ipfsHash) {
+				content_hash = ipfsHash;
+			}
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	}
+
+	async function removeFileFromIPFS() {
+		try {
+			if (content_hash) {
+				const response = await fetch('/api/ipfs/unpin', {
+					method: 'POST',
+					body: JSON.stringify({ content_hash }),
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				});
+
+				const { ipfsHash } = await response.json();
+				if (ipfsHash) {
+					content_hash = ipfsHash;
+				}
+			}
+		} catch (error) {
+			console.error('Error:', error);
+		}
 	}
 </script>
 
@@ -74,59 +200,100 @@
 					on:click={close}
 				/>
 			</div>
+			<!-- <div class="flex flex-row gap-5">
+				<input class=" text-black" type="text" bind:value={id} placeholder="ID" />
+				
+			</div> -->
 			<div class="flex flex-row gap-5">
-				<input class="basis-2/6 text-black" type="text" bind:value={id} placeholder="ID" />
-				<input class="text-black" type="text" bind:value={title} placeholder="Title" />
-			</div>
+				<!-- <input class="text-black" type="number" bind:value={category} placeholder="Category Num" /> -->
 
-			<div class="flex flex-row gap-5">
-				<input class="text-black" type="text" bind:value={proposer} placeholder="Proposer" />
-				<input class="text-black" type="text" bind:value={arbitrator} placeholder="Arbitrator" />
-			</div>
+				<input id="title" class="text-black" type="text" bind:value={title} placeholder="Title" />
 
-			<div class="flex flex-row gap-5">
 				<input
-					class="text-black"
-					type="text"
-					bind:value={proposal_pay}
-					placeholder="Proposal Pay Quantity"
-				/>
-				<input
-					class="text-black"
-					type="text"
-					bind:value={proposal_pay_token_contract}
-					placeholder="Token Contract"
-				/>
-			</div>
-
-			<div class="flex flex-row gap-5">
-				<input
-					class="text-black"
-					type="text"
-					bind:value={arbitrator_pay}
-					placeholder="Arbitrator Pay Quantity"
-				/>
-				<input
-					class="text-black"
-					type="text"
-					bind:value={arbitrator_pay_token_contract}
-					placeholder="Token Contract"
-				/>
-			</div>
-			<div class="flex flex-row gap-5">
-				<input class="text-black" type="number" bind:value={category} placeholder="Category Num" />
-				<input
+					id="job_duration"
 					class="text-black"
 					type="number"
 					bind:value={job_duration}
 					placeholder="Job Duration Seconds"
 				/>
 			</div>
+
+			<div class="flex flex-row gap-5">
+				<input
+					class="text-black"
+					type="text"
+					bind:value={proposer}
+					placeholder="Proposer"
+					disabled
+				/>
+				<input class="text-black" type="text" bind:value={arbiter} placeholder="Arbiter" />
+			</div>
+
+			<div class="flex flex-row gap-5">
+				<input
+					class="text-black"
+					type="number"
+					bind:value={proposal_pay}
+					placeholder="Proposal Pay TLM"
+				/>
+				<input
+					class="text-black"
+					type="number"
+					bind:value={arbiter_pay}
+					placeholder="Arbiter Pay TLM"
+				/>
+				<!-- <input
+					class="text-black"
+					type="text"
+					bind:value={proposal_pay_token_contract}
+					placeholder="Token Contract"
+				/> -->
+			</div>
+
+			<!-- <div class="flex flex-row gap-5">
+				<input
+					class="text-black"
+					type="text"
+					bind:value={arbiter_pay}
+					placeholder="Arbiter Pay Quantity"
+				/>
+				<input
+					class="text-black"
+					type="text"
+					bind:value={arbiter_pay_token_contract}
+					placeholder="Token Contract"
+				/>
+			</div> -->
+
 			<textarea class="text-black" bind:value={summary} placeholder="Summary"></textarea>
-			<input class="text-black" type="text" bind:value={content_hash} placeholder="Content Hash" />
-			<button class="bg-green-500 text-white hover:bg-green-700" on:click={submit}
-				>Create Proposal</button
-			>
+			<!-- <input
+				class="text-black"
+				type="text"
+				bind:value={content_hash}
+				placeholder="IPFS HASH TO DOCUMENT WITH MORE INFO"
+			/> -->
+			<div class="file-upload">
+				<label for="file-upload" class="file-upload__label">Upload document with more info </label>
+				<input
+					id="file-upload"
+					class="file-upload__input"
+					type="file"
+					on:change={handleFileChanged}
+				/>
+			</div>
+			<div class="mt-2">
+				{#if isUploading}
+					<!-- Spining wheel when uploading -->
+					<div class="flex flex-col items-center">
+						<span class="mb-2">Uploading file...</span>
+						<Spinner color="green" />
+					</div>
+				{:else}
+					<button class="bg-green-500 text-white hover:bg-green-700" on:click={submit}
+						>Create Proposal</button
+					>
+				{/if}
+			</div>
 		</div>
 	</div>
 {/if}

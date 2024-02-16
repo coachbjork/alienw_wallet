@@ -38,6 +38,9 @@
 						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_PROPOSAL);
 						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.START_WORK);
 					}
+					if (selectedProposal.arbiter == $session.actor && !selectedProposal.arbiter_agreed) {
+						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.ARBITATOR_AGREE);
+					}
 					break;
 				case AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value:
 					if (selectedProposal.proposer == $session.actor) {
@@ -65,7 +68,7 @@
 					}
 					break;
 				case AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value:
-					if (selectedProposal.arbitrator == $session.actor) {
+					if (selectedProposal.arbiter == $session.actor) {
 						enableActions = [AW_WORKER_PROPOSALS.ACTIONS.ARBIRATOR_VOTE];
 					}
 					break;
@@ -121,7 +124,7 @@
 		await pushActions($session, actions);
 	}
 
-	async function onArbitorVote(vote: string) {
+	async function onArbiterVote(vote: string) {
 		if (!$session) {
 			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
 			return;
@@ -149,7 +152,34 @@
 					}
 				],
 				data: {
-					arbitrator: $session.actor,
+					arbiter: $session.actor,
+					proposal_id: selectedProposal.proposal_id,
+					dac_id: $activePlanetStore.scope
+				}
+			}
+		];
+		await pushActions($session, actions);
+	}
+
+	async function onArbiterAgree() {
+		if (!$session) {
+			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
+			return;
+		}
+		let action_name = AW_WORKER_PROPOSALS.ACTIONS.ARBITATOR_AGREE;
+
+		let actions = [
+			{
+				account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
+				name: action_name,
+				authorization: [
+					{
+						actor: $session.actor,
+						permission: 'active'
+					}
+				],
+				data: {
+					arbiter: $session.actor,
 					proposal_id: selectedProposal.proposal_id,
 					dac_id: $activePlanetStore.scope
 				}
@@ -374,17 +404,15 @@
 		Actions
 	</p>
 	{#if $session}
-		<div class="mt-5 grid grid-cols-2 gap-2">
-			<div class="w-32"></div>
-			<div class="w-32"></div>
+		<div class="mt-5 flex max-w-32 flex-wrap justify-center">
 			<button
-				class="col-span-2 rounded-xl bg-indigo-500 px-3 py-2 font-bold text-white hover:bg-indigo-700"
+				class="m-1 min-w-32 grow rounded-xl bg-indigo-500 p-2 font-bold text-white hover:bg-indigo-700"
 				on:click={() => onNewProposal()}
 			>
 				New Proposal
 			</button>
 
-			<button
+			<!-- <button
 				class="min-w-32 rounded-xl bg-green-500 px-3 py-2 font-bold text-white hover:bg-green-700"
 				on:click={() => onDelegate(true)}
 			>
@@ -395,32 +423,40 @@
 				on:click={() => onDelegate(false)}
 			>
 				Undelegate
-			</button>
+			</button> -->
 
 			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL) || enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL)}
 				<button
-					class="min-w-32 rounded-xl bg-green-500 px-3 py-2 font-bold text-white hover:bg-green-700"
+					class="m-1 min-w-32 grow rounded-xl bg-green-500 p-2 font-bold text-white hover:bg-green-700"
 					on:click={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
 				>
 					Approve
 				</button>
 				<button
-					class="min-w-32 rounded-xl bg-red-500 px-3 py-2 font-bold text-white hover:bg-red-700"
+					class="m-1 min-w-32 grow rounded-xl bg-red-500 p-2 font-bold text-white hover:bg-red-700"
 					on:click={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value)}
 				>
 					Deny
 				</button>
 			{/if}
+			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.ARBITATOR_AGREE)}
+				<button
+					class="m-1 min-w-32 grow rounded-xl bg-blue-500 p-2 font-bold text-white hover:bg-green-700"
+					on:click={() => onArbiterAgree()}
+				>
+					Agree
+				</button>
+			{/if}
 			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.ARBIRATOR_VOTE)}
 				<button
-					class="min-w-32 rounded-xl bg-green-500 px-3 py-2 font-bold text-white hover:bg-green-700"
-					on:click={() => onArbitorVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
+					class="m-1 min-w-32 grow rounded-xl bg-green-500 p-2 font-bold text-white hover:bg-green-700"
+					on:click={() => onArbiterVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
 				>
 					Approve
 				</button>
 				<button
-					class="min-w-32 rounded-xl bg-red-500 px-3 py-2 font-bold text-white hover:bg-red-700"
-					on:click={() => onArbitorVote(AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value)}
+					class="m-1 min-w-32 grow rounded-xl bg-red-500 p-2 font-bold text-white hover:bg-red-700"
+					on:click={() => onArbiterVote(AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value)}
 				>
 					Deny
 				</button>
@@ -428,7 +464,7 @@
 
 			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_PROPOSAL) || enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_WIP_PROPOSAL)}
 				<button
-					class=" min-w-32 rounded-xl bg-gray-500 px-3 py-2 font-bold text-white hover:bg-gray-700"
+					class=" m-1 min-w-32 grow rounded-xl bg-gray-500 p-2 font-bold text-white hover:bg-gray-700"
 					on:click={() => onCancel()}
 				>
 					Cancel
@@ -437,7 +473,7 @@
 
 			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.START_WORK)}
 				<button
-					class=" min-w-32 rounded-xl bg-blue-500 px-3 py-2 font-bold text-white hover:bg-blue-700"
+					class="m-1 min-w-32 grow rounded-xl bg-blue-500 p-2 font-bold text-white hover:bg-blue-700"
 					on:click={() => onStartWork()}
 				>
 					Start Work
@@ -445,7 +481,7 @@
 			{/if}
 			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.COMPLETE_WORK)}
 				<button
-					class="min-w-32 rounded-xl bg-teal-500 px-3 py-2 font-bold text-white hover:bg-teal-700"
+					class="m-1 min-w-32 grow rounded-xl bg-teal-500 p-2 font-bold text-white hover:bg-teal-700"
 					on:click={() => onCompleteWork()}
 				>
 					Complete
@@ -454,7 +490,7 @@
 
 			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.DISPUTE_UNAPPROVED_PROPOSAL)}
 				<button
-					class="min-w-32 rounded-xl bg-purple-500 px-3 py-2 font-bold text-white hover:bg-purple-700"
+					class="m-1 min-w-32 grow rounded-xl bg-purple-500 p-2 font-bold text-white hover:bg-purple-700"
 					on:click={() => onDispute()}
 				>
 					Dispute
@@ -463,7 +499,7 @@
 
 			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL)}
 				<button
-					class="min-w-32 rounded-xl bg-yellow-500 px-3 py-2 font-bold text-white hover:bg-yellow-700"
+					class="m-1 min-w-32 grow rounded-xl bg-yellow-500 p-2 font-bold text-white hover:bg-yellow-700"
 					on:click={() => onFinalize()}
 				>
 					Finalize
@@ -471,7 +507,7 @@
 			{/if}
 			{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CLEAR_EXPIRED_PROPOSAL)}
 				<button
-					class="min-w-32 rounded-xl bg-red-500 px-3 py-2 font-bold text-white hover:bg-red-700"
+					class="m-1 min-w-32 grow rounded-xl bg-red-500 p-2 font-bold text-white hover:bg-red-700"
 					on:click={() => onClearExpired()}
 				>
 					Clear
