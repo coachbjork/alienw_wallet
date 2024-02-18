@@ -7,6 +7,7 @@
 	import type { Planet } from '$lib/types';
 	import { Spinner } from 'flowbite-svelte';
 	import LabelSolid from 'flowbite-svelte-icons/LabelSolid.svelte';
+	import moment from 'moment';
 	import { afterUpdate, onMount } from 'svelte';
 
 	let proposals: any = [];
@@ -281,8 +282,10 @@
 										<div>Proposer: <span class="text-white">{proposal.proposer}</span></div>
 									</div>
 									<div class="flex flex-none basis-3/12 flex-col text-end">
-										<div>Expiration At (UTC)</div>
-										<div class="text-white">{proposal.expiration}</div>
+										<div>Expiration At</div>
+										<div class="text-white">
+											{moment(`${proposal.expiration}Z`).format('YYYY-MM-DD HH:mm:ss')}
+										</div>
 									</div>
 								</div>
 

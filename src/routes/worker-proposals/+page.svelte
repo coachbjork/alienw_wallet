@@ -15,6 +15,7 @@
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { Spinner } from 'flowbite-svelte';
 	import LabelSolid from 'flowbite-svelte-icons/LabelSolid.svelte';
+	import moment from 'moment';
 	import { afterUpdate, onMount } from 'svelte';
 
 	let proposals: any = [];
@@ -821,8 +822,10 @@
 										</div>
 									</div>
 									<div class="flex flex-none basis-3/12 flex-col text-end">
-										<div>Expired At (UTC)</div>
-										<div class="text-white">{proposal.expiry}</div>
+										<div>Expired At</div>
+										<div class="text-white">
+											{moment(`${proposal.expiry}`).format('YYYY-MM-DD HH:mm:ss')}
+										</div>
 										<div>
 											Duration: <span class="text-white"
 												>{secondsToHHMM(proposal.job_duration)}</span
