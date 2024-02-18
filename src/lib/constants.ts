@@ -1,3 +1,4 @@
+
 const blockchain_endpoints = [
     "https://wax.greymass.com",
     "https://api.waxsweden.org",
@@ -94,6 +95,26 @@ const AW_DAO = {
     },
 };
 
+const AW_MSIG = {
+    CONTRACT_NAME: "msig.worlds",
+    TABLES: {
+        PROPOSALS: "proposals",
+
+    },
+    ACTIONS: {
+        PROPOSE: "propose",
+        APPROVE: "approve",
+        UNAPPROVE: "unapprove",
+        CANCEL: "cancel",
+        EXECUTE: "exec",
+    },
+    PROP_STATE: {
+        PENDING: { name: "Pending", value: 0 },
+        EXECUTED: { name: "Executed", value: 1 },
+        CANCELLED: { name: "Cancelled", value: 2 },
+    },
+};
+
 const AW = {
     CONTRACT_NAME: "alien.worlds",
 };
@@ -115,8 +136,22 @@ const ROUTES = [{
 {
     name: "Worker Proposals",
     path: "/worker-proposals",
+},
+{
+    name: "Msig",
+    path: "/msig",
 }
 ];
 
-export { AW, AW_DAO, AW_PLANETS, AW_TOKEN, AW_WORKER_PROPOSALS, ROUTES, TOAST_TYPES, blockchain_endpoints };
+export {
+    AW,
+    AW_DAO,
+    AW_MSIG,
+    AW_PLANETS,
+    AW_TOKEN,
+    AW_WORKER_PROPOSALS,
+    ROUTES,
+    TOAST_TYPES,
+    blockchain_endpoints
+};
 

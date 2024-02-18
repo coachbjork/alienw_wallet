@@ -109,8 +109,8 @@
 				name: action_name,
 				authorization: [
 					{
-						actor: $session.actor,
-						permission: 'active'
+						actor: String($session.actor),
+						permission: String($session?.permission)
 					}
 				],
 				data: {
@@ -147,8 +147,8 @@
 				name: action_name,
 				authorization: [
 					{
-						actor: $session.actor,
-						permission: 'active'
+						actor: String($session.actor),
+						permission: String($session?.permission)
 					}
 				],
 				data: {
@@ -174,8 +174,8 @@
 				name: action_name,
 				authorization: [
 					{
-						actor: $session.actor,
-						permission: 'active'
+						actor: String($session.actor),
+						permission: String($session?.permission)
 					}
 				],
 				data: {
@@ -213,8 +213,8 @@
 				name: action_name,
 				authorization: [
 					{
-						actor: $session.actor,
-						permission: 'active'
+						actor: String($session.actor),
+						permission: String($session?.permission)
 					}
 				],
 				data: {
@@ -247,8 +247,8 @@
 				name: action_name,
 				authorization: [
 					{
-						actor: $session.actor,
-						permission: 'active'
+						actor: String($session.actor),
+						permission: String($session?.permission)
 					}
 				],
 				data: {
@@ -280,8 +280,8 @@
 				name: action_name,
 				authorization: [
 					{
-						actor: $session.actor,
-						permission: 'active'
+						actor: String($session.actor),
+						permission: String($session?.permission)
 					}
 				],
 				data: {
@@ -313,8 +313,8 @@
 				name: action_name,
 				authorization: [
 					{
-						actor: $session.actor,
-						permission: 'active'
+						actor: String($session.actor),
+						permission: String($session?.permission)
 					}
 				],
 				data: {
@@ -347,8 +347,8 @@
 				name: action_name,
 				authorization: [
 					{
-						actor: $session.actor,
-						permission: 'active'
+						actor: String($session.actor),
+						permission: String($session?.permission)
 					}
 				],
 				data: {
@@ -380,8 +380,8 @@
 				name: action_name,
 				authorization: [
 					{
-						actor: $session.actor,
-						permission: 'active'
+						actor: String($session.actor),
+						permission: String($session?.permission)
 					}
 				],
 				data: {

@@ -59,7 +59,7 @@
 		let response = await get_candidates($activePlanetStore.name);
 		if (!response) return;
 		let api_response: any = await fetch(
-			`/api/daoaw/candidates?activePlanetStore=${$activePlanetStore.name}`
+			`/api/daoaw/candidates?activePlanet=${$activePlanetStore.name}`
 		);
 		api_response = await api_response.json();
 		if (api_response) {
@@ -128,8 +128,8 @@
 				name: AW_DAO.ACTIONS.VOTE_CUSTODIANS,
 				authorization: [
 					{
-						actor: $session.actor,
-						permission: 'active'
+						actor: String($session.actor),
+						permission: String($session?.permission)
 					}
 				],
 				data: {

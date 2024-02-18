@@ -626,8 +626,8 @@
 				name: AW_WORKER_PROPOSALS.ACTIONS.CREATE_PROPOSAL,
 				authorization: [
 					{
-						actor: $session.actor,
-						permission: 'active'
+						actor: String($session.actor),
+						permission: String($session?.permission)
 					}
 				],
 				data: {
@@ -681,8 +681,8 @@
 				name: action_name,
 				authorization: [
 					{
-						actor: $session.actor,
-						permission: 'active'
+						actor: String($session.actor),
+						permission: String($session?.permission)
 					}
 				],
 				data: {
@@ -710,8 +710,8 @@
 	// 			name: AW_DAO.ACTIONS.VOTE_CUSTODIANS,
 	// 			authorization: [
 	// 				{
-	// 					actor: $session.actor,
-	// 					permission: 'active'
+	// actor: String($session.actor),
+	// permission: String($session?.permission)
 	// 				}
 	// 			],
 	// 			data: {
