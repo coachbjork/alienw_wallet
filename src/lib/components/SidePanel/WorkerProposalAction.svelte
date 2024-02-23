@@ -111,11 +111,11 @@
 					{
 						actor: String($session.actor),
 						permission: String($session?.permission)
+					},
+					{
+						actor: String($activePlanetStore.account),
+						permission: 'one'
 					}
-					// {
-					// 	actor: String($activePlanetStore.account),
-					// 	permission: 'one'
-					// }
 				],
 				data: {
 					custodian: $session.actor,
