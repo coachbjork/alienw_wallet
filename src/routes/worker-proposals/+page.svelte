@@ -850,13 +850,24 @@
 									<div></div>
 								{:else}
 									<div class="mx-auto mt-5 w-2/3 border-t-2 border-dotted border-gray-500"></div>
-									<div class="text-start">
+									<div class="mt-2 text-start">
 										<div>
 											Approved by: <span class="text-white">{getApprovedBy(proposal)}</span>
 										</div>
-										<div>Denied by: <span class="text-white">{getDeniedBy(proposal)}</span></div>
+										<div class="mt-1">
+											Denied by: <span class="text-white">{getDeniedBy(proposal)}</span>
+										</div>
 									</div>
 								{/if}
+								<div class="mx-auto mt-5 w-2/3 border-t-2 border-dotted border-gray-500"></div>
+								<div class="mt-2 text-start">
+									<div>
+										Title: <span class="text-white">{proposal.title}</span>
+									</div>
+									<div class="mt-1">
+										Summary: <span class="text-white">{proposal.summary}</span>
+									</div>
+								</div>
 							</div>
 							<div class="w-8 flex-none"></div>
 						</button>
