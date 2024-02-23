@@ -10,7 +10,6 @@
 
 	onMount(async () => {
 		setEnableActions();
-		console.log(String($session?.permission));
 	});
 
 	afterUpdate(async () => {

@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 import type { Custodian, Planet } from '$lib/types';
 import { writable } from 'svelte/store';
 
-const defaultValue: Planet = { name: 'Kavian', scope: 'kavian' };
+const defaultValue: Planet = { name: 'Kavian', scope: 'kavian', account: "kavian.dac" };
 export const activePlanetStore = writable<Planet>(defaultValue);
 export const custodiansStore = writable<Custodian[]>([]);
 

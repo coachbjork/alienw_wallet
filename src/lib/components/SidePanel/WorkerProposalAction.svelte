@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AW_WORKER_PROPOSALS, TOAST_TYPES } from '$lib/constants';
-	import { activePlanetStore, custodiansStore, session, toastStore } from '$lib/stores';
+	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { afterUpdate, createEventDispatcher, onMount } from 'svelte';
 
@@ -31,9 +31,9 @@
 				case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value:
 				case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value:
 					enableActions = [];
-					if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
-						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL);
-					}
+					// if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
+					enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL);
+					// }
 					if (selectedProposal.proposer == $session.actor) {
 						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_PROPOSAL);
 						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.START_WORK);
@@ -52,9 +52,9 @@
 					break;
 				case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value:
 					enableActions = [AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL];
-					if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
-						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL);
-					}
+					// if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
+					enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL);
+					// }
 
 					if (selectedProposal.proposer == $session.actor) {
 						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_WIP_PROPOSAL);
@@ -63,9 +63,9 @@
 					break;
 				case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value:
 					enableActions = [AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL];
-					if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
-						enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL);
-					}
+					// if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
+					enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL);
+					// }
 					break;
 				case AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value:
 					if (selectedProposal.arbiter == $session.actor) {
@@ -112,6 +112,10 @@
 						actor: String($session.actor),
 						permission: String($session?.permission)
 					}
+					// {
+					// 	actor: String($activePlanetStore.account),
+					// 	permission: 'one'
+					// }
 				],
 				data: {
 					custodian: $session.actor,

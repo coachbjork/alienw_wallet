@@ -66,13 +66,13 @@ const AW_WORKER_PROPOSALS = {
 };
 
 const AW_PLANETS = [
-    { name: "Kavian", scope: "kavian" },
-    { name: "Eyeke", scope: "eyeke" },
-    { name: "Neri", scope: "nerix" },
-    { name: "Veles", scope: "veles" },
-    { name: "Naron", scope: "naron" },
-    { name: "Magor", scope: "magor" },
-    { name: "Testa", scope: "testa" },
+    { name: "Kavian", scope: "kavian", account: "kavian.dac" },
+    { name: "Eyeke", scope: "eyeke", account: "eyeke.dac" },
+    { name: "Neri", scope: "nerix", account: "neri.dac" },
+    { name: "Veles", scope: "veles", account: "veles.dac" },
+    { name: "Naron", scope: "naron", account: "naron.dac" },
+    { name: "Magor", scope: "magor", account: "magor.dac" },
+    { name: "Testa", scope: "testa", account: "testadacdacc" },
 ];
 
 const AW_TOKEN = {
