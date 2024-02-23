@@ -292,7 +292,12 @@
 								<div class="mx-auto mb-3 mt-5 w-2/3 border-t-2 border-dotted border-gray-500"></div>
 								<div class="text-start">
 									<div>
-										Description: <span class="text-white">{proposal.description}</span>
+										Description: <span class="text-white">
+											{#each proposal.description.split('\n') as line}
+												{line}
+												<br />
+											{/each}</span
+										>
 									</div>
 
 									<div class="mt-2">

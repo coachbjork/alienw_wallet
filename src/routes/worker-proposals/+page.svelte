@@ -849,10 +849,20 @@
 								<div class="mx-auto mt-5 w-2/3 border-t-2 border-dotted border-gray-500"></div>
 								<div class="mt-2 text-start">
 									<div>
-										Title: <span class="text-white">{proposal.title}</span>
+										Title: <span class="text-white">
+											{#each proposal.title.split('\n') as line}
+												{line}
+												<br />
+											{/each}</span
+										>
 									</div>
 									<div class="mt-1">
-										Summary: <span class="text-white">{proposal.summary}</span>
+										Summary: <span class="text-white">
+											{#each proposal.summary.split('\n') as line}
+												{line}
+												<br />
+											{/each}
+										</span>
 									</div>
 								</div>
 								{#if proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.EXPIRED.value || proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value}
