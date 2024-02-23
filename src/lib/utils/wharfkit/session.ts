@@ -14,7 +14,7 @@ export async function pushActions(session: any, actions: any[]) {
             }
         );
         toastStore.add(
-            `<div>Executed: <a class="underline underline-offset-2" href="https://wax.bloks.io/transaction/${res.response.transaction_id}" target={"_blank"}>View Tx</a></div>`,
+            `<div>Executed: <a class="underline underline-offset-2" href="https://waxblock.io/transaction/${res.response.transaction_id}" target={"_blank"}>View Tx</a></div>`,
             TOAST_TYPES.SUCCESS
         );
     } catch (error: any) {

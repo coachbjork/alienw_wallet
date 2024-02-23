@@ -31,6 +31,7 @@
 				case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value:
 				case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value:
 					enableActions = [];
+					// TODO: uncomment
 					// if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
 					enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL);
 					// }
@@ -52,6 +53,7 @@
 					break;
 				case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value:
 					enableActions = [AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL];
+					// TODO: uncomment
 					// if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
 					enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL);
 					// }
@@ -63,6 +65,7 @@
 					break;
 				case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value:
 					enableActions = [AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL];
+					// TODO: uncomment
 					// if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
 					enableActions.push(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL);
 					// }
