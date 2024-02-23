@@ -79,9 +79,9 @@
 			proposal.arbiter_pay = 0;
 		}
 
-		await uploadFileToIPFS();
+		// await uploadFileToIPFS();
 
-		proposal.content_hash = content_hash;
+		// proposal.content_hash = content_hash;
 
 		await onCreateProposal(proposal)
 			.then(async (res: any) => {
@@ -91,13 +91,13 @@
 					close();
 				} else {
 					// unpin the file from IPFS
-					await removeFileFromIPFS();
+					// await removeFileFromIPFS();
 				}
 			})
 			.catch(async (error: any) => {
 				isUploading = false;
 				// unpin the file from IPFS
-				await removeFileFromIPFS();
+				// await removeFileFromIPFS();
 				console.error('Error:', error);
 			});
 	}
@@ -266,13 +266,21 @@
 			</div> -->
 
 			<textarea class="text-black" bind:value={summary} placeholder="Summary"></textarea>
-			<!-- <input
+			<label for="file-upload" class="file-upload__label"
+				>Upload document to IPFS via <a
+					class="text-blue-500 underline"
+					href="https://app.pinata.cloud/register"
+					target="_blank">Pinata</a
+				>
+				then paste the hash here:
+			</label>
+			<input
 				class="text-black"
 				type="text"
 				bind:value={content_hash}
 				placeholder="IPFS HASH TO DOCUMENT WITH MORE INFO"
-			/> -->
-			<div class="file-upload">
+			/>
+			<!-- <div class="file-upload">
 				<label for="file-upload" class="file-upload__label">Upload document with more info </label>
 				<input
 					id="file-upload"
@@ -280,7 +288,7 @@
 					type="file"
 					on:change={handleFileChanged}
 				/>
-			</div>
+			</div> -->
 			<div class="mt-2">
 				{#if isUploading}
 					<!-- Spining wheel when uploading -->
