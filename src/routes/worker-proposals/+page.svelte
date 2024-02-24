@@ -734,6 +734,8 @@
 				<div class="flex justify-center">
 					<Spinner color="purple" />
 				</div>
+			{:else if proposals.length == 0}
+				<div class="flex justify-center">No Data</div>
 			{:else}
 				<div class="flex flex-col gap-6">
 					{#each proposals as proposal}

@@ -29,6 +29,8 @@
 	}
 </script>
 
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y-no-static-element-interactions -->
 <div class="planet_menu rounded-xl border border-indigo-500">
 	<ul>
 		{#each AW_PLANETS as planet}

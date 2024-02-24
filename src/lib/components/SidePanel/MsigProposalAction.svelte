@@ -1,19 +1,28 @@
 <script lang="ts">
-	import { AW_MSIG, TOAST_TYPES } from '$lib/constants';
+	import { AW_DAO, AW_MSIG, TOAST_TYPES } from '$lib/constants';
+	import { get_msig_proposal_by_id } from '$lib/services/awMsigPropService';
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import { pushActions } from '$lib/utils/wharfkit/session';
+	import { ABI, Serializer } from '@wharfkit/antelope';
 	import { afterUpdate, createEventDispatcher, onMount } from 'svelte';
 
 	export let selectedProposal: any = {};
+	export let ableToClaimBudget: any = {};
+
 	let enableActions: any = [];
+	let new_proposal_name: string = '';
 	const dispatch = createEventDispatcher();
+	$: console.log('selectedProposal', selectedProposal);
+	$: console.log('ableToClaimBudget', ableToClaimBudget);
 
 	onMount(async () => {
 		setEnableActions();
+		await generateRandomProposalId();
 	});
 
 	afterUpdate(async () => {
 		setEnableActions();
+		await generateRandomProposalId();
 	});
 
 	function onNewProposal() {
@@ -48,6 +57,26 @@
 		}
 	}
 
+	async function generateRandomProposalId() {
+		const characters = '12345abcdefghijklmnopqrstuvwxyz';
+		let proposal_name = '';
+		let proposal_name_exists = false;
+		while (!proposal_name_exists) {
+			proposal_name = '';
+			for (let i = 0; i < 12; i++) {
+				proposal_name += characters.charAt(Math.floor(Math.random() * characters.length));
+			}
+			const res: any = await get_msig_proposal_by_id($activePlanetStore.name, proposal_name);
+
+			// If it does, generate a new one
+			// If it doesn't, set proposal_name_exists to true
+			if (!res?.proposal_name) {
+				proposal_name_exists = true;
+			}
+		}
+		new_proposal_name = proposal_name;
+	}
+
 	async function onApprove() {
 		if (!$session) {
 			toastStore.add('Please login to call action', TOAST_TYPES.WARNING);
@@ -71,6 +100,79 @@
 						permission: String($session?.permission)
 					},
 					dac_id: $activePlanetStore.scope
+				}
+			}
+		];
+		await pushActions($session, actions);
+	}
+
+	async function onProposeClaimBudget() {
+		if (!$session) {
+			toastStore.add('Please login to call action', TOAST_TYPES.WARNING);
+			return;
+		}
+		const abi = ABI.from({
+			structs: [
+				{
+					name: 'claimbudget',
+					base: '',
+					fields: [
+						{
+							name: 'dac_id',
+							type: 'name'
+						}
+					]
+				}
+			]
+		});
+
+		let actions = [
+			{
+				account: AW_MSIG.CONTRACT_NAME,
+				name: AW_MSIG.ACTIONS.PROPOSE,
+				authorization: [
+					{
+						actor: String($session.actor),
+						permission: String($session?.permission)
+					}
+				],
+				data: {
+					proposer: String($session.actor),
+					proposal_name: new_proposal_name,
+					requested: [{ actor: String($session.actor), permission: String($session?.permission) }],
+					dac_id: $activePlanetStore.scope,
+					metadata: [],
+					trx: {
+						actions: [
+							{
+								account: AW_DAO.CONTRACT_NAME,
+								name: AW_DAO.ACTIONS.CLAIM_BUDGET,
+								authorization: [
+									{
+										actor: String($session.actor),
+										permission: String($session?.permission)
+									}
+								],
+
+								data: Serializer.encode({
+									object: {
+										dac_id: $activePlanetStore.scope
+									},
+									abi,
+									type: 'claimbudget'
+								})
+							}
+						],
+						context_free_actions: [],
+						delay_sec: 0,
+						// expiration is 7 days from now
+						expiration: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('.')[0],
+						max_cpu_usage_ms: 0,
+						max_net_usage_words: 0,
+						ref_block_num: 0,
+						ref_block_prefix: 0,
+						transaction_extensions: []
+					}
 				}
 			}
 		];
@@ -179,6 +281,17 @@
 			</button>
 			<!-- {/if} -->
 
+			<!-- {#if enableActions.includes(AW_DAO.ACTIONS.CLAIM_BUDGET)} -->
+			<button
+				class={`m-1 min-w-32 grow rounded-xl bg-teal-500 p-2 font-bold text-white  ${
+					!ableToClaimBudget ? 'opacity-50' : 'hover:bg-teal-700'
+				}`}
+				disabled={!ableToClaimBudget}
+				on:click={() => onProposeClaimBudget()}
+			>
+				Claim Budget
+			</button>
+			<!-- {/if} -->
 			{#if enableActions.includes(AW_MSIG.ACTIONS.APPROVE)}
 				<button
 					class="m-1 min-w-32 grow rounded-xl bg-green-500 p-2 font-bold text-white hover:bg-green-700"

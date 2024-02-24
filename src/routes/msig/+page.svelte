@@ -3,12 +3,13 @@
 	import RecursiveObjectDisplay from '$lib/components/RecursiveObjectDisplay.svelte';
 	import MsigProposalAction from '$lib/components/SidePanel/MsigProposalAction.svelte';
 	import { AW_MSIG } from '$lib/constants';
+	import { get_dacglobals } from '$lib/services/awdaoService';
 	import { activePlanetStore } from '$lib/stores';
 	import type { Planet } from '$lib/types';
 	import { Spinner } from 'flowbite-svelte';
 	import LabelSolid from 'flowbite-svelte-icons/LabelSolid.svelte';
 	import moment from 'moment';
-	import { afterUpdate, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	let proposals: any = [];
 	function handleMockData() {
@@ -58,22 +59,29 @@
 	let selectedPlanet: Planet = $activePlanetStore;
 	let selectedProposal: any = null;
 	let isModalOpen = false;
+	let ableToClaimBudget = false;
+	let lastclaimbudgettime = new Date(0);
+	let lastperiodtime = new Date(0);
+
+	$: selectedPlanet !== $activePlanetStore && updateData();
 
 	onMount(async () => {
 		await fetchPendingProposals();
+		await fetchDacglobals();
 		loading = false;
 	});
 
-	afterUpdate(async () => {
-		if (selectedPlanet !== $activePlanetStore) {
+	async function updateData() {
+		{
+			loading = true;
 			selectedPlanet = $activePlanetStore;
 			selectedProposal = null;
-			loading = true;
 			proposals = [];
 			await fetchPendingProposals();
+			await fetchDacglobals();
 			loading = false;
 		}
-	});
+	}
 
 	async function fetchPendingProposals() {
 		let api_response: any = await fetch(
@@ -81,6 +89,17 @@
 		);
 		api_response = await api_response.json();
 		proposals = api_response;
+	}
+
+	async function fetchDacglobals() {
+		const response = await get_dacglobals($activePlanetStore.name);
+		if (!response) return;
+		lastclaimbudgettime =
+			response.find((dacglobal: any) => dacglobal.key === 'lastclaimbudgettime').value[1] || 1;
+		lastperiodtime =
+			response.find((dacglobal: any) => dacglobal.key === 'lastperiodtime').value[1] || 1;
+
+		ableToClaimBudget = lastclaimbudgettime < lastperiodtime;
 	}
 
 	function selectProposal(proposal: any) {
@@ -219,6 +238,8 @@
 				<div class="flex justify-center">
 					<Spinner color="purple" />
 				</div>
+			{:else if proposals.length == 0}
+				<div class="flex justify-center">No Data</div>
 			{:else}
 				<div class="flex flex-col gap-6">
 					{#each proposals as proposal}
@@ -333,6 +354,7 @@
 <div class="right-side">
 	<MsigProposalAction
 		{selectedProposal}
+		{ableToClaimBudget}
 		on:new_msig_proposal={handleNewProposal}
 		on:mockdata={handleMockData}
 	/>

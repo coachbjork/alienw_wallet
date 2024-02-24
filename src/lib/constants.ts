@@ -92,6 +92,7 @@ const AW_DAO = {
     },
     ACTIONS: {
         VOTE_CUSTODIANS: "votecust",
+        CLAIM_BUDGET: "claimbudget",
     },
 };
 
