@@ -602,6 +602,36 @@
 		}
 		return formatted;
 	}
+	function convertSecondsToComplexTime(seconds: number) {
+		let duration = moment.duration(seconds, 'seconds');
+		let years = duration.years();
+		let months = duration.months();
+		let days = duration.days();
+		let hours = duration.hours();
+		let minutes = duration.minutes();
+		let secondsLeft = duration.seconds();
+		let formatted = '';
+
+		if (years > 0) {
+			formatted += years + 'Y ';
+		}
+		if (months > 0) {
+			formatted += months + 'M ';
+		}
+		if (days > 0) {
+			formatted += days + 'D ';
+		}
+		if (hours > 0) {
+			formatted += hours + 'h ';
+		}
+		if (minutes > 0) {
+			formatted += minutes + 'm ';
+		}
+		if (secondsLeft > 0) {
+			formatted += secondsLeft + 's';
+		}
+		return formatted;
+	}
 
 	function handleNewProposal(event: any) {
 		isModalOpen = true;
@@ -830,7 +860,7 @@
 										</div>
 										<div>
 											Duration: <span class="text-white"
-												>{secondsToHHMM(proposal.job_duration)}</span
+												>{convertSecondsToComplexTime(proposal.job_duration)}</span
 											>
 										</div>
 									</div>

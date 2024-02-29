@@ -12,8 +12,6 @@
 	let enableActions: any = [];
 	let new_proposal_name: string = '';
 	const dispatch = createEventDispatcher();
-	$: console.log('selectedProposal', selectedProposal);
-	$: console.log('ableToClaimBudget', ableToClaimBudget);
 
 	onMount(async () => {
 		setEnableActions();
