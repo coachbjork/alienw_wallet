@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { AW_DAO, AW_MSIG, TOAST_TYPES } from '$lib/constants';
 	import { get_msig_proposal_by_id } from '$lib/services/awMsigPropService';
-	import { activePlanetStore, session, toastStore } from '$lib/stores';
+	import { activePlanetStore, custodiansStore, session, toastStore } from '$lib/stores';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { ABI, Serializer } from '@wharfkit/antelope';
 	import { afterUpdate, createEventDispatcher, onMount } from 'svelte';
@@ -50,6 +50,9 @@
 			enableActions.push(AW_MSIG.ACTIONS.EXECUTE);
 			enableActions.push(AW_MSIG.ACTIONS.CANCEL);
 			enableActions.push(AW_MSIG.ACTIONS.PROPOSE);
+			if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
+				enableActions.push(AW_DAO.ACTIONS.CLAIM_BUDGET);
+			}
 		} else {
 			enableActions = [];
 		}
@@ -279,17 +282,17 @@
 			</button>
 			<!-- {/if} -->
 
-			<!-- {#if enableActions.includes(AW_DAO.ACTIONS.CLAIM_BUDGET)} -->
-			<button
-				class={`m-1 min-w-32 grow rounded-xl bg-teal-500 p-2 font-bold text-white  ${
-					!ableToClaimBudget ? 'opacity-50' : 'hover:bg-teal-700'
-				}`}
-				disabled={!ableToClaimBudget}
-				on:click={() => onProposeClaimBudget()}
-			>
-				Claim Budget
-			</button>
-			<!-- {/if} -->
+			{#if enableActions.includes(AW_DAO.ACTIONS.CLAIM_BUDGET)}
+				<button
+					class={`m-1 min-w-32 grow rounded-xl bg-teal-500 p-2 font-bold text-white  ${
+						!ableToClaimBudget ? 'opacity-50' : 'hover:bg-teal-700'
+					}`}
+					disabled={!ableToClaimBudget}
+					on:click={() => onProposeClaimBudget()}
+				>
+					Claim Budget
+				</button>
+			{/if}
 			{#if enableActions.includes(AW_MSIG.ACTIONS.APPROVE)}
 				<button
 					class="m-1 min-w-32 grow rounded-xl bg-green-500 p-2 font-bold text-white hover:bg-green-700"
