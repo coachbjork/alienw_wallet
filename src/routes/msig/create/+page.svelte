@@ -156,49 +156,32 @@
 			return;
 		}
 
-		console.log('requested_approvals', requested_approvals);
-		console.log('metadata', metadata);
-		console.log('actions', actions);
-		console.log('expired_at', expired_at);
-		// const abi = ABI.from({
-		// 	structs: [
-		// 		{
-		// 			name: 'claimbudget',
-		// 			base: '',
-		// 			fields: [
-		// 				{
-		// 					name: 'dac_id',
-		// 					type: 'name'
-		// 				}
-		// 			]
-		// 		}
-		// 	]
-		// });
-
 		let actions_data = actions.map((item) => {
-			let abi = ABI.from({
-				structs: [
-					{
-						name: item.action.name,
-						base: item.action.base,
-						fields: item.action.fields
-					}
-				]
-			});
-			let data = Serializer.encode({
-				object: item.data,
-				abi,
-				type: item.action.name
-			});
-			return {
-				account: item.sc_account,
-				name: item.action.name,
-				authorization: item.action.authorization,
-				data: data
-			};
+			try {
+				let abi = ABI.from({
+					structs: [
+						{
+							name: item.action.name,
+							base: item.action.base,
+							fields: item.action.fields
+						}
+					]
+				});
+				let data = Serializer.encode({
+					object: item.data,
+					abi,
+					type: item.action.name
+				});
+				return {
+					account: item.sc_account,
+					name: item.action.name,
+					authorization: item.action.authorization,
+					data: data
+				};
+			} catch (error: any) {
+				toastStore.add(`Error encoding action data: ${error.message}`, TOAST_TYPES.WARNING);
+			}
 		});
-
-		console.log('actions_data', actions_data);
 
 		let tx_actions = [
 			{
@@ -230,6 +213,7 @@
 				}
 			}
 		];
+
 		await pushActions($session, tx_actions);
 	}
 </script>
