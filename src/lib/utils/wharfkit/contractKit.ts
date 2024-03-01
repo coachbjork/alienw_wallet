@@ -37,6 +37,18 @@ const cursorReset = async (cursor: any) => {
     return await cursor.reset();
 }
 
+const getActionsOfAccount = async (account: string) => {
+    const client = new APIClient({ url: get(bpRPCStore) });
+    const res: any = await client.v1.chain.get_abi(account).catch((e) => { });
+    if (!res) return [];
+    const actions = res.abi.actions.map((action: any) => {
+        // get action.type and find the type in abi.structs
+        const struct = res.abi.structs.find((struct: any) => struct.name === action.type);
+        return { name: action.name, fields: struct.fields, base: struct.base };
+    });
+    return actions;
+}
+
 // const data =
 //     "0000402601aca2dac0a6cbd9c58a65cc005480120000000004544c4d000000003732707634732e632e77616d20612e6433752e632e77616d2068776561712e77616d2067796b62342e77616d206f757a346f2e632e77616d"
 
@@ -49,5 +61,10 @@ const cursorReset = async (cursor: any) => {
 // console.log(JSON.stringify(decoded))
 
 
-export { cursorAll, cursorNext, cursorReset, getMultiDataCursor, getSingleData };
+export {
+    cursorAll,
+    cursorNext,
+    cursorReset, getActionsOfAccount, getMultiDataCursor,
+    getSingleData
+};
 

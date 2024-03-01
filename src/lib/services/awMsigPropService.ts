@@ -1,5 +1,5 @@
 import { AW_MSIG, AW_PLANETS } from '$lib/constants';
-import { getSingleData } from '$lib/contractKit';
+import { getSingleData } from '$lib/utils/wharfkit/contractKit';
 
 import _ from "lodash";
 

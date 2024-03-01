@@ -1,5 +1,5 @@
 import { AW_PLANETS, AW_WORKER_PROPOSALS } from '$lib/constants';
-import { cursorAll, getMultiDataCursor, getSingleData } from '$lib/contractKit';
+import { cursorAll, getMultiDataCursor, getSingleData } from '$lib/utils/wharfkit/contractKit';
 
 import _ from "lodash";
 

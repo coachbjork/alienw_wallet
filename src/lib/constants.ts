@@ -144,6 +144,12 @@ const ROUTES = [{
 }
 ];
 
+const LOCAL_STORAGE_KEYS = {
+    ACTIVE_PLANET: "activePlanetStore",
+    CUSTODIANS: "custodiansStore",
+    BP_RPC: "bpRPCStore",
+};
+
 export {
     AW,
     AW_DAO,
@@ -153,6 +159,7 @@ export {
     AW_WORKER_PROPOSALS,
     ROUTES,
     TOAST_TYPES,
-    blockchain_endpoints
+    blockchain_endpoints,
+    LOCAL_STORAGE_KEYS
 };
 

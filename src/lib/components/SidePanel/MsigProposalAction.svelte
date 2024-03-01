@@ -23,10 +23,6 @@
 		await generateRandomProposalId();
 	});
 
-	function onNewProposal() {
-		dispatch('new_msig_proposal', {});
-	}
-
 	function setEnableActions() {
 		if (selectedProposal && $session) {
 			enableActions = [];
@@ -274,12 +270,13 @@
 	{#if $session}
 		<div class="mt-5 flex max-w-32 flex-wrap justify-center">
 			<!-- {#if enableActions.includes(AW_MSIG.ACTIONS.PROPOSE)} -->
-			<button
-				class="m-1 min-w-32 grow rounded-xl bg-indigo-500 p-2 font-bold text-white hover:bg-indigo-700"
-				on:click={() => onNewProposal()}
+			<a
+				href="/msig/create"
+				class="m-1 min-w-32 grow rounded-xl bg-indigo-500 p-2 text-center font-bold text-white hover:bg-indigo-700"
+				type="button"
 			>
 				New Msig
-			</button>
+			</a>
 			<!-- {/if} -->
 
 			{#if enableActions.includes(AW_DAO.ACTIONS.CLAIM_BUDGET)}

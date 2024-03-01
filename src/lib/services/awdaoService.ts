@@ -1,6 +1,6 @@
 import { AW_DAO, AW_PLANETS, AW_TOKEN } from '$lib/constants';
-import { cursorAll, getMultiDataCursor, getSingleData } from '$lib/contractKit';
 import { voteDecayFormula } from '$lib/utils';
+import { cursorAll, getMultiDataCursor, getSingleData } from '$lib/utils/wharfkit/contractKit';
 import _ from "lodash";
 
 export async function get_dacglobals(activePlanet: string) {

@@ -58,7 +58,6 @@
 	let loading = true;
 	let selectedPlanet: Planet = $activePlanetStore;
 	let selectedProposal: any = null;
-	let isModalOpen = false;
 	let ableToClaimBudget = false;
 	let lastclaimbudgettime = new Date(0);
 	let lastperiodtime = new Date(0);
@@ -178,10 +177,6 @@
 	// 	}
 	// }
 
-	function handleNewProposal(event: any) {
-		isModalOpen = true;
-	}
-
 	// async function handleCreateProposalAction(proposal: any) {
 	// 	if (!$session) {
 	// 		toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
@@ -224,10 +219,6 @@
 	// 	];
 	// 	return pushActions($session, actions);
 	// }
-
-	function closeModal() {
-		isModalOpen = false;
-	}
 </script>
 
 <div class="main-content py-6">
@@ -352,19 +343,8 @@
 	<!-- {#if $session}{/if} -->
 </div>
 <div class="right-side">
-	<MsigProposalAction
-		{selectedProposal}
-		{ableToClaimBudget}
-		on:new_msig_proposal={handleNewProposal}
-		on:mockdata={handleMockData}
-	/>
+	<MsigProposalAction {selectedProposal} {ableToClaimBudget} on:mockdata={handleMockData} />
 </div>
-
-<!-- <CreateWorkerProposalModal
-	isOpen={isModalOpen}
-	onClose={closeModal}
-	onCreateProposal={handleCreateProposalAction}
-/> -->
 
 <style>
 </style>
