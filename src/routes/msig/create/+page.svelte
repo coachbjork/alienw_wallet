@@ -274,7 +274,7 @@
 						</button>
 					</div>
 					{#each requested_approvals as requested, index}
-						<div class="mt-1 flex flex-row">
+						<div class="mt-1 flex flex-row flex-wrap">
 							<input
 								type="text"
 								bind:value={requested.actor}
@@ -285,7 +285,7 @@
 							<input
 								type="text"
 								bind:value={requested.permission}
-								class="ml-10 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+								class="ml-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 								placeholder="Permission Name"
 							/>
 
@@ -324,7 +324,7 @@
 							<input
 								type="text"
 								bind:value={pair.value}
-								class="ml-10 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+								class="ml-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 								placeholder="Value"
 							/>
 
@@ -369,7 +369,7 @@
 								on:change={(event) => {
 									on_change_action_name(event?.target?.value, index);
 								}}
-								class=" ml-10 mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+								class=" ml-1 mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 							>
 								<option value="" selected>Select an action...</option>
 								{#each action.sc_actions as item}
@@ -431,7 +431,7 @@
 										<input
 											type="text"
 											bind:value={auth_item.permission}
-											class="ml-10 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+											class="ml-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 											placeholder="Permission Name"
 										/>
 
