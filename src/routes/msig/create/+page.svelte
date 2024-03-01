@@ -226,7 +226,7 @@
 		<!-- need label and input fields for: proposer, proposal_name -->
 
 		{#if $session}
-			<div class="mx-auto flex w-2/3 flex-col rounded-lg border border-indigo-500 p-5">
+			<div class="mx-auto flex w-2/3 flex-col rounded-lg border p-5">
 				<div class="flex flex-col">
 					<label for="proposer" class="text-base font-semibold"> Proposer: </label>
 					<input
