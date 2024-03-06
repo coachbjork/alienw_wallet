@@ -45,6 +45,7 @@
 	"type": "module",
 	"dependencies": {
 		"@pinata/sdk": "^2.1.0",
+		"@wharfkit/account": "^1.0.1",
 		"@wharfkit/antelope": "^1.0.3",
 		"@wharfkit/contract": "^1.1.2",
 		"@wharfkit/session": "^1.2.2",

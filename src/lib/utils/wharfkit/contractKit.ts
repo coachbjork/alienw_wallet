@@ -37,7 +37,7 @@ const cursorReset = async (cursor: any) => {
     return await cursor.reset();
 }
 
-const getActionsOfAccount = async (account: string) => {
+const getActionsOfSmartContract = async (account: string) => {
     const client = new APIClient({ url: get(bpRPCStore) });
     const res: any = await client.v1.chain.get_abi(account).catch((e) => { });
     if (!res) return [];
@@ -64,7 +64,7 @@ const getActionsOfAccount = async (account: string) => {
 export {
     cursorAll,
     cursorNext,
-    cursorReset, getActionsOfAccount, getMultiDataCursor,
+    cursorReset, getActionsOfSmartContract, getMultiDataCursor,
     getSingleData
 };
 

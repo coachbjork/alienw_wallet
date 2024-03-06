@@ -4,7 +4,8 @@
 	import { get_msig_proposal_by_id } from '$lib/services/awMsigPropService';
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import type { Authorization, Planet, Transaction_Action } from '$lib/types';
-	import { getActionsOfAccount } from '$lib/utils/wharfkit/contractKit';
+	import { getAccountOnchain } from '$lib/utils/wharfkit/accountKit';
+	import { getActionsOfSmartContract } from '$lib/utils/wharfkit/contractKit';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { ABI, Serializer } from '@wharfkit/antelope';
 	import { CirclePlusSolid, XCircleSolid } from 'flowbite-svelte-icons';
@@ -14,23 +15,39 @@
 	let selectedPlanet: Planet = $activePlanetStore;
 	$: selectedPlanet !== $activePlanetStore && updateData();
 	let new_proposal_name: string = '';
-	let expired_at: string = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
+	let expired_at: string = new Date(
+		new Date().getTime() - new Date().getTimezoneOffset() * 60000 + 7 * 24 * 60 * 60 * 1000
+	)
 		.toISOString()
 		.slice(0, 16);
+
 	let requested_approvals: Authorization[] = [];
 	let metadata: any = [];
 	let actions: Transaction_Action[] = [];
+	let planetDAO_permissions: string[] = [];
 
 	onMount(async () => {
 		await generateRandomProposalId();
-		if ($session) {
+		if ($activePlanetStore) {
+			await getAccountInstance($activePlanetStore.account);
+
 			requested_approvals = [
 				{
-					actor: $session ? String($session.actor) : '',
-					permission: $session ? String($session?.permission) : ''
+					actor: $activePlanetStore ? $activePlanetStore.account : '',
+					permission: planetDAO_permissions[0] ? planetDAO_permissions[0] : ''
 				}
 			];
 		}
+		metadata = [
+			{
+				key: 'Title',
+				value: ''
+			},
+			{
+				key: 'Description',
+				value: ''
+			}
+		];
 		loading = false;
 	});
 
@@ -38,11 +55,18 @@
 		{
 			loading = true;
 			selectedPlanet = $activePlanetStore;
-			expired_at = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000)
+			expired_at = new Date(
+				new Date().getTime() - new Date().getTimezoneOffset() * 60000 + 7 * 24 * 60 * 60 * 1000
+			)
 				.toISOString()
 				.slice(0, 16);
-			requested_approvals = [];
-			new_request_approval();
+			requested_approvals = [
+				{
+					actor: $activePlanetStore ? $activePlanetStore.account : '',
+					permission: planetDAO_permissions[0] ? planetDAO_permissions[0] : ''
+				}
+			];
+			actions = [];
 			await generateRandomProposalId();
 			loading = false;
 		}
@@ -72,8 +96,8 @@
 		requested_approvals = [
 			...requested_approvals,
 			{
-				actor: '',
-				permission: ''
+				actor: $activePlanetStore ? $activePlanetStore.account : '',
+				permission: planetDAO_permissions[0] ? planetDAO_permissions[0] : ''
 			}
 		];
 	}
@@ -111,8 +135,16 @@
 		actions = actions.filter((_, i) => i !== index);
 	}
 
+	async function getAccountInstance(account: string) {
+		const dao_instance = await getAccountOnchain(account);
+		planetDAO_permissions = dao_instance.data.permissions.map((item: any) =>
+			String(item.perm_name)
+		);
+		console.log(planetDAO_permissions);
+	}
+
 	async function on_change_sc_account(index: number) {
-		const data = await getActionsOfAccount(actions[index].sc_account);
+		const data = await getActionsOfSmartContract(actions[index].sc_account);
 		actions[index].sc_actions = data;
 	}
 
@@ -120,11 +152,15 @@
 		let action = actions[index].sc_actions.find((action) => action.name === value);
 		action.authorization = [
 			{
-				actor: '',
-				permission: ''
+				actor: $activePlanetStore ? $activePlanetStore.account : '',
+				permission: planetDAO_permissions[0] ? planetDAO_permissions[0] : ''
 			}
 		];
 		actions[index].action = action;
+	}
+
+	function on_change_approval_permission(value: any, index: number) {
+		requested_approvals[index].permission = value;
 	}
 
 	function new_action_auth(index: number) {
@@ -263,7 +299,9 @@
 				<!-- Request Approvals -->
 				<div class="mt-3 flex flex-col">
 					<div class="flex flex-row">
-						<label for="expired_at" class="text-base font-semibold"> Request Approvals: </label>
+						<label for="request-approvals" class="text-base font-semibold">
+							Request Approvals:
+						</label>
 						<!-- Icon add -->
 						<button
 							on:click={() => {
@@ -280,14 +318,29 @@
 								bind:value={requested.actor}
 								class=" rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 								placeholder="Account Name"
+								disabled
 							/>
 
-							<input
+							<!-- <input
 								type="text"
 								bind:value={requested.permission}
 								class="ml-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 								placeholder="Permission Name"
-							/>
+							/> -->
+							<select
+								id={`request_approval_${index}`}
+								name={`request_approval_${index}`}
+								bind:value={requested.permission}
+								on:change={(event) => {
+									on_change_approval_permission(event?.target?.value, index);
+								}}
+								class=" ml-1 mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+							>
+								<option value="" selected>Select a permission...</option>
+								{#each planetDAO_permissions as item}
+									<option value={item}>{item}</option>
+								{/each}
+							</select>
 
 							<button
 								on:click={() => {
@@ -302,7 +355,7 @@
 				<!-- Metadata -->
 				<div class="mt-3 flex flex-col">
 					<div class="flex flex-row">
-						<label for="expired_at" class="text-base font-semibold">Metadata: </label>
+						<label for="metadata" class="text-base font-semibold">Metadata: </label>
 						<!-- Icon add -->
 						<button
 							on:click={() => {
@@ -325,7 +378,7 @@
 								type="text"
 								bind:value={pair.value}
 								class="ml-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
-								placeholder="Value"
+								placeholder="Enter Value"
 							/>
 
 							<button
@@ -341,7 +394,7 @@
 				<!-- Action Data -->
 				<div class="mt-3 flex flex-col">
 					<div class="flex flex-row">
-						<label for="expired_at" class="text-base font-semibold">Actions: </label>
+						<label for="action-data" class="text-base font-semibold">Actions: </label>
 						<!-- Icon add -->
 						<button
 							on:click={() => {
@@ -389,7 +442,7 @@
 						<!-- Fields -->
 						<div class="ml-10 mt-3 flex flex-col">
 							{#if action.action.fields.length > 0}
-								<label for="expired_at" class="text-base font-semibold">Fields: </label>
+								<label for="fields" class="text-base font-semibold">Fields: </label>
 								<!-- List all fields -->
 								{#each action.action.fields as field, index2}
 									<div class="mt-1 flex flex-row">
@@ -409,7 +462,9 @@
 						{#if action.action.authorization.length > 0}
 							<div class="mb-3 ml-10 mt-3 flex flex-col">
 								<div class="flex flex-row">
-									<label for="expired_at" class="text-base font-semibold"> Authorization: </label>
+									<label for="authorization" class="text-base font-semibold">
+										Authorization:
+									</label>
 									<!-- Icon add -->
 									<button
 										on:click={() => {
