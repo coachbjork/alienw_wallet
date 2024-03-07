@@ -214,6 +214,14 @@
 						}
 					]
 				});
+				// JSON.parse all attributes of data
+
+				Object.keys(item.data).forEach((key) => {
+					try {
+						item.data[key] = JSON.parse(item.data[key]);
+					} catch (error) {}
+				});
+
 				let data = Serializer.encode({
 					object: item.data,
 					abi,
@@ -228,6 +236,13 @@
 			} catch (error: any) {
 				toastStore.add(`Error encoding action data: ${error.message}`, TOAST_TYPES.WARNING);
 			}
+		});
+		// new_metadata with all key as lowercase
+		let new_metadata = metadata.map((item: any) => {
+			return {
+				key: item.key.toLowerCase(),
+				value: item.value
+			};
 		});
 		let tx_actions = [
 			{
@@ -244,7 +259,7 @@
 					proposal_name: new_proposal_name,
 					requested: requested_approvals,
 					dac_id: $activePlanetStore.scope,
-					metadata,
+					metadata: new_metadata,
 					trx: {
 						actions: actions_data,
 						context_free_actions: [],
