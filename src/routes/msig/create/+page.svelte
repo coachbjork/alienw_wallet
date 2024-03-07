@@ -140,16 +140,27 @@
 		planetDAO_permissions = dao_instance.data.permissions.map((item: any) =>
 			String(item.perm_name)
 		);
-		console.log(planetDAO_permissions);
 	}
 
 	async function on_change_sc_account(index: number) {
 		const data = await getActionsOfSmartContract(actions[index].sc_account);
+		actions[index].action = { name: '', fields: [], authorization: [], base: '' };
+		actions[index].data = {};
 		actions[index].sc_actions = data;
 	}
 
 	function on_change_action_name(value: any, index: number) {
-		let action = actions[index].sc_actions.find((action) => action.name === value);
+		if (value === '') {
+			// reset action and data
+			actions[index].action = { name: '', fields: [], authorization: [], base: '' };
+			actions[index].data = {};
+			console.log(actions);
+			return;
+		}
+		let action = Object.assign(
+			{},
+			actions[index].sc_actions.find((item) => item.name === value)
+		);
 		action.authorization = [
 			{
 				actor: $activePlanetStore ? $activePlanetStore.account : '',
@@ -218,7 +229,6 @@
 				toastStore.add(`Error encoding action data: ${error.message}`, TOAST_TYPES.WARNING);
 			}
 		});
-
 		let tx_actions = [
 			{
 				account: AW_MSIG.CONTRACT_NAME,
@@ -318,7 +328,6 @@
 								bind:value={requested.actor}
 								class=" rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 								placeholder="Account Name"
-								disabled
 							/>
 
 							<!-- <input
@@ -454,6 +463,11 @@
 											class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 											placeholder={field.name}
 										/>
+										<span
+											class="mt-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"
+										>
+											{field.type}
+										</span>
 									</div>
 								{/each}
 							{/if}

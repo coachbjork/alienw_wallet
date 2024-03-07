@@ -19,9 +19,7 @@ export async function GET({ params, request, cookies }) {
             // 		dac_id: 'kavian'
             // 	}
             // },
-            // convert trx_contracts and trx_actions to an array of objects 
-            //  dao.worlds is the contract name and claimbudget is the action name
-            // dac_id is a parameter for the action and kavian is the value
+            // convert trx_contracts and trx_actions to an array of objects with contract_name, action_name and action_data
             item.actions = Object.keys(item.trx_contracts).map((key: any) => {
 
                 return {
