@@ -12,11 +12,15 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@svelte-plugins/tooltips": "^3.0.0",
 		"@sveltejs/adapter-auto": "^3.0.0",
+		"@sveltejs/adapter-static": "^3.0.1",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@tailwindcss/forms": "^0.5.3",
 		"@types/eslint": "8.56.0",
+		"@types/lodash": "^4.14.202",
+		"@types/node": "^20.11.17",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
 		"autoprefixer": "^10.4.16",
@@ -24,8 +28,8 @@
 		"eslint-config-prettier": "^9.1.0",
 		"eslint-plugin-svelte": "^2.35.1",
 		"flowbite": "^2.2.1",
-		"flowbite-svelte": "^0.44.21",
-		"flowbite-svelte-icons": "^0.4.5",
+		"flowbite-svelte": "^0.44.22",
+		"flowbite-svelte-icons": "^1.0.4",
 		"postcss": "^8.4.33",
 		"prettier": "^3.1.1",
 		"prettier-plugin-svelte": "^3.1.2",
@@ -40,6 +44,8 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@pinata/sdk": "^2.1.0",
+		"@wharfkit/account": "^1.0.1",
 		"@wharfkit/antelope": "^1.0.3",
 		"@wharfkit/contract": "^1.1.2",
 		"@wharfkit/session": "^1.2.2",
@@ -51,7 +57,9 @@
 		"@wharfkit/wallet-plugin-wombat": "^1.1.0",
 		"@wharfkit/web-renderer": "^1.1.2",
 		"axios": "^1.6.5",
+		"lodash": "^4.17.21",
 		"moment": "^2.30.1",
-		"svelte-awesome": "^3.3.1"
+		"svelte-awesome": "^3.3.1",
+		"web-streams-node": "^0.4.0"
 	}
 }

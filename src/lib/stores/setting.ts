@@ -1,18 +1,18 @@
 import { browser } from '$app/environment';
+import { LOCAL_STORAGE_KEYS } from '$lib/constants';
 import { writable } from 'svelte/store';
 
 const defaultValue = 'https://wax.greymass.com';
-const initialValue = browser ? window.localStorage.getItem('blockchain_rpc') ?? defaultValue : defaultValue;
-export const blockchain_rpc = writable<string>(initialValue);
+export const bpRPCStore = writable<string>(defaultValue);
 
-blockchain_rpc.subscribe((value) => {
-    if (browser) {
-        window.localStorage.setItem('blockchain_rpc', value);
-    }
-});
 if (browser) {
-    const stored = window.localStorage.getItem('blockchain_rpc');
+
+    const stored = window.localStorage.getItem(LOCAL_STORAGE_KEYS.BP_RPC);
     if (stored) {
-        blockchain_rpc.set(stored);
+        bpRPCStore.set(stored);
     }
+
+    bpRPCStore.subscribe((value) => {
+        window.localStorage.setItem(LOCAL_STORAGE_KEYS.BP_RPC, value);
+    });
 }

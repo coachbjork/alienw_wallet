@@ -1,3 +1,4 @@
+
 const blockchain_endpoints = [
     "https://wax.greymass.com",
     "https://api.waxsweden.org",
@@ -13,17 +14,110 @@ const blockchain_endpoints = [
     "https://api.wax.alohaeos.com",
 ];
 
-const AW_planets = ["Kavian", "Eyeke", "Neri", "Veles", "Naron", "Magor"];
+const AW_WORKER_PROPOSALS = {
+    CONTRACT_NAME: "prop.worlds",
+    TABLES: {
+        PROPOSALS: "proposals",
+        PROPOSAL_VOTES: "propvotes",
+        CONFIGS: "configs",
+    },
+    DELEGATE_MODE: {
+        PROPOSAL: "proposal",
+        CATEGORY: "category",
+    },
+    ACTIONS: {
+        CREATE_PROPOSAL: "createprop",
+        VOTE_PROPOSAL: "voteprop",
+        START_WORK: "startwork",
+        CANCEL_PROPOSAL: "cancelprop",
+        CANCEL_WIP_PROPOSAL: "cancelwip",
+        COMPLETE_WORK: "completework",
+        VOTE_FINISH_PROPOSAL: "votepropfin",
+        DISPUTE_UNAPPROVED_PROPOSAL: "dispute",
+        FINALIZE_PROPOSAL: "finalize",
+        UPDATE_CONFIG: "updateconfig",
+        ARBIRATOR_APPROVE: "arbapprove",
+        ARBIRATOR_DENY: "arbdeny",
+        ARBIRATOR_VOTE: "arbirator_vote",
+        ARBITATOR_AGREE: "arbagree",
+        CLEAR_EXPIRED_PROPOSAL: "clearexpprop",
+        DELEGATE_VOTE: "delegatevote",
+        DELEGATE_VOTE_CATEGORY: "delegatecat",
+        UNDELEGATE_VOTE: "undelegateca",
+    },
+    PROP_STATE: {
+        PENDING_APPROVAL: { name: "Pending Approval", value: "pendingappr" },
+        HAS_ENOUGH_APP_VOTES: { name: "Ready To Start", value: "apprvtes" },
+        IN_PROGRESS: { name: "In Progress", value: "inprogress" },
+        PENDING_FINALIZE: { name: "Pending Finalize", value: "pendingfin" },
+        HAS_ENOUGH_FIN_VOTES: { name: "Ready To Finalize", value: "apprfinvtes" },
+        EXPIRED: { name: "Expired", value: "expired" },
+        DISPUTED: { name: "Disputed", value: "indispute" },
+    },
+    VOTE: {
+        VOTE_PROP_APPROVE: { name: "Approve", value: "propapprove" },
+        VOTE_PROP_DENY: { name: "Deny", value: "propdeny" },
+        VOTE_FINAL_APPROVE: { name: "Approve", value: "finalapprove" },
+        VOTE_FINAL_DENY: { name: "Deny", value: "finaldeny" },
+        VOTE_APPROVE: { name: "Approve", value: "approve" },
+        VOTE_DENY: { name: "Deny", value: "deny" },
+        VOTE_ABSTAIN: { name: "Abstain", value: "abstain" },
+    }
+};
 
-const AW = {
-    PLANETS: ["Kavian", "Eyeke", "Neri", "Veles", "Naron", "Magor"],
+const AW_PLANETS = [
+    { name: "Kavian", scope: "kavian", account: "kavian.dac" },
+    { name: "Eyeke", scope: "eyeke", account: "eyeke.dac" },
+    { name: "Neri", scope: "nerix", account: "neri.dac" },
+    { name: "Veles", scope: "veles", account: "veles.dac" },
+    { name: "Naron", scope: "naron", account: "naron.dac" },
+    { name: "Magor", scope: "magor", account: "magor.dac" },
+    { name: "Testa", scope: "testa", account: "testadacdacc" },
+];
+
+const AW_TOKEN = {
+    CONTRACT_NAME: "token.worlds",
+    TABLES: {
+        STAKES: "stakes",
+    }
+};
+
+const AW_DAO = {
     CONTRACT_NAME: "dao.worlds",
-    CANDIDATES_TABLE: "candidates",
-    DACGLOBALS_TABLE: "dacglobals",
-    VOTES_TABLE: "votes",
+    TABLES: {
+        CANDIDATES: "candidates",
+        DACGLOBALS: "dacglobals",
+        VOTES: "votes",
+        CUSTODIANS1: "custodians1",
+    },
     ACTIONS: {
         VOTE_CUSTODIANS: "votecust",
-    }
+        CLAIM_BUDGET: "claimbudget",
+    },
+};
+
+const AW_MSIG = {
+    CONTRACT_NAME: "msig.worlds",
+    TABLES: {
+        PROPOSALS: "proposals",
+
+    },
+    ACTIONS: {
+        PROPOSE: "propose",
+        APPROVE: "approve",
+        UNAPPROVE: "unapprove",
+        CANCEL: "cancel",
+        EXECUTE: "exec",
+    },
+    PROP_STATE: {
+        PENDING: { name: "Pending", value: 0 },
+        EXECUTED: { name: "Executed", value: 1 },
+        CANCELLED: { name: "Cancelled", value: 2 },
+    },
+};
+
+const AW = {
+    CONTRACT_NAME: "alien.worlds",
 };
 
 const TOAST_TYPES = {
@@ -33,5 +127,39 @@ const TOAST_TYPES = {
     WARNING: "warning",
 };
 
-export { AW, AW_planets, TOAST_TYPES, blockchain_endpoints };
+const ROUTES = [{
+    name: "Home",
+    path: "/",
+}, {
+    name: "Voting",
+    path: "/voting",
+},
+{
+    name: "Worker Proposals",
+    path: "/worker-proposals",
+},
+{
+    name: "Msig",
+    path: "/msig",
+}
+];
+
+const LOCAL_STORAGE_KEYS = {
+    ACTIVE_PLANET: "activePlanetStore",
+    CUSTODIANS: "custodiansStore",
+    BP_RPC: "bpRPCStore",
+};
+
+export {
+    AW,
+    AW_DAO,
+    AW_MSIG,
+    AW_PLANETS,
+    AW_TOKEN,
+    AW_WORKER_PROPOSALS,
+    ROUTES,
+    TOAST_TYPES,
+    blockchain_endpoints,
+    LOCAL_STORAGE_KEYS
+};
 

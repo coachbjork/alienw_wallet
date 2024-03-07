@@ -50,7 +50,7 @@
 				params={{ delay: 250, duration: 500 }}
 				bind:open={toast.open}
 				color="green"
-				divClass="w-full max-w-xs min-w-64 p-2 text-white bg-green-500 gap-2 break-all"
+				divClass="w-full max-w-xs min-w-64 p-2 text-white bg-green-500 gap-2 "
 				on:close={() => onClose(toast)}
 			>
 				<ThumbsUpSolid slot="icon" class="h-4 w-4" />
@@ -63,7 +63,7 @@
 				params={{ delay: 250, duration: 500 }}
 				bind:open={toast.open}
 				color="red"
-				divClass="w-full max-w-xs min-w-64 p-2 text-white bg-red-500 gap-2 break-all"
+				divClass="w-full max-w-xs min-w-64 p-2 text-white bg-red-500 gap-2 "
 				on:close={() => onClose(toast)}
 			>
 				<ThumbsDownSolid slot="icon" class="h-4 w-4" />
@@ -76,7 +76,7 @@
 				params={{ delay: 250, duration: 500 }}
 				bind:open={toast.open}
 				color="yellow"
-				divClass="w-full max-w-xs min-w-64 p-2 text-white bg-yellow-400 gap-2 break-all"
+				divClass="w-full max-w-xs min-w-64 p-2 text-white bg-yellow-400 gap-2 "
 				on:close={() => onClose(toast)}
 			>
 				<ShieldSolid slot="icon" class="h-4 w-4" />
@@ -89,7 +89,7 @@
 				params={{ delay: 250, duration: 500 }}
 				bind:open={toast.open}
 				color="blue"
-				divClass="w-full max-w-xs min-w-64 p-2 text-white bg-blue-500 gap-2 break-all"
+				divClass="w-full max-w-xs min-w-64 p-2 text-white bg-blue-500 gap-2 "
 				on:close={() => onClose(toast)}
 			>
 				<InfoCircleSolid slot="icon" class="h-4 w-4" />

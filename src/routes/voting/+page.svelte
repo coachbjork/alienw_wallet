@@ -1,11 +1,19 @@
 <script lang="ts">
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
-	import VotedFor from '$lib/components/RightSide/VotedFor.svelte';
-	import { AW, TOAST_TYPES } from '$lib/constants';
-	import { activePlanet, session, toastStore } from '$lib/stores';
-	import { voteDecayFormula } from '$lib/utils';
+	import VotedFor from '$lib/components/SidePanel/VotedFor.svelte';
+	import { AW_DAO, TOAST_TYPES } from '$lib/constants';
+	import {
+		get_candidates,
+		get_dacglobals,
+		get_staked_by_user,
+		get_votes_by_user
+	} from '$lib/services/awdaoService';
+	import { activePlanetStore, session, toastStore } from '$lib/stores';
+	import type { Planet } from '$lib/types';
 	import { pushActions } from '$lib/utils/wharfkit/session';
+	import { tooltip } from '@svelte-plugins/tooltips';
 	import { Spinner } from 'flowbite-svelte';
+	import _ from 'lodash';
 	import { afterUpdate, onMount } from 'svelte';
 	import CrownSolid from 'svelte-awesome-icons/CrownSolid.svelte';
 	import ShareFromSquareRegular from 'svelte-awesome-icons/ShareFromSquareRegular.svelte';
@@ -13,60 +21,85 @@
 	let candidates: any = [];
 	let votedForCandidates: any = [];
 	let maxvotes: any = 1;
-	let selectedPlanet = $activePlanet;
+	let selectedPlanet: Planet = $activePlanetStore;
 	let loading = true;
 	let selectedCandidates: any = [];
+	let staked: string = '';
 
 	onMount(async () => {
-		await fetchCandidates($activePlanet);
+		await fetchCandidates();
 		loading = false;
-		await fetchDacglobals($activePlanet);
 
 		if ($session) {
-			await fetchVotedFor($activePlanet);
+			await fetchVotedFor();
+			await fetchStaked();
 		}
+
+		await fetchDacglobals();
 	});
 
 	afterUpdate(async () => {
-		if (selectedPlanet !== $activePlanet) {
-			selectedPlanet = $activePlanet;
+		if (selectedPlanet !== $activePlanetStore) {
+			selectedPlanet = $activePlanetStore;
 			loading = true;
 			selectedCandidates = [];
-			await fetchCandidates($activePlanet);
+			votedForCandidates = [];
+			staked = '';
+			await fetchCandidates();
 			loading = false;
-			await fetchDacglobals($activePlanet);
-
 			if ($session) {
-				await fetchVotedFor($activePlanet);
+				await fetchVotedFor();
+				await fetchStaked();
 			}
+			await fetchDacglobals();
 		}
 	});
 
-	async function fetchCandidates(planet: any) {
-		const response = await fetch(`/api/daoaw/candidates?activePlanet=${planet}`);
-		candidates = await response.json();
+	async function fetchCandidates() {
+		let response = await get_candidates($activePlanetStore.name);
+		if (!response) return;
+		let api_response: any = await fetch(
+			`/api/daoaw/candidates?activePlanet=${$activePlanetStore.name}`
+		);
+		api_response = await api_response.json();
+		if (api_response) {
+			response = response.map((item: any) => {
+				return {
+					...item,
+					description: api_response[String(item.candidate_name)]?.description || '',
+					image: api_response[String(item.candidate_name)]?.image || '',
+					name: api_response[String(item.candidate_name)]?.name || String(item.candidate_name)
+				};
+			});
+		}
+		candidates = response;
 	}
 
-	async function fetchDacglobals(planet: any) {
-		const response = await fetch(`/api/daoaw/dacglobals?activePlanet=${planet}`);
-		const dacglobals = await response.json();
-		maxvotes = dacglobals.find((dacglobal: any) => dacglobal.key === 'maxvotes').value[1] || 1;
+	async function fetchDacglobals() {
+		const response = await get_dacglobals($activePlanetStore.name);
+		if (!response) return;
+		maxvotes = response.find((dacglobal: any) => dacglobal.key === 'maxvotes').value[1] || 1;
 	}
 
-	async function fetchVotedFor(planet: any) {
+	async function fetchVotedFor() {
 		if ($session) {
-			const response = await fetch(
-				`/api/daoaw/votes?activePlanet=${planet}&voter=${$session?.actor}`
-			);
-			let data = await response.json();
-			console.log(data);
-			data = data.candidates.map((candidate: any) => {
+			let response = await get_votes_by_user($activePlanetStore.name, String($session?.actor));
+			if (!response) return;
+			response = response.candidates.map((candidate: any) => {
 				return candidates.find((c: any) => {
-					return c.candidate_name === candidate;
+					return c.candidate_name === String(candidate);
 				});
 			});
-			votedForCandidates = data.filter((candidate: any) => candidate !== undefined);
-			console.log(votedForCandidates);
+			votedForCandidates = response.filter((candidate: any) => candidate !== undefined);
+			selectedCandidates = votedForCandidates.map((candidate: any) => candidate.candidate_name);
+		}
+	}
+
+	async function fetchStaked() {
+		if ($session) {
+			let response = await get_staked_by_user($activePlanetStore.name, String($session?.actor));
+			if (!response) return;
+			staked = String(response.stake);
 		}
 	}
 
@@ -91,58 +124,22 @@
 		}
 		let actions = [
 			{
-				account: AW.CONTRACT_NAME,
-				name: AW.ACTIONS.VOTE_CUSTODIANS,
+				account: AW_DAO.CONTRACT_NAME,
+				name: AW_DAO.ACTIONS.VOTE_CUSTODIANS,
 				authorization: [
 					{
-						actor: $session.actor,
-						permission: 'active'
+						actor: String($session.actor),
+						permission: String($session?.permission)
 					}
 				],
 				data: {
 					voter: $session.actor,
-					dac_id: selectedPlanet.toLowerCase(),
+					dac_id: selectedPlanet.scope,
 					newvotes: selectedCandidates
 				}
 			}
 		];
 		await pushActions($session, actions);
-
-		// await $session
-		// 	.transact(
-		// 		{
-		// 			actions: [
-		// 				{
-		// 					account: AW.CONTRACT_NAME,
-		// 					name: AW.ACTIONS.VOTE_CUSTODIANS,
-		// 					authorization: [
-		// 						{
-		// 							actor: $session.actor,
-		// 							permission: 'active'
-		// 						}
-		// 					],
-		// 					data: {
-		// 						voter: $session.actor,
-		// 						dac_id: selectedPlanet.toLowerCase(),
-		// 						newvotes: selectedCandidates
-		// 					}
-		// 				}
-		// 			]
-		// 		},
-		// 		{
-		// 			broadcast: true,
-		// 			expireSeconds: 120
-		// 		}
-		// 	)
-		// 	.then((res: any) => {
-		// 		toastStore.add(
-		// 			`<div>Executed: <a class="underline underline-offset-2" href="https://wax.bloks.io/transaction/${res.response.transaction_id}" target={"_blank"}>View Tx</a></div>`,
-		// 			TOAST_TYPES.SUCCESS
-		// 		);
-		// 	})
-		// 	.catch((error: any) => {
-		// 		toastStore.add(error.message, TOAST_TYPES.ERROR);
-		// 	});
 	}
 </script>
 
@@ -157,8 +154,8 @@
 					<th>User</th>
 					<th>Account</th>
 					<th>Vote power</th>
-					<th>Voters</th>
-					<th>Vote Decay</th>
+					<th class="hidden md:table-cell">Voters</th>
+					<th class="hidden md:table-cell">Vote Decay</th>
 				</tr>
 			</thead>
 			<tbody class="text-2xl">
@@ -170,7 +167,7 @@
 					</tr>
 				{:else}
 					{#each candidates as candidate, i}
-						<tr class={i % 2 === 0 ? 'bg-blue-900 bg-opacity-30' : ''}>
+						<tr>
 							<td>
 								<input
 									type="checkbox"
@@ -180,6 +177,7 @@
 									}}
 									value={candidate.candidate_name}
 									disabled={$session === null}
+									checked={_.find(votedForCandidates, { candidate_name: candidate.candidate_name })}
 								/>
 							</td>
 							<td>
@@ -192,20 +190,37 @@
 							<td class="flex items-center"
 								>{candidate.name}
 								<a href={`https://waxblock.io/account/${candidate.candidate_name}`} target="_blank"
-									><ShareFromSquareRegular class="ml-2" color="white" /></a
+									><ShareFromSquareRegular class="ml-2" /></a
 								>
 							</td>
 							<td>{candidate.candidate_name}</td>
 							<td>{new Intl.NumberFormat('en-US').format(candidate.total_vote_power.toFixed(0))}</td
 							>
-							<td>{candidate.number_voters}</td>
+							<td class="hidden md:table-cell">{candidate.number_voters}</td>
 							<td
-								>{(
-									100 -
-									(voteDecayFormula(candidate.avg_vote_time_stamp, candidate.total_vote_power) /
-										candidate.total_vote_power) *
-										100
-								).toFixed(2)}</td
+								class={`hidden md:table-cell ${
+									candidate.vote_decay > 50
+										? 'vote6'
+										: candidate.vote_decay > 40
+											? 'vote5'
+											: candidate.vote_decay > 30
+												? 'vote4'
+												: candidate.vote_decay > 20
+													? 'vote3'
+													: candidate.vote_decay > 10
+														? 'vote2'
+														: candidate.vote_decay > 0
+															? 'vote1'
+															: ''
+								}`}
+								use:tooltip={{
+									content: `${new Intl.NumberFormat('en-US').format(
+										candidate.current_vote_power.toFixed(0)
+									)}`,
+									position: 'right',
+									style: { 'background-color': '#1f2937', 'border-radius': '5px' },
+									animation: 'puff'
+								}}>-{candidate.vote_decay}%</td
 							>
 						</tr>
 					{/each}
@@ -227,11 +242,29 @@
 	</div>
 </div>
 <div class="left-side">
-	<!-- <Custodians custodians={candidates} /> -->
+	{#if $session}
+		<VotedFor custodians={votedForCandidates} {staked} />
+	{/if}
 </div>
-<div class="right-side">
-	<VotedFor custodians={votedForCandidates} />
-</div>
+<div class="right-side"></div>
 
 <style>
+	.vote1 {
+		color: #69b34c;
+	}
+	.vote2 {
+		color: #acb334;
+	}
+	.vote3 {
+		color: #fab733;
+	}
+	.vote4 {
+		color: #ff8e15;
+	}
+	.vote5 {
+		color: #ff4e11;
+	}
+	.vote6 {
+		color: #ff0d0d;
+	}
 </style>

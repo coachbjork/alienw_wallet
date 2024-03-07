@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { allSessions, blockchain_rpc, session } from '$lib/stores';
+	import { allSessions, bpRPCStore, session } from '$lib/stores';
 	import { Session, SessionKit } from '@wharfkit/session';
 	import { TransactPluginAutoCorrect } from '@wharfkit/transact-plugin-autocorrect';
 	import { WalletPluginAnchor } from '@wharfkit/wallet-plugin-anchor';
@@ -22,7 +22,7 @@
 				chains: [
 					{
 						id: '1064487b3cd1a897ce03ae5b6a865651747e2e152090f99c1d19d44e01aea5a4',
-						url: $blockchain_rpc
+						url: $bpRPCStore
 					}
 				],
 				ui: new WebRenderer({ minimal: true }),
@@ -115,7 +115,6 @@
 							<button on:click={() => selectUser(account)}>{account.actor} </button>
 							<button
 								on:click={() => {
-									console.log('here');
 									removeUser(account);
 								}}
 							>

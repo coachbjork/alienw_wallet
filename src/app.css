@@ -16,7 +16,7 @@ body {
 	grid-template-rows: 55px 60px;
 	background-color: #060C27;
 	gap: 0px 0px;
-	z-index: 1000;
+	z-index: 100;
 	grid-auto-flow: row;
 	position:fixed;
 	box-shadow: rgb(165, 236, 248, 0.4) 1px 1px 2px 1px;
@@ -51,6 +51,9 @@ body {
 	align-self: start;
 	padding: 20px 20px 0 20px;
 	gap: 10px 10px;
+	position: sticky; 
+	position: -webkit-sticky;
+	top: 100px; 
 }
 
 .left-side { 
@@ -60,6 +63,9 @@ body {
 	align-self: start;
 	padding: 20px 20px 0 20px;
 	gap: 10px 10px;
+	position: sticky; 
+	position: -webkit-sticky;
+	top: 100px; 
 }
 
 .side-column {
@@ -77,3 +83,58 @@ body {
   	min-height: 100vh; 
 	width: 100%;
 }
+
+/* Table */
+
+table {
+	margin: 0 0 2.75rem 0;
+	width: 100%;
+}
+
+table tbody tr {
+	border: solid 1px;
+	border-left: 0;
+	border-right: 0;
+}
+
+table td {
+	padding: 0.75rem 0.75rem;
+	color: #b5b7bb;
+}
+
+table th {
+	color: #9ea5ad;
+	font-size: 1.1rem;
+	font-weight: 700;
+	padding: 0 0.75rem 0.75rem 0.75rem;
+	text-align: left;
+}
+
+table thead {
+	border-bottom: solid 2px;
+}
+
+table tfoot {
+	border-top: solid 2px;
+}
+
+table tbody tr {
+	border-color: rgba(0, 0, 0, 0.15);
+}
+
+table tbody tr:nth-child(2n + 1) {
+	background-color: rgba(144, 144, 144, 0.075);
+}
+
+table th {
+	color: #474d55;
+}
+
+table thead {
+	border-bottom-color: rgba(0, 0, 0, 0.15);
+}
+
+table tfoot {
+	border-top-color: rgba(0, 0, 0, 0.15);
+}
+
