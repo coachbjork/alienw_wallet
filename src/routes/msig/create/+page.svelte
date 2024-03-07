@@ -8,7 +8,7 @@
 	import { getActionsOfSmartContract } from '$lib/utils/wharfkit/contractKit';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { ABI, Serializer } from '@wharfkit/antelope';
-	import { CirclePlusSolid, XCircleSolid } from 'flowbite-svelte-icons';
+	import { ArrowLeftSolid, CirclePlusSolid, XCircleSolid } from 'flowbite-svelte-icons';
 	import { onMount } from 'svelte';
 
 	let loading = true;
@@ -282,9 +282,13 @@
 <div class="main-content py-6">
 	<div class="container">
 		<PlanetMenu />
-		<!-- Title of the feature -->
-		<h1 class="my-4 text-center text-2xl font-bold">Create A New Msig</h1>
-		<!-- need label and input fields for: proposer, proposal_name -->
+		<div class="flex flex-row items-center justify-center">
+			<a href="/msig" class="text-indigo-500 hover:underline">
+				<ArrowLeftSolid class="h-8 w-8 text-indigo-500" />
+			</a>
+			<!-- Title of the feature -->
+			<h1 class="mx-auto my-4 text-2xl font-bold">Create A New Msig</h1>
+		</div>
 
 		{#if $session}
 			<div class="mx-auto flex w-2/3 flex-col rounded-lg border p-5">
