@@ -61,7 +61,6 @@
 		const response = await sessionKit.login();
 		session.set(response.session);
 		allSessions.set([...$allSessions, response.session]);
-		console.log('all session', $allSessions);
 	}
 
 	async function logout() {

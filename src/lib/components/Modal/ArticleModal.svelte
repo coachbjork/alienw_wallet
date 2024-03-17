@@ -3,7 +3,6 @@
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { Spinner } from 'flowbite-svelte';
-	import { CirclePlusSolid, XCircleSolid } from 'flowbite-svelte-icons';
 	import XSolid from 'flowbite-svelte-icons/XSolid.svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
 
@@ -11,23 +10,21 @@
 	let isOpen = false;
 	let isSubmitting = false;
 	let isCreating = true;
-	let wallet = '';
-	let identity_name = '';
-	let header_graphic = '';
-	let logo = '';
+	let title = '';
 	let description = '';
-	let contacts: string[] = [];
+	let image = '';
+	let link = '';
+	let author = '';
 
 	export function setModalOpen(bool: boolean, data: any) {
-		let { identity } = data;
-		if (identity) {
+		let { article } = data;
+		if (article) {
 			isCreating = false;
-			wallet = identity.wallet;
-			identity_name = identity.identity_name;
-			header_graphic = identity.header_graphic;
-			logo = identity.logo;
-			description = identity.description;
-			contacts = identity.contacts;
+			title = article.title;
+			image = article.image;
+			link = article.link;
+			author = article.author;
+			description = article.description;
 		} else {
 			isCreating = true;
 		}
@@ -47,26 +44,26 @@
 			return;
 		}
 
-		if (!wallet) {
-			toastStore.add('Wallet is required', TOAST_TYPES.WARNING);
+		if (!title) {
+			toastStore.add('Title is required', TOAST_TYPES.WARNING);
 			isSubmitting = false;
 			return;
 		}
 
-		if (!identity_name) {
-			toastStore.add('Identity Name is required', TOAST_TYPES.WARNING);
+		if (!image) {
+			toastStore.add('Image URL is required', TOAST_TYPES.WARNING);
 			isSubmitting = false;
 			return;
 		}
 
-		if (!header_graphic) {
-			toastStore.add('Header Graphic is required', TOAST_TYPES.WARNING);
+		if (!link) {
+			toastStore.add('Article Link is required', TOAST_TYPES.WARNING);
 			isSubmitting = false;
 			return;
 		}
 
-		if (!logo) {
-			toastStore.add('Logo is required', TOAST_TYPES.WARNING);
+		if (!author) {
+			toastStore.add('Author is required', TOAST_TYPES.WARNING);
 			isSubmitting = false;
 			return;
 		}
@@ -77,16 +74,10 @@
 			return;
 		}
 
-		// if(contacts.length == 0) {
-		// 	toastStore.add('Contacts is required', TOAST_TYPES.WARNING);
-		// 	isSubmitting = false;
-		// 	return;
-		// }
-
 		let actions = [
 			{
 				account: AW_DAO_INFRA.CONTRACT_NAME,
-				name: AW_DAO_INFRA.ACTIONS.SET_IDENTITY,
+				name: isCreating ? AW_DAO_INFRA.ACTIONS.ADD_ARTICLE : AW_DAO_INFRA.ACTIONS.UPDATE_ARTICLE,
 				authorization: [
 					{
 						actor: String($session.actor),
@@ -96,12 +87,11 @@
 				data: {
 					dac_id: $activePlanetStore.scope,
 					executor: String($session.actor),
-					wallet,
-					identity_name,
-					header_graphic,
-					logo,
-					description,
-					contacts
+					title,
+					image,
+					link,
+					author,
+					description
 				}
 			}
 		];
@@ -112,12 +102,11 @@
 	}
 
 	async function close() {
-		wallet = '';
-		identity_name = '';
-		header_graphic = '';
-		logo = '';
+		title = '';
 		description = '';
-		contacts = [];
+		image = '';
+		link = '';
+		author = '';
 		isOpen = false;
 	}
 </script>
@@ -143,30 +132,42 @@
 					on:click={close}
 				/>
 			</div>
-			<label for="wallet" class="text-base font-semibold"> Wallet: </label>
+			<label for="title" class="text-base font-semibold"> Title: </label>
+			<div class="flex flex-row">
+				<input id="title" class="text-black" type="text" bind:value={title} placeholder="Title" />
+				<span
+					class="my-2 ml-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"
+				>
+					String
+				</span>
+			</div>
+			<label for="author" class="text-base font-semibold"> Author: </label>
+			<div class="flex flex-row">
+				<input class="text-black" type="text" bind:value={author} placeholder="Author" />
+				<span
+					class="my-2 ml-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"
+				>
+					String
+				</span>
+			</div>
+			<label for="image" class="text-base font-semibold"> Image URL: </label>
 			<div class="flex flex-row">
 				<input
-					id="wallet"
+					id="image"
 					class="text-black"
 					type="text"
-					bind:value={wallet}
-					placeholder="Wallet Name"
+					bind:value={image}
+					placeholder="Image URL"
 				/>
 				<span
 					class="my-2 ml-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"
 				>
-					Name
+					String
 				</span>
 			</div>
-			<label for="identity-name" class="text-base font-semibold"> Identity Name: </label>
+			<label for="link" class="text-base font-semibold"> Link: </label>
 			<div class="flex flex-row">
-				<input
-					id="identity_name"
-					class="text-black"
-					type="text"
-					bind:value={identity_name}
-					placeholder="Identity Name"
-				/>
+				<input class="text-black" type="text" bind:value={link} placeholder="Link" />
 				<span
 					class="my-2 ml-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"
 				>
@@ -174,30 +175,6 @@
 				</span>
 			</div>
 
-			<label for="header-graphic" class="text-base font-semibold"> Header Graphic URL: </label>
-			<div class="flex flex-row">
-				<input
-					class="text-black"
-					type="text"
-					bind:value={header_graphic}
-					placeholder="Header Graphic URL"
-				/>
-				<span
-					class="my-2 ml-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"
-				>
-					String
-				</span>
-			</div>
-			<label for="logo" class="text-base font-semibold"> Logo URL: </label>
-			<div class="flex flex-row">
-				<input class="text-black" type="text" bind:value={logo} placeholder="Logo URL" />
-				<span
-					class="my-2 ml-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"
-				>
-					String
-				</span>
-			</div>
-			<label for="description" class="text-base font-semibold"> Description: </label>
 			<div class="flex flex-row">
 				<textarea class="text-black" bind:value={description} placeholder="Description"></textarea>
 				<span
@@ -206,39 +183,6 @@
 					String
 				</span>
 			</div>
-
-			<div class="flex flex-row">
-				<label for="contact" class="text-base font-semibold"> Contacts: </label>
-				<CirclePlusSolid
-					class="ml-2 h-6 w-6 text-indigo-500"
-					on:click={() => {
-						contacts = [...contacts, ''];
-					}}
-				/>
-			</div>
-			{#each contacts as item, index}
-				<div class="mt-1 flex flex-row">
-					<input
-						type="text"
-						bind:value={item}
-						class=" rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
-						placeholder="Contact Info"
-					/>
-
-					<span
-						class="my-2 ml-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"
-					>
-						String
-					</span>
-
-					<XCircleSolid
-						class="ml-2 mt-4 flex h-6 w-6 items-center justify-center text-red-500 "
-						on:click={() => {
-							contacts = contacts.filter((_, i) => i !== index);
-						}}
-					/>
-				</div>
-			{/each}
 
 			<div class="mt-2">
 				{#if isSubmitting}

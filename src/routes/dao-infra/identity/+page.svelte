@@ -22,8 +22,6 @@
 	onMount(async () => {
 		loading = true;
 		await fetchIdentities();
-		if ($session) {
-		}
 		loading = false;
 	});
 
