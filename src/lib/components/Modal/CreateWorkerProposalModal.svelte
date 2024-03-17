@@ -3,7 +3,7 @@
 	import { get_worker_proposal_by_id } from '$lib/services/awWorkerPropService';
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import { Spinner } from 'flowbite-svelte';
-	import { XSolid } from 'flowbite-svelte-icons';
+	import XSolid from 'flowbite-svelte-icons/XSolid.svelte';
 	import { onMount } from 'svelte';
 
 	export let isOpen = false;

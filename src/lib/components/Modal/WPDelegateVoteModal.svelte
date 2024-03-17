@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AW_WORKER_PROPOSALS } from '$lib/constants';
-	import { XSolid } from 'flowbite-svelte-icons';
+	import XSolid from 'flowbite-svelte-icons/XSolid.svelte';
 
 	export let isOpen = false;
 	export let isDelegate = false;

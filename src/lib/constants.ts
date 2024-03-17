@@ -14,6 +14,26 @@ const blockchain_endpoints = [
     "https://api.wax.alohaeos.com",
 ];
 
+const AW_DAO_INFRA = {
+    CONTRACT_NAME: "awdaoinfrasc",
+    TABLES: {
+        ARTICLES: "articles",
+        IDENTITIES: "identities",
+    },
+    ACTIONS: {
+        NEW_IDENTITY: "setidentity",
+        SET_IDENTITY: "setidentity",
+        REMOVE_IDENTITY: "rmidentity",
+        ADD_ARTICLE: "addarticle",
+        UPDATE_ARTICLE: "updarticle",
+        REMOVE_ARTICLE: "rmarticle",
+    },
+    PERMISSION_LEVEL: {
+        PARENT: "parent",
+        SUB: "sub",
+    },
+};
+
 const AW_WORKER_PROPOSALS = {
     CONTRACT_NAME: "prop.worlds",
     TABLES: {
@@ -128,9 +148,6 @@ const TOAST_TYPES = {
 };
 
 const ROUTES = [{
-    name: "Home",
-    path: "/",
-}, {
     name: "Voting",
     path: "/voting",
 },
@@ -141,7 +158,21 @@ const ROUTES = [{
 {
     name: "Msig",
     path: "/msig",
-}
+},
+{
+    name: "DAO Infra",
+    path: "/dao-infra",
+    group: [
+        {
+            name: "Article",
+            path: "/dao-infra/article",
+        },
+        {
+            name: "Identity",
+            path: "/dao-infra/identity",
+        },
+    ],
+},
 ];
 
 const LOCAL_STORAGE_KEYS = {
@@ -153,13 +184,13 @@ const LOCAL_STORAGE_KEYS = {
 export {
     AW,
     AW_DAO,
+    AW_DAO_INFRA,
     AW_MSIG,
     AW_PLANETS,
     AW_TOKEN,
     AW_WORKER_PROPOSALS,
+    LOCAL_STORAGE_KEYS,
     ROUTES,
-    TOAST_TYPES,
-    blockchain_endpoints,
-    LOCAL_STORAGE_KEYS
+    TOAST_TYPES, blockchain_endpoints
 };
 

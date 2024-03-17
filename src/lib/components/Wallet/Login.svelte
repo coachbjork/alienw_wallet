@@ -7,9 +7,9 @@
 	import { WalletPluginCleos } from '@wharfkit/wallet-plugin-cleos';
 	import { WalletPluginCloudWallet } from '@wharfkit/wallet-plugin-cloudwallet';
 	import WebRenderer from '@wharfkit/web-renderer';
+	import { AngleDownSolid } from 'flowbite-svelte-icons';
 	import { onMount } from 'svelte';
 	import Icon from 'svelte-awesome';
-	import caretDown from 'svelte-awesome/icons/caretDown';
 	import trash from 'svelte-awesome/icons/trash';
 
 	let sessionKit: SessionKit;
@@ -88,6 +88,7 @@
 
 	async function selectUser(account: Session) {
 		session.set(account);
+		sessionKit.persistSession(account);
 	}
 
 	async function removeUser(account: Session) {
@@ -105,7 +106,8 @@
 			<button on:click={activeDropdown}>
 				<span class=" rounded-lg border border-indigo-500 px-4 py-1"
 					>{$session.actor}
-					<Icon data={caretDown} />
+					<!-- <Icon data={caretDown} /> -->
+					<AngleDownSolid class="inline-block" size="sm" />
 				</span>
 			</button>
 			{#if showDropdown}
