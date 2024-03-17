@@ -136,7 +136,7 @@
 	}
 
 	async function getAccountInstance(account: string) {
-		const dao_instance = await getAccountOnchain(account);
+		const dao_instance: any = await getAccountOnchain(account);
 		planetDAO_permissions = dao_instance.data.permissions.map((item: any) =>
 			String(item.perm_name)
 		);
