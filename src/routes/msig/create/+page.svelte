@@ -8,7 +8,7 @@
 	import { getActionsOfSmartContract } from '$lib/utils/wharfkit/contractKit';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { ABI, Serializer } from '@wharfkit/antelope';
-	import { ArrowLeftSolid, CirclePlusSolid, XCircleSolid } from 'flowbite-svelte-icons';
+	import { ArrowLeftOutline, CirclePlusSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
 	import { onMount } from 'svelte';
 
 	let loading = true;
@@ -284,7 +284,7 @@
 		<PlanetMenu />
 		<div class="flex flex-row items-center justify-center">
 			<a href="/msig" class="text-indigo-500 hover:underline">
-				<ArrowLeftSolid class="h-8 w-8 text-indigo-500" />
+				<ArrowLeftOutline class="h-8 w-8 text-indigo-500" />
 			</a>
 			<!-- Title of the feature -->
 			<h1 class="mx-auto my-4 text-2xl font-bold">Create A New Msig</h1>
@@ -375,7 +375,7 @@
 									remove_request_approval(index);
 								}}
 							>
-								<XCircleSolid class="ml-2 h-6 w-6 text-red-500" />
+								<CloseCircleSolid class="ml-2 h-6 w-6 text-red-500" />
 							</button>
 						</div>
 					{/each}
@@ -414,7 +414,7 @@
 									remove_metadata(index);
 								}}
 							>
-								<XCircleSolid class="ml-2 h-6 w-6 text-red-500" />
+								<CloseCircleSolid class="ml-2 h-6 w-6 text-red-500" />
 							</button>
 						</div>
 					{/each}
@@ -464,7 +464,7 @@
 									remove_action(index);
 								}}
 							>
-								<XCircleSolid class="ml-2 h-6 w-6 text-red-500" />
+								<CloseCircleSolid class="ml-2 h-6 w-6 text-red-500" />
 							</button>
 						</div>
 						<!-- Fields -->
@@ -528,7 +528,7 @@
 												remove_action_auth(index, auth_index);
 											}}
 										>
-											<XCircleSolid class="ml-2 h-6 w-6 text-red-500" />
+											<CloseCircleSolid class="ml-2 h-6 w-6 text-red-500" />
 										</button>
 									</div>
 								{/each}

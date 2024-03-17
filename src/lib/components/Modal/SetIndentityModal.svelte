@@ -3,7 +3,7 @@
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { Spinner } from 'flowbite-svelte';
-	import { CirclePlusSolid, XCircleSolid } from 'flowbite-svelte-icons';
+	import { CirclePlusSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
 	import XSolid from 'flowbite-svelte-icons/XSolid.svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
 
@@ -231,7 +231,7 @@
 						String
 					</span>
 
-					<XCircleSolid
+					<CloseCircleSolid
 						class="ml-2 mt-4 flex h-6 w-6 items-center justify-center text-red-500 "
 						on:click={() => {
 							contacts = contacts.filter((_, i) => i !== index);

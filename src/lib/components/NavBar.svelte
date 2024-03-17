@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { ROUTES } from '$lib/constants';
-	import { AngleDownSolid } from 'flowbite-svelte-icons';
+	import { AngleDownOutline } from 'flowbite-svelte-icons';
 	import BarsSolid from 'svelte-awesome-icons/BarsSolid.svelte';
 
 	let isOpen = false; // State to track if the hamburger menu is open
@@ -24,14 +24,14 @@
 						<div class={activeUrl.includes(route.path) ? 'active px-4' : 'px-4'}>
 							{route.name}
 							{#if route.group}
-								<AngleDownSolid class="inline-block" size="sm" />
+								<AngleDownOutline class="inline-block" size="sm" />
 							{/if}
 						</div>
 					{:else}
 						<a href={route.path} class={activeUrl.includes(route.path) ? 'active px-4' : 'px-4'}>
 							{route.name}
 							{#if route.group}
-								<AngleDownSolid class="inline-block" size="sm" />
+								<AngleDownOutline class="inline-block" size="sm" />
 							{/if}
 						</a>
 					{/if}

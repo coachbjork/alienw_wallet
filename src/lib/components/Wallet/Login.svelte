@@ -7,7 +7,7 @@
 	import { WalletPluginCleos } from '@wharfkit/wallet-plugin-cleos';
 	import { WalletPluginCloudWallet } from '@wharfkit/wallet-plugin-cloudwallet';
 	import WebRenderer from '@wharfkit/web-renderer';
-	import { AngleDownSolid } from 'flowbite-svelte-icons';
+	import AngleDownOutline from 'flowbite-svelte-icons/AngleDownOutline.svelte';
 	import { onMount } from 'svelte';
 	import Icon from 'svelte-awesome';
 	import trash from 'svelte-awesome/icons/trash';
@@ -106,7 +106,7 @@
 				<span class=" rounded-lg border border-indigo-500 px-4 py-1"
 					>{$session.actor}
 					<!-- <Icon data={caretDown} /> -->
-					<AngleDownSolid class="inline-block" size="sm" />
+					<AngleDownOutline class="inline-block" size="sm" />
 				</span>
 			</button>
 			{#if showDropdown}
