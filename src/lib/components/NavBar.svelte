@@ -67,7 +67,7 @@
 					<a href={route.path} class={activeUrl === route.path ? 'active px-4' : 'px-4'}>
 						{route.name}
 						{#if route.group}
-							<AngleDownSolid class="inline-block" size="sm" />
+							<AngleDownOutline class="inline-block" size="sm" />
 						{/if}
 					</a>
 					{#if route.group}
