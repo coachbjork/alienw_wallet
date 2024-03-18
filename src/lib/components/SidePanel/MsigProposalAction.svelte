@@ -2,6 +2,7 @@
 	import { AW_DAO, AW_MSIG, TOAST_TYPES } from '$lib/constants';
 	import { get_msig_proposal_by_id } from '$lib/services/awMsigPropService';
 	import { activePlanetStore, custodiansStore, session, toastStore } from '$lib/stores';
+	import { getAccountOnchain } from '$lib/utils/wharfkit/accountKit';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { ABI, Serializer } from '@wharfkit/antelope';
 	import { afterUpdate, createEventDispatcher, onMount } from 'svelte';
@@ -11,11 +12,15 @@
 
 	let enableActions: any = [];
 	let new_proposal_name: string = '';
+	let planetDAO_permissions: string[] = [];
 	const dispatch = createEventDispatcher();
 
 	onMount(async () => {
 		setEnableActions();
 		await generateRandomProposalId();
+		if ($activePlanetStore) {
+			await getAccountInstance($activePlanetStore.account);
+		}
 	});
 
 	afterUpdate(async () => {
@@ -72,6 +77,13 @@
 			}
 		}
 		new_proposal_name = proposal_name;
+	}
+
+	async function getAccountInstance(account: string) {
+		const dao_instance: any = await getAccountOnchain(account);
+		planetDAO_permissions = dao_instance.data.permissions.map((item: any) =>
+			String(item.perm_name)
+		);
 	}
 
 	async function onApprove() {
@@ -136,7 +148,12 @@
 				data: {
 					proposer: String($session.actor),
 					proposal_name: new_proposal_name,
-					requested: [{ actor: String($session.actor), permission: String($session?.permission) }],
+					requested: [
+						{
+							actor: $activePlanetStore.account,
+							permission: planetDAO_permissions[0]
+						}
+					],
 					dac_id: $activePlanetStore.scope,
 					metadata: [],
 					trx: {
@@ -146,8 +163,8 @@
 								name: AW_DAO.ACTIONS.CLAIM_BUDGET,
 								authorization: [
 									{
-										actor: String($session.actor),
-										permission: String($session?.permission)
+										actor: $activePlanetStore.account,
+										permission: planetDAO_permissions[0]
 									}
 								],
 
