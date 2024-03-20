@@ -8,7 +8,7 @@
 	import { afterUpdate, createEventDispatcher, onMount } from 'svelte';
 
 	export let selectedProposal: any = {};
-	export let ableToClaimBudget: any = {};
+	export let ableToClaimBudget: any = false;
 
 	let enableActions: any = [];
 	let new_proposal_name: string = '';
@@ -29,7 +29,7 @@
 	});
 
 	function setEnableActions() {
-		if (selectedProposal && $session) {
+		if ($session) {
 			enableActions = [];
 			// switch (selectedProposal.state) {
 			// 	case AW_MSIG.PROP_STATE.PENDING.value:
@@ -46,11 +46,13 @@
 			// 		enableActions = [];
 			// 		break;
 			// }
-			enableActions.push(AW_MSIG.ACTIONS.APPROVE);
-			enableActions.push(AW_MSIG.ACTIONS.UNAPPROVE);
-			enableActions.push(AW_MSIG.ACTIONS.EXECUTE);
-			enableActions.push(AW_MSIG.ACTIONS.CANCEL);
-			enableActions.push(AW_MSIG.ACTIONS.PROPOSE);
+			if (selectedProposal) {
+				enableActions.push(AW_MSIG.ACTIONS.APPROVE);
+				enableActions.push(AW_MSIG.ACTIONS.UNAPPROVE);
+				enableActions.push(AW_MSIG.ACTIONS.EXECUTE);
+				enableActions.push(AW_MSIG.ACTIONS.CANCEL);
+				enableActions.push(AW_MSIG.ACTIONS.PROPOSE);
+			}
 			if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
 				enableActions.push(AW_DAO.ACTIONS.CLAIM_BUDGET);
 			}
