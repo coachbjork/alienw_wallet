@@ -404,10 +404,8 @@
 <div class="flex flex-col">
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-	<p
-		class=" text-center text-2xl underline underline-offset-4"
-		on:click={() => dispatch('mockdata', {})}
-	>
+	<p class=" text-center text-2xl underline underline-offset-4">
+		<!-- on:click={() => dispatch('mockdata', {})} -->
 		Actions
 	</p>
 	{#if $session}

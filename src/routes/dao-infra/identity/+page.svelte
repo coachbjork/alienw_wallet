@@ -86,6 +86,10 @@
 									identity.permission_level == AW_DAO_INFRA.PERMISSION_LEVEL.PARENT
 										? 'border-purple-700 shadow-purple-700'
 										: 'border-gray-700 shadow-gray-700 '
+								} ${
+									identity?.wallet == selectedIdentity?.wallet
+										? 'backdrop-brightness-200'
+										: 'backdrop-brightness-125'
 								}`}
 							>
 								<div class="flex flex-row flex-wrap">

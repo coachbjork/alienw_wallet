@@ -88,7 +88,12 @@
 								{/if}
 							</div>
 							<div
-								class={`flex-grow rounded-2xl border border-solid border-gray-700 p-5 shadow-md shadow-gray-700  `}
+								class={`flex-grow rounded-2xl border border-solid border-gray-700 p-5 shadow-md shadow-gray-700  
+								${
+									article?.article_id == selectedArticle?.article_id
+										? 'backdrop-brightness-200'
+										: 'backdrop-brightness-125'
+								}`}
 							>
 								<div class="flex flex-row flex-wrap">
 									<div class="flex flex-none basis-2/12 flex-col text-start">

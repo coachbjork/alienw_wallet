@@ -242,13 +242,17 @@
 							</div>
 							<div
 								class={`flex-grow rounded-2xl border border-solid p-5 shadow-md  ${
-									proposal.state == AW_MSIG.PROP_STATE.PENDING.value
+									proposal.proposal_status == AW_MSIG.PROP_STATE.PENDING.value
 										? 'border-yellow-700 shadow-yellow-700'
-										: proposal.state == AW_MSIG.PROP_STATE.EXECUTED.value
+										: proposal.proposal_status == AW_MSIG.PROP_STATE.EXECUTED.value
 											? 'border-blue-700 shadow-blue-700'
-											: proposal.state == AW_MSIG.PROP_STATE.CANCELLED.value
+											: proposal.proposal_status == AW_MSIG.PROP_STATE.CANCELLED.value
 												? 'border-red-700 shadow-red-700'
 												: ''
+								} ${
+									proposal.proposal_id == selectedProposal?.proposal_id
+										? 'backdrop-brightness-200'
+										: 'backdrop-brightness-125'
 								}`}
 							>
 								<div class="flex flex-row flex-wrap">

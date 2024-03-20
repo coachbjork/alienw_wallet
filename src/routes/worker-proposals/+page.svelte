@@ -20,7 +20,8 @@
 
 	let proposals: any = [];
 	function handleMockData() {
-		proposals = [
+		selectedProposal = null;
+		let mock_data = [
 			{
 				proposal_id: 'testprop1',
 				proposer: 'awtesterooo1',
@@ -178,7 +179,7 @@
 					{
 						vote_id: 0,
 						voter: 'awtesterooo1',
-						proposal_id: 'testprop2',
+						proposal_id: 'testprop22',
 						category_id: null,
 						vote: 'propapprove',
 						delegatee: 'null',
@@ -187,7 +188,7 @@
 					{
 						vote_id: 1,
 						voter: 'awtesterooo2',
-						proposal_id: 'testprop2',
+						proposal_id: 'testprop22',
 						category_id: null,
 						vote: 'propapprove',
 						delegatee: 'null',
@@ -217,7 +218,7 @@
 					{
 						vote_id: 0,
 						voter: 'awtesterooo1',
-						proposal_id: 'testprop2',
+						proposal_id: 'testprop3',
 						category_id: null,
 						vote: 'propapprove',
 						delegatee: 'null',
@@ -226,7 +227,7 @@
 					{
 						vote_id: 1,
 						voter: 'awtesterooo2',
-						proposal_id: 'testprop2',
+						proposal_id: 'testprop3',
 						category_id: null,
 						vote: 'propapprove',
 						delegatee: 'null',
@@ -256,7 +257,7 @@
 					{
 						vote_id: 0,
 						voter: 'awtesterooo1',
-						proposal_id: 'testprop2',
+						proposal_id: 'testprop33',
 						category_id: null,
 						vote: 'propapprove',
 						delegatee: 'null',
@@ -265,7 +266,7 @@
 					{
 						vote_id: 1,
 						voter: 'awtesterooo2',
-						proposal_id: 'testprop2',
+						proposal_id: 'testprop33',
 						category_id: null,
 						vote: 'propapprove',
 						delegatee: 'null',
@@ -295,7 +296,7 @@
 					{
 						vote_id: 0,
 						voter: 'awtesterooo1',
-						proposal_id: 'testprop2',
+						proposal_id: 'testprop4',
 						category_id: null,
 						vote: 'finaldeny',
 						delegatee: 'null',
@@ -304,46 +305,7 @@
 					{
 						vote_id: 1,
 						voter: 'awtesterooo2',
-						proposal_id: 'testprop2',
-						category_id: null,
-						vote: 'finalapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					}
-				]
-			},
-			{
-				proposal_id: 'testprop44',
-				proposer: String($session ? $session.actor : 'waximusjazzz'),
-				arbiter: 'awtesterooo2',
-				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
-				proposal_pay: {
-					contract: 'alien.worlds',
-					quantity: '2.0000 TLM'
-				},
-				arbiter_pay: {
-					contract: 'alien.worlds',
-					quantity: '1.0000 TLM'
-				},
-				arbiter_agreed: true,
-				state: 'pendingfin',
-				expiry: '2023-07-28T08:49:10Z',
-				job_duration: 2592000,
-				category: 3,
-				votes: [
-					{
-						vote_id: 0,
-						voter: 'awtesterooo1',
-						proposal_id: 'testprop2',
-						category_id: null,
-						vote: 'finaldeny',
-						delegatee: 'null',
-						comment_hash: 'null'
-					},
-					{
-						vote_id: 1,
-						voter: 'awtesterooo2',
-						proposal_id: 'testprop2',
+						proposal_id: 'testprop4',
 						category_id: null,
 						vote: 'finalapprove',
 						delegatee: 'null',
@@ -373,7 +335,7 @@
 					{
 						vote_id: 0,
 						voter: 'awtesterooo1',
-						proposal_id: 'testprop2',
+						proposal_id: 'testprop5',
 						category_id: null,
 						vote: 'finalapprove',
 						delegatee: 'null',
@@ -382,7 +344,7 @@
 					{
 						vote_id: 1,
 						voter: 'awtesterooo2',
-						proposal_id: 'testprop2',
+						proposal_id: 'testprop5',
 						category_id: null,
 						vote: 'finalapprove',
 						delegatee: 'null',
@@ -407,7 +369,8 @@
 				state: 'expired',
 				expiry: '2023-07-28T08:49:10Z',
 				job_duration: 2592000,
-				category: 3
+				category: 3,
+				votes: []
 			},
 			{
 				proposal_id: 'testprop7',
@@ -426,9 +389,12 @@
 				state: 'indispute',
 				expiry: '2023-07-28T08:49:10Z',
 				job_duration: 2592000,
-				category: 3
+				category: 3,
+				votes: []
 			}
 		];
+		proposals = [...mock_data];
+		console.log('proposals', typeof proposals);
 	}
 
 	let loading = true;
@@ -776,7 +742,7 @@
 								{/if}
 							</div>
 							<div
-								class={`flex-grow rounded-2xl border border-solid p-5 shadow-md  ${
+								class={`flex-grow rounded-2xl border border-solid p-5 shadow-md   ${
 									proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value
 										? 'border-gray-700 shadow-gray-700 '
 										: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value
@@ -793,6 +759,10 @@
 															: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value
 																? 'border-purple-700 shadow-purple-700'
 																: ''
+								} ${
+									proposal.proposal_id == selectedProposal?.proposal_id
+										? 'backdrop-brightness-200'
+										: 'backdrop-brightness-125'
 								}`}
 							>
 								<div class="flex flex-row flex-wrap">
@@ -882,7 +852,7 @@
 								<div class="mt-2 text-start">
 									<div>
 										Title: <span class="text-white">
-											{#each proposal.title.split('\n') as line}
+											{#each proposal?.title?.split('\n') as line}
 												{line}
 												<br />
 											{/each}</span
@@ -890,7 +860,7 @@
 									</div>
 									<div class="mt-1">
 										Summary: <span class="text-white">
-											{#each proposal.summary.split('\n') as line}
+											{#each proposal?.summary?.split('\n') as line}
 												{line}
 												<br />
 											{/each}
@@ -927,7 +897,6 @@
 		{selectedProposal}
 		on:new_proposal={handleNewProposal}
 		on:delegatevote={handleDelegate}
-		on:mockdata={handleMockData}
 	/>
 </div>
 
