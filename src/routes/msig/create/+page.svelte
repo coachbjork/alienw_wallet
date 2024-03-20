@@ -398,14 +398,14 @@
 							<input
 								type="text"
 								bind:value={pair.key}
-								class=" rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+								class=" h-12 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 								placeholder="Key"
 							/>
 
-							<input
-								type="text"
+							<textarea
+								rows="1"
 								bind:value={pair.value}
-								class="ml-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+								class="ml-1 w-full rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 								placeholder="Enter Value"
 							/>
 
@@ -483,7 +483,7 @@
 											placeholder={field.name}
 										/>
 										<span
-											class="mt-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"
+											class="ml-1 mt-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"
 										>
 											{field.type}
 										</span>
