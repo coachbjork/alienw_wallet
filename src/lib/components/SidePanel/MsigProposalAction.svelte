@@ -10,7 +10,6 @@
 	export let selectedProposal: any = {};
 	export let ableToClaimBudget: any = false;
 
-	$: console.log('selectedProposal', selectedProposal);
 	let enableActions: any = [];
 	let new_proposal_name: string = '';
 	let planetDAO_permissions: string[] = [];
