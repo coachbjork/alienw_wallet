@@ -283,8 +283,8 @@
 	<div class="container">
 		<PlanetMenu />
 		<div class="flex flex-row items-center justify-center">
-			<a href="/msig" class="text-indigo-500 hover:underline">
-				<ArrowLeftOutline class="h-8 w-8 text-indigo-500" />
+			<a href="/msig">
+				<ArrowLeftOutline class="h-14 w-14 text-indigo-400 hover:contrast-200 " />
 			</a>
 			<!-- Title of the feature -->
 			<h1 class="mx-auto my-4 text-2xl font-bold">Create A New Msig</h1>

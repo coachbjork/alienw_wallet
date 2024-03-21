@@ -10,6 +10,7 @@
 	export let selectedProposal: any = {};
 	export let ableToClaimBudget: any = false;
 
+	$: console.log('selectedProposal', selectedProposal);
 	let enableActions: any = [];
 	let new_proposal_name: string = '';
 	let planetDAO_permissions: string[] = [];
@@ -49,8 +50,15 @@
 			if (selectedProposal) {
 				enableActions.push(AW_MSIG.ACTIONS.APPROVE);
 				enableActions.push(AW_MSIG.ACTIONS.UNAPPROVE);
-				enableActions.push(AW_MSIG.ACTIONS.EXECUTE);
-				enableActions.push(AW_MSIG.ACTIONS.CANCEL);
+				if (selectedProposal?.approved_by.length >= 3) {
+					enableActions.push(AW_MSIG.ACTIONS.EXECUTE);
+				}
+				if (
+					selectedProposal?.proposer == String($session.actor) &&
+					selectedProposal?.proposal_status == AW_MSIG.PROP_STATE.PENDING.value
+				) {
+					enableActions.push(AW_MSIG.ACTIONS.CANCEL);
+				}
 				enableActions.push(AW_MSIG.ACTIONS.PROPOSE);
 			}
 			if ($custodiansStore.find((c) => c.cust_name == String($session?.actor))) {
@@ -322,7 +330,7 @@
 					class="m-1 min-w-32 grow rounded-xl bg-yellow-500 p-2 font-bold text-white hover:bg-yellow-700"
 					on:click={() => onRevoke()}
 				>
-					Revoke
+					Unapprove
 				</button>
 			{/if}
 			{#if enableActions.includes(AW_MSIG.ACTIONS.EXECUTE)}
