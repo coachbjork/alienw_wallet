@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { ROUTES } from '$lib/constants';
 	import { AngleDownOutline } from 'flowbite-svelte-icons';
@@ -21,30 +22,39 @@
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div class="nav-item" on:mouseenter={() => {}} on:mouseleave={() => {}}>
 					{#if route.group}
-						<div class={activeUrl.includes(route.path) ? 'active px-4' : 'px-4'}>
+						<div
+							class={(activeUrl.includes(route.path) ? 'active px-4' : 'px-4') + ' cursor-pointer'}
+						>
 							{route.name}
 							{#if route.group}
 								<AngleDownOutline class="inline-block" size="sm" />
 							{/if}
 						</div>
 					{:else}
-						<a href={route.path} class={activeUrl.includes(route.path) ? 'active px-4' : 'px-4'}>
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+						<div
+							class={(activeUrl.includes(route.path) ? 'active px-4' : 'px-4') + ' cursor-pointer'}
+							on:click={() => goto(route.path)}
+						>
 							{route.name}
 							{#if route.group}
 								<AngleDownOutline class="inline-block" size="sm" />
 							{/if}
-						</a>
+						</div>
 					{/if}
 
 					{#if route.group}
 						<div class="dropdown-content ml-3 rounded-lg bg-background-default">
 							{#each route.group as groupItem}
-								<a
-									href={groupItem.path}
-									class={`dropdown-item rounded-lg px-4 ${
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<div
+									on:click={() => goto(groupItem.path)}
+									class={`dropdown-item cursor-pointer rounded-lg px-4 ${
 										activeUrl === groupItem.path ? 'active px-4' : 'px-4'
-									}`}>{groupItem.name}</a
+									}`}
 								>
+									{groupItem.name}
+								</div>
 							{/each}
 						</div>
 					{/if}
@@ -64,16 +74,37 @@
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div class="nav-item" on:mouseenter={() => {}} on:mouseleave={() => {}}>
 					<!-- Arrow down icon -->
-					<a href={route.path} class={activeUrl === route.path ? 'active px-4' : 'px-4'}>
-						{route.name}
-						{#if route.group}
-							<AngleDownOutline class="inline-block" size="sm" />
-						{/if}
-					</a>
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					{#if route.group}
+						<div
+							class={(activeUrl.includes(route.path) ? 'active px-4' : 'px-4') + ' cursor-pointer'}
+						>
+							{route.name}
+							{#if route.group}
+								<AngleDownOutline class="inline-block" size="sm" />
+							{/if}
+						</div>
+					{:else}
+						<div
+							on:click={() => goto(route.path)}
+							class={(activeUrl.includes(route.path) ? 'active px-4' : 'px-4') + ' cursor-pointer'}
+						>
+							{route.name}
+						</div>
+					{/if}
+
 					{#if route.group}
 						<div class="dropdown-content ml-3 rounded-lg bg-background-default">
 							{#each route.group as groupItem}
-								<a href={groupItem.path} class="dropdown-item rounded-lg px-4">{groupItem.name}</a>
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<div
+									on:click={() => goto(groupItem.path)}
+									class={`dropdown-item cursor-pointer rounded-lg px-4 ${
+										activeUrl === groupItem.path ? 'active px-4' : 'px-4'
+									}`}
+								>
+									{groupItem.name}
+								</div>
 							{/each}
 						</div>
 					{/if}
