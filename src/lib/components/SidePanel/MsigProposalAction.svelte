@@ -305,21 +305,20 @@
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<!-- svelte-ignore a11y-missing-attribute -->
 		<div class="mt-5 flex max-w-32 flex-wrap justify-center">
-			<a
+			<button
 				on:click={() => navigateToMsigCreate()}
 				class="m-1 min-w-32 grow rounded-xl bg-indigo-500 p-2 text-center font-bold text-white hover:bg-indigo-700"
-				type="button"
 			>
 				New Msig
-			</a>
+			</button>
 			{#if selectedProposal}
-				<a
+				<button
 					on:click={() => navigateToMsigCreate(true)}
 					class="m-1 min-w-32 grow rounded-xl bg-gray-500 p-2 text-center font-bold text-white hover:bg-gray-700"
 					type="button"
 				>
 					Clone Msig
-				</a>
+				</button>
 			{/if}
 
 			{#if enableActions.includes(AW_DAO.ACTIONS.CLAIM_BUDGET)}
