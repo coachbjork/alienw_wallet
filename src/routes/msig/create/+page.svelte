@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import { AW_MSIG, TOAST_TYPES } from '$lib/constants';
 	import { get_msig_proposal_by_id } from '$lib/services/awMsigPropService';
@@ -48,6 +49,9 @@
 				value: ''
 			}
 		];
+		if ($page.state?.data) {
+			await updateCloneData();
+		}
 		loading = false;
 	});
 
@@ -67,9 +71,59 @@
 				}
 			];
 			actions = [];
+			if ($page.state?.data) {
+				await updateCloneData();
+			}
 			await generateRandomProposalId();
 			loading = false;
 		}
+	}
+
+	async function updateCloneData() {
+		const { data } = $page.state;
+		metadata = [
+			{
+				key: 'Title',
+				value: data.metadata.find((item: any) => item.key === 'Title')?.value
+			},
+			{
+				key: 'Description',
+				value: data.metadata.find((item: any) => item.key === 'Description')?.value
+			}
+		];
+
+		let clone_actions = [];
+
+		for (let item of data.actions) {
+			const sc_actions = await getActionsOfSmartContract(item.contract_name);
+			let action = Object.assign(
+				{},
+				sc_actions.find((i: any) => i.name === item.action_name)
+			);
+			action.authorization = [
+				{
+					actor: $activePlanetStore ? $activePlanetStore.account : '',
+					permission: planetDAO_permissions[0] ? planetDAO_permissions[0] : ''
+				}
+			];
+
+			clone_actions.push({
+				action,
+				data: item.action_data,
+				sc_account: item.contract_name,
+				sc_actions
+			});
+		}
+		actions = clone_actions;
+	}
+
+	function autoResize(event: any) {
+		event.target.style.height = 'auto'; // Reset height to recalculate
+		event.target.style.height = event.target.scrollHeight + 'px'; // Set new height
+	}
+
+	function resetHeight(event: any) {
+		event.target.style.height = 'auto'; // Reset height to recalculate
 	}
 
 	async function generateRandomProposalId() {
@@ -154,7 +208,6 @@
 			// reset action and data
 			actions[index].action = { name: '', fields: [], authorization: [], base: '' };
 			actions[index].data = {};
-			console.log(actions);
 			return;
 		}
 		let action = Object.assign(
@@ -190,6 +243,7 @@
 	}
 
 	async function onCreateMsig() {
+		console.log('create msig', actions);
 		if (!$session) {
 			toastStore.add('Please login to call action', TOAST_TYPES.WARNING);
 			return;
@@ -407,6 +461,9 @@
 								bind:value={pair.value}
 								class="ml-1 w-full rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 								placeholder="Enter Value"
+								on:input={autoResize}
+								on:focusin={() => autoResize(event)}
+								on:focusout={() => resetHeight(event)}
 							/>
 
 							<button
@@ -433,6 +490,9 @@
 						</button>
 					</div>
 					{#each actions as action, index}
+						<label for="action" class="mt-1 text-base italic underline">
+							Action {index + 1}
+						</label>
 						<div class="mt-2 flex flex-row">
 							<input
 								type="text"
@@ -473,14 +533,20 @@
 								<label for="fields" class="text-base font-semibold">Fields: </label>
 								<!-- List all fields -->
 								{#each action.action.fields as field, index2}
-									<div class="mt-1 flex flex-row">
-										<input
-											type="text"
+									<label for={`field_${index}_${index2}`} class="mt-1 text-base italic underline">
+										{field.name}
+									</label>
+									<div class="flex flex-row">
+										<textarea
+											rows="1"
 											id={`field_${index}_${index2}`}
 											name={`field_${index}_${index2}`}
 											bind:value={action.data[field.name]}
-											class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+											class="mt-1 w-full resize rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 											placeholder={field.name}
+											on:input={autoResize}
+											on:focusin={() => autoResize(event)}
+											on:focusout={() => resetHeight(event)}
 										/>
 										<span
 											class="ml-1 mt-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"

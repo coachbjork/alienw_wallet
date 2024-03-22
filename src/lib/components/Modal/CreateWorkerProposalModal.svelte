@@ -3,7 +3,7 @@
 	import { get_worker_proposal_by_id } from '$lib/services/awWorkerPropService';
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import { Spinner } from 'flowbite-svelte';
-	import XSolid from 'flowbite-svelte-icons/XSolid.svelte';
+	import CloseOutline from 'flowbite-svelte-icons/CloseOutline.svelte';
 	import { onMount } from 'svelte';
 
 	export let isOpen = false;
@@ -181,6 +181,15 @@
 			console.error('Error:', error);
 		}
 	}
+
+	function autoResize(event: any) {
+		event.target.style.height = 'auto'; // Reset height to recalculate
+		event.target.style.height = event.target.scrollHeight + 'px'; // Set new height
+	}
+
+	function resetHeight(event: any) {
+		event.target.style.height = 'auto'; // Reset height to recalculate
+	}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -193,7 +202,7 @@
 					New Worker Proposal
 				</h2>
 				<div class="flex-grow"></div>
-				<XSolid
+				<CloseOutline
 					class="text-red-500 hover:cursor-pointer"
 					size="lg"
 					strokeWidth="3"
@@ -265,7 +274,14 @@
 				/>
 			</div> -->
 
-			<textarea class="text-black" bind:value={summary} placeholder="Summary"></textarea>
+			<textarea
+				class="text-black"
+				bind:value={summary}
+				placeholder="Summary"
+				on:input={autoResize}
+				on:focusin={() => autoResize(event)}
+				on:focusout={() => resetHeight(event)}
+			></textarea>
 			<label for="file-upload" class="file-upload__label"
 				>Upload document to IPFS via <a
 					class="text-blue-500 underline"

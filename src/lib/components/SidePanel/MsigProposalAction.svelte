@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { AW_DAO, AW_MSIG, TOAST_TYPES } from '$lib/constants';
 	import { get_msig_proposal_by_id } from '$lib/services/awMsigPropService';
 	import { activePlanetStore, custodiansStore, session, toastStore } from '$lib/stores';
@@ -31,21 +32,7 @@
 	function setEnableActions() {
 		if ($session) {
 			enableActions = [];
-			// switch (selectedProposal.state) {
-			// 	case AW_MSIG.PROP_STATE.PENDING.value:
-			// 		enableActions = [];
-			// 		break;
-			// 	case AW_MSIG.PROP_STATE.EXECUTED.value:
-			// 		enableActions = [];
 
-			// 		break;
-			// 	case AW_MSIG.PROP_STATE.CANCELLED.value:
-			// 		enableActions = [];
-			// 		break;
-			// 	default:
-			// 		enableActions = [];
-			// 		break;
-			// }
 			if (selectedProposal) {
 				enableActions.push(AW_MSIG.ACTIONS.APPROVE);
 				enableActions.push(AW_MSIG.ACTIONS.UNAPPROVE);
@@ -282,6 +269,26 @@
 		];
 		await pushActions($session, actions);
 	}
+
+	function navigateToMsigCreate(isCopy: boolean = false) {
+		if (isCopy) {
+			const data = {
+				actions: selectedProposal.actions,
+				metadata: [
+					{
+						key: 'Title',
+						value: selectedProposal.proposal_title
+					},
+					{
+						key: 'Description',
+						value: selectedProposal.description
+					}
+				]
+			};
+
+			goto('/msig/create', { state: { data } });
+		} else goto('/msig/create');
+	}
 </script>
 
 <div class="flex flex-col">
@@ -294,16 +301,26 @@
 		Actions
 	</p>
 	{#if $session}
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<!-- svelte-ignore a11y-missing-attribute -->
 		<div class="mt-5 flex max-w-32 flex-wrap justify-center">
-			<!-- {#if enableActions.includes(AW_MSIG.ACTIONS.PROPOSE)} -->
 			<a
-				href="/msig/create"
+				on:click={() => navigateToMsigCreate()}
 				class="m-1 min-w-32 grow rounded-xl bg-indigo-500 p-2 text-center font-bold text-white hover:bg-indigo-700"
 				type="button"
 			>
 				New Msig
 			</a>
-			<!-- {/if} -->
+			{#if selectedProposal}
+				<a
+					on:click={() => navigateToMsigCreate(true)}
+					class="m-1 min-w-32 grow rounded-xl bg-gray-500 p-2 text-center font-bold text-white hover:bg-gray-700"
+					type="button"
+				>
+					Clone Msig
+				</a>
+			{/if}
 
 			{#if enableActions.includes(AW_DAO.ACTIONS.CLAIM_BUDGET)}
 				<button
@@ -342,7 +359,7 @@
 			{/if}
 			{#if enableActions.includes(AW_MSIG.ACTIONS.CANCEL)}
 				<button
-					class="m-1 min-w-32 grow rounded-xl bg-gray-500 p-2 font-bold text-white hover:bg-gray-700"
+					class="m-1 min-w-32 grow rounded-xl bg-red-500 p-2 font-bold text-white hover:bg-red-700"
 					on:click={() => onCancel()}
 				>
 					Cancel
