@@ -4,7 +4,7 @@ import axios from 'axios';
 
 export async function GET({ params, request, cookies }) {
     const { planet } = params;
-    const response = await axios.get(`${ALIEN_WALLET_API}/proposals/${planet}?limit=2`);
+    const response = await axios.get(`${ALIEN_WALLET_API}/proposals/${planet}`);
     if (response?.data) {
         let { data } = response;
         data = data.map((item: any) => {

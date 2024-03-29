@@ -120,7 +120,7 @@ const AW_MSIG = {
     CONTRACT_NAME: "msig.worlds",
     TABLES: {
         PROPOSALS: "proposals",
-
+        APPROVALS: "approvals",
     },
     ACTIONS: {
         PROPOSE: "propose",
@@ -138,6 +138,145 @@ const AW_MSIG = {
 
 const AW = {
     CONTRACT_NAME: "alien.worlds",
+    TOKEN: { NAME: "TLM", },
+    ACTIONS: [
+        {
+            "name": "addvesting",
+            "fields": [
+                {
+                    "name": "account",
+                    "type": "name"
+                },
+                {
+                    "name": "vesting_start",
+                    "type": "time_point_sec"
+                },
+                {
+                    "name": "vesting_length",
+                    "type": "uint32"
+                },
+                {
+                    "name": "vesting_quantity",
+                    "type": "asset"
+                }
+            ],
+            "base": ""
+        },
+        {
+            "name": "burn",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ],
+            "base": ""
+        },
+        {
+            "name": "close",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "symbol",
+                    "type": "symbol"
+                }
+            ],
+            "base": ""
+        },
+        {
+            "name": "create",
+            "fields": [
+                {
+                    "name": "issuer",
+                    "type": "name"
+                },
+                {
+                    "name": "maximum_supply",
+                    "type": "asset"
+                }
+            ],
+            "base": ""
+        },
+        {
+            "name": "issue",
+            "fields": [
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ],
+            "base": ""
+        },
+        {
+            "name": "open",
+            "fields": [
+                {
+                    "name": "owner",
+                    "type": "name"
+                },
+                {
+                    "name": "symbol",
+                    "type": "symbol"
+                },
+                {
+                    "name": "ram_payer",
+                    "type": "name"
+                }
+            ],
+            "base": ""
+        },
+        {
+            "name": "pause",
+            "fields": [],
+            "base": ""
+        },
+        {
+            "name": "transfer",
+            "fields": [
+                {
+                    "name": "from",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "name"
+                },
+                {
+                    "name": "quantity",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ],
+            "base": ""
+        },
+        {
+            "name": "unpause",
+            "fields": [],
+            "base": ""
+        }
+    ],
 };
 
 const TOAST_TYPES = {

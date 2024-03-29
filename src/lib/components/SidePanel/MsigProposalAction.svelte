@@ -22,6 +22,29 @@
 		if ($activePlanetStore) {
 			await getAccountInstance($activePlanetStore.account);
 		}
+		// const packedTransaction = PackedTransaction.from({
+		// 	packed_trx:
+		// 		'11a60a6600000000000000000000018053bc9483a95c34000000572d3ccdcd01000032094ce3b68100000000a8ed323248000032094ce3b68100009086039780f8c0e1e4000000000004544c4d000000002747616c6163746963313233204b617669616e2e576f726c642053636176656e6765722048756e7400'
+		// });
+
+		// const transaction = packedTransaction.getTransaction();
+		// console.log(transaction);
+		// console.log(transaction.expiration.toDate());
+
+		// for (let action of transaction.actions) {
+		// 	console.log(action);
+		// 	const d = action.decoded;
+		// 	console.log(d.data);
+		// 	console.log(action.abi?.toJSON());
+		// 	console.log(String(action.name));
+		// 	const typedAction = Action.from(action);
+		// 	const client = new APIClient({ url: get(bpRPCStore) });
+		// 	const { abi } = await client.v1.chain.get_abi(String(action.account));
+		// 	console.log(abi);
+		// 	const decoded = typedAction.decodeData(action.abi);
+
+		// 	console.log(decoded);
+		// }
 	});
 
 	afterUpdate(async () => {
@@ -274,16 +297,8 @@
 		if (isCopy) {
 			const data = {
 				actions: selectedProposal.actions,
-				metadata: [
-					{
-						key: 'Title',
-						value: selectedProposal.proposal_title
-					},
-					{
-						key: 'Description',
-						value: selectedProposal.description
-					}
-				]
+				proposal_title: selectedProposal.proposal_title,
+				description: selectedProposal.description
 			};
 
 			goto('/msig/create', { state: { data } });
@@ -292,18 +307,8 @@
 </script>
 
 <div class="flex flex-col">
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-	<p
-		class=" text-center text-2xl underline underline-offset-4"
-		on:click={() => dispatch('mockdata', {})}
-	>
-		Actions
-	</p>
+	<p class=" text-center text-2xl underline underline-offset-4">Actions</p>
 	{#if $session}
-		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<!-- svelte-ignore a11y-no-static-element-interactions -->
-		<!-- svelte-ignore a11y-missing-attribute -->
 		<div class="mt-5 flex max-w-32 flex-wrap justify-center">
 			<button
 				on:click={() => navigateToMsigCreate()}

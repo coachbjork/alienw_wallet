@@ -16,14 +16,12 @@
 		</button>
 		<div class="hidden rounded-xl border border-indigo-500 p-2 md:flex">
 			{#each ROUTES as route}
-				<!-- <a href={route.path} class={activeUrl === route.path ? 'active px-4' : 'px-4'}
-					>{route.name}</a
-				> -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div class="nav-item" on:mouseenter={() => {}} on:mouseleave={() => {}}>
 					{#if route.group}
 						<div
-							class={(activeUrl.includes(route.path) ? 'active px-4' : 'px-4') + ' cursor-pointer'}
+							class={(activeUrl.includes(route.path) ? 'px-4 text-orange-500' : 'px-4') +
+								' cursor-pointer'}
 						>
 							{route.name}
 							{#if route.group}
@@ -33,7 +31,8 @@
 					{:else}
 						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<div
-							class={(activeUrl.includes(route.path) ? 'active px-4' : 'px-4') + ' cursor-pointer'}
+							class={(activeUrl.includes(route.path) ? 'px-4 text-orange-500' : 'px-4') +
+								' cursor-pointer'}
 							on:click={() => goto(route.path)}
 						>
 							{route.name}
@@ -50,7 +49,7 @@
 								<div
 									on:click={() => goto(groupItem.path)}
 									class={`dropdown-item cursor-pointer rounded-lg px-4 ${
-										activeUrl === groupItem.path ? 'active px-4' : 'px-4'
+										activeUrl === groupItem.path ? 'px-4 text-orange-500' : 'px-4'
 									}`}
 								>
 									{groupItem.name}
@@ -68,16 +67,14 @@
 			class=" absolute right-0 top-full w-full rounded-xl border border-indigo-500 bg-background-default md:hidden"
 		>
 			{#each ROUTES as route}
-				<!-- <a href={route.path} class={activeUrl === route.path ? 'active block px-4' : ' block px-4'}
-					>{route.name}</a
-				> -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div class="nav-item" on:mouseenter={() => {}} on:mouseleave={() => {}}>
 					<!-- Arrow down icon -->
 					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					{#if route.group}
 						<div
-							class={(activeUrl.includes(route.path) ? 'active px-4' : 'px-4') + ' cursor-pointer'}
+							class={(activeUrl.includes(route.path) ? 'px-4 text-orange-500' : 'px-4') +
+								' cursor-pointer'}
 						>
 							{route.name}
 							{#if route.group}
@@ -87,7 +84,8 @@
 					{:else}
 						<div
 							on:click={() => goto(route.path)}
-							class={(activeUrl.includes(route.path) ? 'active px-4' : 'px-4') + ' cursor-pointer'}
+							class={(activeUrl.includes(route.path) ? 'px-4 text-orange-500' : 'px-4') +
+								' cursor-pointer'}
 						>
 							{route.name}
 						</div>
@@ -100,7 +98,7 @@
 								<div
 									on:click={() => goto(groupItem.path)}
 									class={`dropdown-item cursor-pointer rounded-lg px-4 ${
-										activeUrl === groupItem.path ? 'active px-4' : 'px-4'
+										activeUrl === groupItem.path ? 'px-4 text-orange-500' : 'px-4'
 									}`}
 								>
 									{groupItem.name}
@@ -115,9 +113,6 @@
 </nav>
 
 <style>
-	.active {
-		color: #e46414; /* Active link color */
-	}
 	.nav-item {
 		position: relative;
 		/* display: inline-block; */

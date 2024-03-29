@@ -12,49 +12,6 @@
 	import { onMount } from 'svelte';
 
 	let proposals: any = [];
-	function handleMockData() {
-		proposals = [
-			{
-				_num: 313,
-				schema_version: 1,
-				planet: 'kavian',
-				proposal_title: '- No title -',
-				proposal_id: 'kv43aluty5aa',
-				proposer: 'hweaq.wam',
-				trx_contracts: {
-					'0': {
-						'dao.worlds': 'claimbudget'
-					}
-				},
-				trx_actions: {
-					'0': {
-						dac_id: 'kavian'
-					}
-				},
-				trx_packed: {
-					'0': '000000004ce3b681'
-				},
-				actions: [
-					{
-						contract_name: 'dao.worlds',
-						action_name: 'claimbudget',
-						action_data: {
-							dac_id: 'kavian'
-						}
-					}
-				],
-				description: '- No description -',
-				proposal_status: 0,
-				approved_by: [],
-				created: '2024-02-14T07:53:08',
-				modified: '2024-02-14T07:53:08',
-				expiration: '2024-02-21T07:53:04',
-				trx_id: '8af5f3d4e52387e8a6154843debb6d200c25edfe8a5d779b437eccf2f62fa3dd',
-				unique_hash: '8af5f3d4e52387e8a6154843debb6d200c25edfe8a5d779b437eccf2f62fa3ddkv43aluty5aa'
-			}
-		];
-	}
-
 	let loading = true;
 	let selectedPlanet: Planet = $activePlanetStore;
 	let selectedProposal: any = null;
@@ -65,7 +22,8 @@
 	$: selectedPlanet !== $activePlanetStore && updateData();
 
 	onMount(async () => {
-		await fetchPendingProposals();
+		await fetchProposals();
+		// await fetchMsigs();
 		await fetchDacglobals();
 		loading = false;
 	});
@@ -76,19 +34,24 @@
 			selectedPlanet = $activePlanetStore;
 			selectedProposal = null;
 			proposals = [];
-			await fetchPendingProposals();
+			await fetchProposals();
 			await fetchDacglobals();
 			loading = false;
 		}
 	}
 
-	async function fetchPendingProposals() {
-		let api_response: any = await fetch(
-			`/api/daoaw/msig_proposals/pending/${$activePlanetStore.scope}`
-		);
+	async function fetchProposals() {
+		let api_response: any = await fetch(`/api/daoaw/msig_proposals/${$activePlanetStore.scope}`);
 		api_response = await api_response.json();
 		proposals = api_response;
 	}
+
+	// async function fetchMsigs() {
+	// 	const cursor = await get_msig_cursor($activePlanetStore.name);
+	// 	if (!cursor) return;
+	// 	const response = await get_msigs(cursor);
+	// 	// console.log(response);
+	// }
 
 	async function fetchDacglobals() {
 		const response = await get_dacglobals($activePlanetStore.name);
@@ -347,7 +310,7 @@
 	<!-- {#if $session}{/if} -->
 </div>
 <div class="right-side">
-	<MsigProposalAction {selectedProposal} {ableToClaimBudget} on:mockdata={handleMockData} />
+	<MsigProposalAction {selectedProposal} {ableToClaimBudget} />
 </div>
 
 <style>
