@@ -189,7 +189,6 @@
 
 	async function new_transferTLM_action() {
 		actions = [
-			...actions,
 			{
 				sc_account: AW.CONTRACT_NAME,
 				action: { name: '', fields: [], authorization: [], base: '' },
@@ -199,7 +198,7 @@
 		];
 		on_change_action_name('transfer', actions.length - 1);
 		actions[actions.length - 1].data = {
-			from: $session ? String($session.actor) : '',
+			from: $activePlanetStore ? $activePlanetStore.account : '',
 			to: '',
 			quantity: '',
 			memo: ''
@@ -209,6 +208,7 @@
 	function new_multi_transfer_action() {
 		title = 'CWA';
 		description = 'CWA';
+		actions = [];
 		for (let custodian of $custodiansStore) {
 			actions = [
 				...actions,
@@ -221,7 +221,7 @@
 			];
 			on_change_action_name('transfer', actions.length - 1);
 			actions[actions.length - 1].data = {
-				from: $session ? String($session.actor) : '',
+				from: $activePlanetStore ? $activePlanetStore.account : '',
 				to: custodian.cust_name,
 				quantity: '',
 				memo: 'CWA'
