@@ -38,7 +38,8 @@
 			selectedPlanet = $activePlanetStore;
 			selectedProposal = null;
 			proposals = [];
-			await fetchProposals();
+			// await fetchProposals();
+			await fetchMsigs();
 			await fetchDacglobals();
 			loading = false;
 		}
