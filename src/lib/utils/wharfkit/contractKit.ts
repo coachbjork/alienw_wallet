@@ -1,5 +1,5 @@
 import { bpRPCStore } from '$lib/stores';
-import { APIClient } from "@wharfkit/antelope";
+import { APIClient, Bytes, Name, PackedTransaction, Serializer } from "@wharfkit/antelope";
 import { ContractKit } from "@wharfkit/contract";
 import { get } from 'svelte/store';
 
@@ -49,6 +49,20 @@ const getActionsOfSmartContract = async (account: string) => {
     return actions;
 }
 
+const decodeAction = async (account: Name, action: Name, data: Bytes) => {
+    const client = new APIClient({ url: get(bpRPCStore) });
+    const { abi } = await client.v1.chain.get_abi(account);
+    const decoded = Serializer.decode({ data, abi, type: String(action) });
+    return decoded;
+
+}
+
+const unpackTransaction = async (packed_trx: any) => {
+    const packedTransaction = PackedTransaction.from({ packed_trx });
+    const transaction = packedTransaction.getTransaction();
+    return transaction;
+}
+
 // const data =
 //     "0000402601aca2dac0a6cbd9c58a65cc005480120000000004544c4d000000003732707634732e632e77616d20612e6433752e632e77616d2068776561712e77616d2067796b62342e77616d206f757a346f2e632e77616d"
 
@@ -64,7 +78,7 @@ const getActionsOfSmartContract = async (account: string) => {
 export {
     cursorAll,
     cursorNext,
-    cursorReset, getActionsOfSmartContract, getMultiDataCursor,
-    getSingleData
+    cursorReset, decodeAction, getActionsOfSmartContract, getMultiDataCursor,
+    getSingleData, unpackTransaction
 };
 

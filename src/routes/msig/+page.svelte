@@ -3,6 +3,7 @@
 	import RecursiveObjectDisplay from '$lib/components/RecursiveObjectDisplay.svelte';
 	import MsigProposalAction from '$lib/components/SidePanel/MsigProposalAction.svelte';
 	import { AW_MSIG } from '$lib/constants';
+	import { get_msig_cursor, get_msigs } from '$lib/services/awMsigPropService';
 	import { get_dacglobals } from '$lib/services/awdaoService';
 	import { activePlanetStore } from '$lib/stores';
 	import type { Planet } from '$lib/types';
@@ -12,7 +13,10 @@
 	import { onMount } from 'svelte';
 
 	let proposals: any = [];
+	let next_page_key: any = undefined;
+	let more: boolean = true;
 	let loading = true;
+	let loadingMore = true;
 	let selectedPlanet: Planet = $activePlanetStore;
 	let selectedProposal: any = null;
 	let ableToClaimBudget = false;
@@ -22,8 +26,8 @@
 	$: selectedPlanet !== $activePlanetStore && updateData();
 
 	onMount(async () => {
-		await fetchProposals();
-		// await fetchMsigs();
+		// await fetchProposals();
+		await fetchMsigs();
 		await fetchDacglobals();
 		loading = false;
 	});
@@ -46,12 +50,18 @@
 		proposals = api_response;
 	}
 
-	// async function fetchMsigs() {
-	// 	const cursor = await get_msig_cursor($activePlanetStore.name);
-	// 	if (!cursor) return;
-	// 	const response = await get_msigs(cursor);
-	// 	// console.log(response);
-	// }
+	async function fetchMsigs() {
+		loadingMore = true;
+		const cursor = await get_msig_cursor($activePlanetStore.name, next_page_key, 10);
+		if (!cursor) return;
+		if (more) {
+			const { rows, next_key } = await get_msigs(cursor);
+			proposals = [...proposals, ...rows];
+			next_page_key = next_key;
+			more = rows.length >= 10;
+		}
+		loadingMore = false;
+	}
 
 	async function fetchDacglobals() {
 		const response = await get_dacglobals($activePlanetStore.name);
@@ -112,7 +122,7 @@
 	// }
 
 	function getApprovedBy(proposal: any) {
-		return proposal.approved_by.join(', ');
+		return proposal?.approved_by?.join(', ') || '';
 	}
 
 	// function getDeniedBy(proposal: any) {
@@ -263,7 +273,7 @@
 									<div class="flex flex-none basis-3/12 flex-col text-end">
 										<div>Expiration At</div>
 										<div class="text-white">
-											{moment(`${proposal.expiration}Z`).format('YYYY-MM-DD HH:mm:ss')}
+											{moment(proposal.expiration).format('YYYY-MM-DD HH:mm:ss')}
 										</div>
 									</div>
 								</div>
@@ -301,6 +311,23 @@
 							<div class="w-8 flex-none"></div>
 						</button>
 					{/each}
+					<!-- Load More button -->
+					<div class="flex justify-center">
+						{#if loadingMore}
+							<div class="flex justify-center">
+								<Spinner color="purple" />
+							</div>
+						{:else}
+							<button
+								class="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+								on:click={() => {
+									fetchMsigs();
+								}}
+							>
+								Load More
+							</button>
+						{/if}
+					</div>
 				</div>
 			{/if}
 		</div>
