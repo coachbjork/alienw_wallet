@@ -35,6 +35,7 @@
 	async function updateData() {
 		{
 			loading = true;
+			more = true;
 			selectedPlanet = $activePlanetStore;
 			selectedProposal = null;
 			proposals = [];
