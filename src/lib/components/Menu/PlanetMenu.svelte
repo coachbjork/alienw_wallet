@@ -52,7 +52,7 @@
 	.planet_menu ul {
 		flex-direction: row;
 		align-items: flex-start;
-		flex-wrap: nowrap;
+		flex-wrap: wrap;
 		display: flex;
 		padding: 5px;
 		margin: 0;

@@ -197,6 +197,10 @@
 	// }
 </script>
 
+<div class="left-side">
+	<!-- {#if $session}{/if} -->
+</div>
+
 <div class="main-content py-6">
 	<div class="container">
 		<PlanetMenu />
@@ -217,7 +221,7 @@
 								{/if}
 							</div>
 							<div
-								class={`flex-grow rounded-2xl border border-solid p-5 shadow-md  ${
+								class={`grow rounded-2xl border border-solid p-5 shadow-md  ${
 									proposal.proposal_status == AW_MSIG.PROP_STATE.PENDING.value
 										? 'border-yellow-700 shadow-yellow-700'
 										: proposal.proposal_status == AW_MSIG.PROP_STATE.EXECUTED.value
@@ -292,23 +296,23 @@
 										>
 									</div>
 
-									<div class="mt-2">
-										<!-- for each actions in proposal -->
-										{#each proposal.actions as action}
-											<div class="flex flex-row">
-												<div class="flex-none basis-5/12">
-													Action: <span class="text-white"
-														>{action.contract_name} - {action.action_name}</span
-													>
-												</div>
-												<div class="ml-10 flex flex-1 overflow-auto">
-													Data: <span class="text-white"
-														><RecursiveObjectDisplay data={action.action_data} /></span
-													>
-												</div>
+									<!-- <div class="mt-2"> -->
+									<!-- for each actions in proposal -->
+									{#each proposal.actions as action}
+										<div class="mt-2 flex flex-row flex-wrap">
+											<div class="flex-none basis-5/12">
+												Action: <span class="text-white"
+													>{action.contract_name} - {action.action_name}</span
+												>
 											</div>
-										{/each}
-									</div>
+											<div class=" mx-auto basis-6/12 overflow-auto text-ellipsis">
+												Data: <span class=" text-white"
+													><RecursiveObjectDisplay data={action.action_data} /></span
+												>
+											</div>
+										</div>
+									{/each}
+									<!-- </div> -->
 								</div>
 							</div>
 							<div class="w-8 flex-none"></div>
@@ -336,9 +340,7 @@
 		</div>
 	</div>
 </div>
-<div class="left-side">
-	<!-- {#if $session}{/if} -->
-</div>
+
 <div class="right-side">
 	<MsigProposalAction {selectedProposal} {ableToClaimBudget} />
 </div>
