@@ -38,6 +38,7 @@
 			more = true;
 			selectedPlanet = $activePlanetStore;
 			selectedProposal = null;
+			next_page_key = undefined;
 			proposals = [];
 			// await fetchProposals();
 			await fetchMsigs();
