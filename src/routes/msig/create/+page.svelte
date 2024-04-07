@@ -520,7 +520,7 @@
 					{/if}
 				</div>
 
-				<div class="flex w-full flex-row place-content-between">
+				<div class="flex w-full flex-row flex-wrap place-content-between">
 					<!-- Request Approvals -->
 					<div class="mt-3 flex flex-col">
 						{#each requested_approvals as requested, index}
@@ -532,11 +532,11 @@
 									<input
 										type="text"
 										bind:value={requested.actor}
-										class=" rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+										class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 										placeholder="Account Name"
 									/>
 								</div>
-								<div class="ml-1 flex flex-col">
+								<div class=" flex flex-col">
 									{#if index == 0}
 										<label for="planet-permission" class="text-base font-semibold">
 											Permission
@@ -549,7 +549,7 @@
 										on:change={(event) => {
 											on_change_approval_permission(event?.target?.value, index);
 										}}
-										class="rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+										class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 									>
 										<option value="" selected>Select a permission...</option>
 										{#each planetDAO_permissions as item}
@@ -660,11 +660,11 @@
 						>
 							Action {index + 1}
 						</label>
-						<div class="mt-2 flex flex-row">
+						<div class="mt-2 flex flex-row flex-wrap">
 							<input
 								type="text"
 								bind:value={action.sc_account}
-								class=" rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+								class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 								placeholder="Contract Account"
 								on:change={() => {
 									on_change_sc_account(index);
@@ -677,7 +677,7 @@
 								on:change={(event) => {
 									on_change_action_name(event?.target?.value, index);
 								}}
-								class=" ml-1 mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+								class=" m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 							>
 								<option value="" selected>Select an action...</option>
 								{#each action.sc_actions as item}
@@ -739,18 +739,18 @@
 									</button>
 								</div>
 								{#each action.action.authorization as auth_item, auth_index}
-									<div class="mt-1 flex flex-row">
+									<div class="mt-1 flex flex-row flex-wrap">
 										<input
 											type="text"
 											bind:value={auth_item.actor}
-											class=" rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+											class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 											placeholder="Account Name"
 										/>
 
 										<input
 											type="text"
 											bind:value={auth_item.permission}
-											class="ml-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+											class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 											placeholder="Permission Name"
 										/>
 

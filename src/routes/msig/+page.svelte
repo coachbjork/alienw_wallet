@@ -301,7 +301,7 @@
 														>{action.contract_name} - {action.action_name}</span
 													>
 												</div>
-												<div class="ml-10 flex flex-1">
+												<div class="ml-10 flex flex-1 overflow-auto">
 													Data: <span class="text-white"
 														><RecursiveObjectDisplay data={action.action_data} /></span
 													>
