@@ -6,9 +6,9 @@
 	import { activePlanetStore, custodiansStore, session, toastStore } from '$lib/stores';
 	import type { Authorization, Planet, Transaction_Action } from '$lib/types';
 	import { getAccountOnchain } from '$lib/utils/wharfkit/accountKit';
-	import { getActionsOfSmartContract } from '$lib/utils/wharfkit/contractKit';
+	import { encodeAction, getActionsOfSmartContract } from '$lib/utils/wharfkit/contractKit';
 	import { pushActions } from '$lib/utils/wharfkit/session';
-	import { ABI, Serializer } from '@wharfkit/antelope';
+	import { Name } from '@wharfkit/antelope';
 	import { ArrowLeftOutline, CirclePlusSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
 	import { onMount } from 'svelte';
 
@@ -300,40 +300,54 @@
 			return;
 		}
 
-		let actions_data = actions.map((item) => {
+		let actions_data: any = [];
+		for (let item of actions) {
 			try {
-				let abi = ABI.from({
-					structs: [
-						{
-							name: item.action.name,
-							base: item.action.base,
-							fields: item.action.fields
-						}
-					]
-				});
+				// let abi = ABI.from({
+				// 	structs: [
+				// 		{
+				// 			name: item.action.name,
+				// 			base: item.action.base,
+				// 			fields: item.action.fields
+				// 		}
+				// 	]
+				// });
 				// JSON.parse all attributes of data
-
-				Object.keys(item.data).forEach((key) => {
+				let object_data = Object.assign({}, item.data);
+				Object.keys(object_data).forEach((key) => {
 					try {
-						item.data[key] = JSON.parse(item.data[key]);
+						object_data[key] = JSON.parse(object_data[key]);
 					} catch (error) {}
 				});
-
-				let data = Serializer.encode({
-					object: item.data,
-					abi,
-					type: item.action.name
-				});
-				return {
-					account: item.sc_account,
-					name: item.action.name,
-					authorization: item.action.authorization,
-					data: data
-				};
+				// let data = Serializer.encode({
+				// 	object: object_data,
+				// 	abi,
+				// 	type: item.action.name
+				// });
+				// let abi = await getSCAbi(Name.from(item.sc_account));
+				// const typedAction = Action.from(
+				// 	{
+				// 		account: item.sc_account,
+				// 		name: item.action.name,
+				// 		authorization: item.action.authorization,
+				// 		data: object_data
+				// 	},
+				// 	abi
+				// );
+				const typedAction = await encodeAction(
+					Name.from(item.sc_account),
+					Name.from(item.action.name),
+					item.action.authorization,
+					object_data
+				);
+				actions_data.push(typedAction);
+				// return typedAction;
 			} catch (error: any) {
 				toastStore.add(`Error encoding action data: ${error.message}`, TOAST_TYPES.WARNING);
+				return;
 			}
-		});
+		}
+
 		// new_metadata with all key as lowercase
 		let new_metadata = metadata.map((item: any) => {
 			return {

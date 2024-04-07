@@ -1,5 +1,5 @@
 import { bpRPCStore } from '$lib/stores';
-import { APIClient, Bytes, Name, PackedTransaction, Serializer } from "@wharfkit/antelope";
+import { Action, APIClient, Bytes, Name, PackedTransaction, Serializer } from "@wharfkit/antelope";
 import { ContractKit } from "@wharfkit/contract";
 import { get } from 'svelte/store';
 
@@ -54,7 +54,29 @@ const decodeAction = async (account: Name, action: Name, data: Bytes) => {
     const { abi } = await client.v1.chain.get_abi(account);
     const decoded = Serializer.decode({ data, abi, type: String(action) });
     return decoded;
+}
 
+const encodeAction = async (account: Name, action: Name, authorization: any, object: any) => {
+    const client = new APIClient({ url: get(bpRPCStore) });
+    const { abi } = await client.v1.chain.get_abi(account);
+
+    const typedAction = Action.from(
+        {
+            account: account,
+            name: action,
+            authorization,
+            data: object
+        },
+        abi
+    );
+    // const encoded = Serializer.encode({ object, abi, type: String(action) });
+    return typedAction;
+}
+
+const getSCAbi = async (account: Name) => {
+    const client = new APIClient({ url: get(bpRPCStore) });
+    const { abi } = await client.v1.chain.get_abi(account);
+    return abi;
 }
 
 const unpackTransaction = async (packed_trx: any) => {
@@ -63,13 +85,23 @@ const unpackTransaction = async (packed_trx: any) => {
     return transaction;
 }
 
+// const main = async () => {
+//     const unpacked = await unpackTransaction("1d4b1666000000000000000000000100004ef1520ea84900b262491fe94c4401000000c824e0ae9a00000000a8ed3232080000000080eeae9a00");
+//     console.log(unpacked);
+//     const decoded = await decodeAction(unpacked.actions[0].account, unpacked.actions[0].name, unpacked.actions[0].data);
+//     console.log(decoded);
+//     const encoded = await encodeAction(unpacked.actions[0].account, unpacked.actions[0].name, [], decoded);
+//     console.log(encoded.data.toString());
+// }
+// main();
+
 // const data =
-//     "0000402601aca2dac0a6cbd9c58a65cc005480120000000004544c4d000000003732707634732e632e77616d20612e6433752e632e77616d2068776561712e77616d2067796b62342e77616d206f757a346f2e632e77616d"
+//     "000000c824e0ae9a000000000060705a000000c824e0ae9a00000000a8ed3232"
 
 // const client = new APIClient({ url: "https://wax.greymass.com" })
-// const { abi } = await client.v1.chain.get_abi("alien.worlds")
+// const { abi } = await client.v1.chain.get_abi("eosio.msig")
 
-// const decoded = Serializer.decode({ data, abi, type: "transfer" })
+// const decoded = Serializer.decode({ data, abi, type: "approve" })
 
 // console.log(decoded)
 // console.log(JSON.stringify(decoded))
@@ -78,7 +110,6 @@ const unpackTransaction = async (packed_trx: any) => {
 export {
     cursorAll,
     cursorNext,
-    cursorReset, decodeAction, getActionsOfSmartContract, getMultiDataCursor,
-    getSingleData, unpackTransaction
+    cursorReset, decodeAction, encodeAction, getActionsOfSmartContract, getMultiDataCursor, getSCAbi, getSingleData, unpackTransaction
 };
 

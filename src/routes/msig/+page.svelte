@@ -28,8 +28,8 @@
 	onMount(async () => {
 		// await fetchProposals();
 		await fetchMsigs();
-		await fetchDacglobals();
 		loading = false;
+		await fetchDacglobals();
 	});
 
 	async function updateData() {
@@ -41,8 +41,8 @@
 			proposals = [];
 			// await fetchProposals();
 			await fetchMsigs();
-			await fetchDacglobals();
 			loading = false;
+			await fetchDacglobals();
 		}
 	}
 
