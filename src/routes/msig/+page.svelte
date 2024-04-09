@@ -293,10 +293,17 @@
 									<div class="mx-3 flex flex-1 flex-col text-start">
 										<div>Proposer: <span class="text-white">{proposal.proposer}</span></div>
 									</div>
-									<div class="flex flex-none basis-3/12 flex-col text-end">
-										<div>Expiration At</div>
-										<div class="text-white">
-											{moment(proposal.expiration).format('YYYY-MM-DD HH:mm:ss')}
+									<div class="mx-auto flex flex-none basis-3/12 flex-col text-start">
+										<div>
+											Updated At: <span class="text-white">
+												{moment(proposal.modified_date).format('YYYY-MM-DD HH:mm:ss')}
+											</span>
+										</div>
+
+										<div>
+											Expired At: <span class="text-white">
+												{moment(proposal.expiration).format('YYYY-MM-DD HH:mm:ss')}
+											</span>
 										</div>
 									</div>
 								</div>
