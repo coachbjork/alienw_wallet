@@ -107,5 +107,5 @@ export async function get_msigs(cursor: any) {
             actions
         };
     }, { concurrency: 3 });
-    return { rows: deserializedData, next_key };
+    return { rows: deserializedData, next_key, planetName };
 }

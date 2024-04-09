@@ -10,7 +10,7 @@
 	import { Spinner } from 'flowbite-svelte';
 	import LabelSolid from 'flowbite-svelte-icons/LabelSolid.svelte';
 	import moment from 'moment';
-	import { onMount } from 'svelte';
+	import { afterUpdate, onMount } from 'svelte';
 
 	let proposals: any = [];
 	let next_page_key: any = undefined;
@@ -23,7 +23,7 @@
 	let lastclaimbudgettime = new Date(0);
 	let lastperiodtime = new Date(0);
 
-	$: selectedPlanet !== $activePlanetStore && updateData();
+	// $: selectedPlanet !== $activePlanetStore && updateData();
 
 	onMount(async () => {
 		// await fetchProposals();
@@ -32,8 +32,8 @@
 		await fetchDacglobals();
 	});
 
-	async function updateData() {
-		{
+	afterUpdate(async () => {
+		if (selectedPlanet !== $activePlanetStore) {
 			loading = true;
 			more = true;
 			selectedPlanet = $activePlanetStore;
@@ -45,7 +45,22 @@
 			loading = false;
 			await fetchDacglobals();
 		}
-	}
+	});
+
+	// async function updateData() {
+	// 	{
+	// 		loading = true;
+	// 		more = true;
+	// 		selectedPlanet = $activePlanetStore;
+	// 		selectedProposal = null;
+	// 		next_page_key = undefined;
+	// 		proposals = [];
+	// 		// await fetchProposals();
+	// 		await fetchMsigs();
+	// 		loading = false;
+	// 		await fetchDacglobals();
+	// 	}
+	// }
 
 	async function fetchProposals() {
 		let api_response: any = await fetch(`/api/daoaw/msig_proposals/${$activePlanetStore.scope}`);
@@ -58,7 +73,8 @@
 		const cursor = await get_msig_cursor($activePlanetStore.name, next_page_key, 10);
 		if (!cursor) return;
 		if (more) {
-			const { rows, next_key } = await get_msigs(cursor);
+			const { rows, next_key, planetName } = await get_msigs(cursor);
+			if (planetName !== $activePlanetStore.name) return;
 			proposals = [...proposals, ...rows];
 			next_page_key = next_key;
 			more = rows.length >= 10;
