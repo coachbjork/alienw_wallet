@@ -4,6 +4,7 @@
 	import CreateWorkerProposalModal from '$lib/components/Modal/CreateWorkerProposalModal.svelte';
 	import WPDelegateVoteModal from '$lib/components/Modal/WPDelegateVoteModal.svelte';
 	import WorkerProposalAction from '$lib/components/SidePanel/WorkerProposalAction.svelte';
+	import Badge from '$lib/components/Text/Badge.svelte';
 	import { AW, AW_WORKER_PROPOSALS, TOAST_TYPES } from '$lib/constants';
 	import {
 		get_worker_proposals,
@@ -19,383 +20,6 @@
 	import { afterUpdate, onMount } from 'svelte';
 
 	let proposals: any = [];
-	function handleMockData() {
-		selectedProposal = null;
-		let mock_data = [
-			{
-				proposal_id: 'testprop1',
-				proposer: 'awtesterooo1',
-				arbiter: String($session ? $session.actor : 'waximusjazzz'),
-				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
-				proposal_pay: {
-					contract: 'alien.worlds',
-					quantity: '2.0000 TLM'
-				},
-				arbiter_pay: {
-					contract: 'alien.worlds',
-					quantity: '1.0000 TLM'
-				},
-				arbiter_agreed: false,
-				state: 'pendingappr',
-				expiry: '2023-07-28T08:49:10Z',
-				job_duration: 2591000,
-				category: 3,
-				votes: [
-					{
-						vote_id: 0,
-						voter: 'awtesterooo1',
-						proposal_id: 'testprop1',
-						category_id: null,
-						vote: 'propdeny',
-						delegatee: 'null',
-						comment_hash: 'null'
-					},
-					{
-						vote_id: 2,
-						voter: 'awtesterooo3',
-						proposal_id: 'testprop1',
-						category_id: null,
-						vote: '',
-						delegatee: 'null',
-						comment_hash: 'null'
-					},
-					{
-						vote_id: 1,
-						voter: 'awtesterooo2',
-						proposal_id: 'testprop1',
-						category_id: null,
-						vote: 'propapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					}
-				]
-			},
-			{
-				proposal_id: 'testprop11',
-				proposer: String($session ? $session.actor : 'waximusjazzz'),
-				arbiter: 'awtesterooo2',
-				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
-				proposal_pay: {
-					contract: 'alien.worlds',
-					quantity: '2.0000 TLM'
-				},
-				arbiter_pay: {
-					contract: 'alien.worlds',
-					quantity: '1.0000 TLM'
-				},
-				arbiter_agreed: true,
-				state: 'pendingappr',
-				expiry: '2023-07-28T08:49:10Z',
-				job_duration: 2591000,
-				category: 3,
-				votes: [
-					{
-						vote_id: 0,
-						voter: 'awtesterooo1',
-						proposal_id: 'testprop1',
-						category_id: null,
-						vote: 'propdeny',
-						delegatee: 'null',
-						comment_hash: 'null'
-					},
-					{
-						vote_id: 2,
-						voter: 'awtesterooo3',
-						proposal_id: 'testprop1',
-						category_id: null,
-						vote: '',
-						delegatee: 'null',
-						comment_hash: 'null'
-					},
-					{
-						vote_id: 1,
-						voter: 'awtesterooo2',
-						proposal_id: 'testprop1',
-						category_id: null,
-						vote: 'propapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					}
-				]
-			},
-			{
-				proposal_id: 'testprop2',
-				proposer: 'awtesterooo1',
-				arbiter: 'awtesterooo2',
-				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
-				proposal_pay: {
-					contract: 'alien.worlds',
-					quantity: '2.0000 TLM'
-				},
-				arbiter_pay: {
-					contract: 'alien.worlds',
-					quantity: '1.0000 TLM'
-				},
-				arbiter_agreed: true,
-				state: 'apprvtes',
-				expiry: '2023-07-28T08:49:10Z',
-				job_duration: 2592000,
-				category: 3,
-				votes: [
-					{
-						vote_id: 0,
-						voter: 'awtesterooo1',
-						proposal_id: 'testprop2',
-						category_id: null,
-						vote: 'propapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					},
-					{
-						vote_id: 1,
-						voter: 'awtesterooo2',
-						proposal_id: 'testprop2',
-						category_id: null,
-						vote: 'propapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					}
-				]
-			},
-			{
-				proposal_id: 'testprop22',
-				proposer: String($session ? $session.actor : 'waximusjazzz'),
-				arbiter: 'awtesterooo2',
-				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
-				proposal_pay: {
-					contract: 'alien.worlds',
-					quantity: '2.0000 TLM'
-				},
-				arbiter_pay: {
-					contract: 'alien.worlds',
-					quantity: '1.0000 TLM'
-				},
-				arbiter_agreed: false,
-				state: 'apprvtes',
-				expiry: '2023-07-28T08:49:10Z',
-				job_duration: 2592000,
-				category: 3,
-				votes: [
-					{
-						vote_id: 0,
-						voter: 'awtesterooo1',
-						proposal_id: 'testprop22',
-						category_id: null,
-						vote: 'propapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					},
-					{
-						vote_id: 1,
-						voter: 'awtesterooo2',
-						proposal_id: 'testprop22',
-						category_id: null,
-						vote: 'propapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					}
-				]
-			},
-			{
-				proposal_id: 'testprop3',
-				proposer: 'awtesterooo1',
-				arbiter: 'awtesterooo2',
-				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
-				proposal_pay: {
-					contract: 'alien.worlds',
-					quantity: '2.0000 TLM'
-				},
-				arbiter_pay: {
-					contract: 'alien.worlds',
-					quantity: '1.0000 TLM'
-				},
-				arbiter_agreed: true,
-				state: 'inprogress',
-				expiry: '2023-07-28T08:49:10Z',
-				job_duration: 2592000,
-				category: 3,
-				votes: [
-					{
-						vote_id: 0,
-						voter: 'awtesterooo1',
-						proposal_id: 'testprop3',
-						category_id: null,
-						vote: 'propapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					},
-					{
-						vote_id: 1,
-						voter: 'awtesterooo2',
-						proposal_id: 'testprop3',
-						category_id: null,
-						vote: 'propapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					}
-				]
-			},
-			{
-				proposal_id: 'testprop33',
-				proposer: String($session ? $session.actor : 'waximusjazzz'),
-				arbiter: 'awtesterooo2',
-				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
-				proposal_pay: {
-					contract: 'alien.worlds',
-					quantity: '2.0000 TLM'
-				},
-				arbiter_pay: {
-					contract: 'alien.worlds',
-					quantity: '1.0000 TLM'
-				},
-				arbiter_agreed: true,
-				state: 'inprogress',
-				expiry: '2023-07-28T08:49:10Z',
-				job_duration: 2592000,
-				category: 3,
-				votes: [
-					{
-						vote_id: 0,
-						voter: 'awtesterooo1',
-						proposal_id: 'testprop33',
-						category_id: null,
-						vote: 'propapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					},
-					{
-						vote_id: 1,
-						voter: 'awtesterooo2',
-						proposal_id: 'testprop33',
-						category_id: null,
-						vote: 'propapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					}
-				]
-			},
-			{
-				proposal_id: 'testprop4',
-				proposer: 'awtesterooo1',
-				arbiter: 'awtesterooo2',
-				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
-				proposal_pay: {
-					contract: 'alien.worlds',
-					quantity: '2.0000 TLM'
-				},
-				arbiter_pay: {
-					contract: 'alien.worlds',
-					quantity: '1.0000 TLM'
-				},
-				arbiter_agreed: true,
-				state: 'pendingfin',
-				expiry: '2023-07-28T08:49:10Z',
-				job_duration: 2592000,
-				category: 3,
-				votes: [
-					{
-						vote_id: 0,
-						voter: 'awtesterooo1',
-						proposal_id: 'testprop4',
-						category_id: null,
-						vote: 'finaldeny',
-						delegatee: 'null',
-						comment_hash: 'null'
-					},
-					{
-						vote_id: 1,
-						voter: 'awtesterooo2',
-						proposal_id: 'testprop4',
-						category_id: null,
-						vote: 'finalapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					}
-				]
-			},
-			{
-				proposal_id: 'testprop5',
-				proposer: 'awtesterooo1',
-				arbiter: 'awtesterooo2',
-				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
-				proposal_pay: {
-					contract: 'alien.worlds',
-					quantity: '2.0000 TLM'
-				},
-				arbiter_pay: {
-					contract: 'alien.worlds',
-					quantity: '1.0000 TLM'
-				},
-				arbiter_agreed: true,
-				state: 'apprfinvtes',
-				expiry: '2023-07-28T08:49:10Z',
-				job_duration: 2592000,
-				category: 3,
-				votes: [
-					{
-						vote_id: 0,
-						voter: 'awtesterooo1',
-						proposal_id: 'testprop5',
-						category_id: null,
-						vote: 'finalapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					},
-					{
-						vote_id: 1,
-						voter: 'awtesterooo2',
-						proposal_id: 'testprop5',
-						category_id: null,
-						vote: 'finalapprove',
-						delegatee: 'null',
-						comment_hash: 'null'
-					}
-				]
-			},
-			{
-				proposal_id: 'testprop6',
-				proposer: 'awtesterooo1',
-				arbiter: 'awtesterooo2',
-				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
-				proposal_pay: {
-					contract: 'alien.worlds',
-					quantity: '2.0000 TLM'
-				},
-				arbiter_pay: {
-					contract: 'alien.worlds',
-					quantity: '1.0000 TLM'
-				},
-				arbiter_agreed: true,
-				state: 'expired',
-				expiry: '2023-07-28T08:49:10Z',
-				job_duration: 2592000,
-				category: 3,
-				votes: []
-			},
-			{
-				proposal_id: 'testprop7',
-				proposer: 'awtesterooo1',
-				arbiter: String($session ? $session.actor : 'waximusjazzz'),
-				content_hash: 'QmbW6VPbuj2jUUY8UcZF4TJgYDdZfd4zEW1MWgKyQ2jJBN',
-				proposal_pay: {
-					contract: 'alien.worlds',
-					quantity: '2.0000 TLM'
-				},
-				arbiter_pay: {
-					contract: 'alien.worlds',
-					quantity: '1.0000 TLM'
-				},
-				arbiter_agreed: true,
-				state: 'indispute',
-				expiry: '2023-07-28T08:49:10Z',
-				job_duration: 2592000,
-				category: 3,
-				votes: []
-			}
-		];
-		proposals = [...mock_data];
-		console.log('proposals', typeof proposals);
-	}
 
 	let loading = true;
 	let selectedPlanet: Planet = $activePlanetStore;
@@ -744,7 +368,7 @@
 							<div
 								class={`flex-grow rounded-2xl border border-solid p-5 shadow-md   ${
 									proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value
-										? 'border-gray-700 shadow-gray-700 '
+										? 'border-purple-700 shadow-purple-700 '
 										: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value
 											? 'border-green-700 shadow-green-700'
 											: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value
@@ -755,9 +379,9 @@
 														  AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value
 														? 'border-teal-700 shadow-teal-700'
 														: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.EXPIRED.value
-															? 'border-red-700 shadow-red-700'
+															? 'border-gray-700 shadow-gray-700'
 															: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value
-																? 'border-purple-700 shadow-purple-700'
+																? 'border-red-700 shadow-red-700'
 																: ''
 								} ${
 									proposal.proposal_id == selectedProposal?.proposal_id
@@ -770,30 +394,32 @@
 										<div>
 											#: <span class="text-white underline">{proposal.proposal_id}</span>
 										</div>
-										<div
-											class={`${
-												proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value
-													? 'text-gray-500 '
-													: proposal.state ==
-														  AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value
-														? 'text-green-500'
-														: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value
-															? 'text-blue-500'
-															: proposal.state ==
-																  AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value
-																? 'text-yellow-500'
+										<div>
+											<Badge
+												color={`${
+													proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value
+														? 'gray'
+														: proposal.state ==
+															  AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value
+															? 'green'
+															: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value
+																? 'blue'
 																: proposal.state ==
-																	  AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value
-																	? 'text-teal-500'
-																	: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.EXPIRED.value
-																		? 'text-red-500'
-																		: proposal.state ==
-																			  AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value
-																			? 'text-purple-500'
-																			: ''
-											}`}
-										>
-											{getStateName(proposal.state)}
+																	  AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value
+																	? 'yellow'
+																	: proposal.state ==
+																		  AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value
+																		? 'teal'
+																		: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.EXPIRED.value
+																			? 'red'
+																			: proposal.state ==
+																				  AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value
+																				? 'purple'
+																				: 'gray'
+												}`}
+											>
+												{getStateName(proposal.state)}
+											</Badge>
 										</div>
 										<div>{getApprovalState(proposal)}</div>
 									</div>

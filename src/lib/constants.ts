@@ -116,6 +116,45 @@ const AW_DAO = {
     },
 };
 
+const AW_REFERENDUM = {
+    CONTRACT_NAME: "ref.worlds",
+    TABLES: {
+        REFERENDUMS: "referendums",
+        VOTES: "votes",
+        DEPOSITS: "deposits",
+        CONFIG: "config",
+    },
+    ACTIONS: {
+        PROPOSE: "propose",
+        VOTE: "vote",
+        CANCEL: "cancel",
+        EXECUTE: "exec",
+    },
+    STATUS: {
+        OPEN: { name: "Open", value: "open" },
+        PASSING: { name: "Passing", value: "passing" },
+        FAILING: { name: "Failing", value: "failing" },
+        QUORUM_UNMET: { name: "Quorum Unmet", value: "quorum.unmet" },
+        EXPIRED: { name: "Expired", value: "expired" },
+        EXECUTED: { name: "Executed", value: "executed" },
+    },
+    VOTE: {
+        REMOVE: { name: "Remove", value: "remove" },
+        YES: { name: "Yes", value: "yes" },
+        NO: { name: "No", value: "no" },
+        ABSTAIN: { name: "Abstain", value: "abstain" },
+    },
+    REF_TYPE: {
+        BINDING: { name: "Binding", value: "binding", tip: "This requires an associated transaction that will get executed if the referendum reaches a positive consensus through voting. It will have no intervention by the custodians or provide any mechanism for the custodians to intervene if they disagree with the outcome." },
+        SEMI_BINDING: { name: "Semi Binding", value: "semibinding", tip: "Similar to the binding referendum, this requires a transaction that could be executed if the referendum reaches a positive consensus but rather than being executed it will be referred to the custodians as a proposal to make the final decision via voting before executing. Given it would have passed the consensus of the DAO community to get to this point it would be likely that the DAO would approve but may have a valid reason not to. This would open opportunity for interesting DAO politics to play out." },
+        OPINION: { name: "Opinion", value: "opinion", tip: "This simply captures the group opinion of the DAO. It doesn't lead to the execution of any logic." },
+    },
+    COUNT_TYPE: {
+        TOKEN: { name: "Token", value: "token" },
+        ACCOUNT: { name: "Account", value: "account" },
+    }
+};
+
 const AW_MSIG = {
     CONTRACT_NAME: "msig.worlds",
     TABLES: {
@@ -286,32 +325,37 @@ const TOAST_TYPES = {
     WARNING: "warning",
 };
 
-const ROUTES = [{
-    name: "Voting",
-    path: "/voting",
-},
-{
-    name: "Worker Proposals",
-    path: "/worker-proposals",
-},
-{
-    name: "Msig",
-    path: "/msig",
-},
-{
-    name: "DAO Infra",
-    path: "/dao-infra",
-    group: [
-        {
-            name: "Article",
-            path: "/dao-infra/article",
-        },
-        {
-            name: "Identity",
-            path: "/dao-infra/identity",
-        },
-    ],
-},
+const ROUTES = [
+    {
+        name: "Voting",
+        path: "/voting",
+    },
+    {
+        name: "Worker Proposals",
+        path: "/worker-proposals",
+    },
+    {
+        name: "Msig",
+        path: "/msig",
+    },
+    {
+        name: "DAO Infra",
+        path: "/dao-infra",
+        group: [
+            {
+                name: "Article",
+                path: "/dao-infra/article",
+            },
+            {
+                name: "Identity",
+                path: "/dao-infra/identity",
+            },
+        ],
+    },
+    {
+        name: "Referendum",
+        path: "/referendum",
+    },
 ];
 
 const LOCAL_STORAGE_KEYS = {
@@ -325,8 +369,7 @@ export {
     AW_DAO,
     AW_DAO_INFRA,
     AW_MSIG,
-    AW_PLANETS,
-    AW_TOKEN,
+    AW_PLANETS, AW_REFERENDUM, AW_TOKEN,
     AW_WORKER_PROPOSALS,
     LOCAL_STORAGE_KEYS,
     ROUTES,

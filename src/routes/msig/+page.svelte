@@ -2,6 +2,7 @@
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import RecursiveObjectDisplay from '$lib/components/RecursiveObjectDisplay.svelte';
 	import MsigProposalAction from '$lib/components/SidePanel/MsigProposalAction.svelte';
+	import Badge from '$lib/components/Text/Badge.svelte';
 	import { AW_MSIG } from '$lib/constants';
 	import { get_msig_cursor, get_msigs } from '$lib/services/awMsigPropService';
 	import { get_dacglobals } from '$lib/services/awdaoService';
@@ -23,12 +24,8 @@
 	let lastclaimbudgettime = new Date(0);
 	let lastperiodtime = new Date(0);
 
-	// $: selectedPlanet !== $activePlanetStore && updateData();
-
 	onMount(async () => {
-		// await fetchProposals();
 		await fetchMsigs();
-		loading = false;
 		await fetchDacglobals();
 	});
 
@@ -40,27 +37,11 @@
 			selectedProposal = null;
 			next_page_key = undefined;
 			proposals = [];
-			// await fetchProposals();
 			await fetchMsigs();
-			loading = false;
+
 			await fetchDacglobals();
 		}
 	});
-
-	// async function updateData() {
-	// 	{
-	// 		loading = true;
-	// 		more = true;
-	// 		selectedPlanet = $activePlanetStore;
-	// 		selectedProposal = null;
-	// 		next_page_key = undefined;
-	// 		proposals = [];
-	// 		// await fetchProposals();
-	// 		await fetchMsigs();
-	// 		loading = false;
-	// 		await fetchDacglobals();
-	// 	}
-	// }
 
 	async function fetchProposals() {
 		let api_response: any = await fetch(`/api/daoaw/msig_proposals/${$activePlanetStore.scope}`);
@@ -80,6 +61,7 @@
 			more = rows.length >= 10;
 		}
 		loadingMore = false;
+		loading = false;
 	}
 
 	async function fetchDacglobals() {
@@ -115,102 +97,9 @@
 		}
 	}
 
-	// function getApprovalState(proposal: any) {
-	// 	if (
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value ||
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value ||
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value
-	// 	) {
-	// 		// calculate how many approved vote
-	// 		let approvedVotes = proposal.votes.filter(
-	// 			(item: any) => item.vote == AW_WORKER_PROPOSALS.VOTE.VOTE_PROP_APPROVE.value
-	// 		);
-	// 		return `(${approvedVotes.length}/${wpConfig.proposal_threshold})`;
-	// 	} else if (
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value ||
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value
-	// 	) {
-	// 		// calculate how many approved vote
-	// 		let approvedVotes = proposal.votes.filter(
-	// 			(item: any) => item.vote == AW_WORKER_PROPOSALS.VOTE.VOTE_FINAL_APPROVE.value
-	// 		);
-	// 		return `(${approvedVotes.length}/${wpConfig.finalize_threshold})`;
-	// 	} else {
-	// 		return '';
-	// 	}
-	// }
-
 	function getApprovedBy(proposal: any) {
 		return proposal?.approved_by?.join(', ') || '';
 	}
-
-	// function getDeniedBy(proposal: any) {
-	// 	if (
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value ||
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value ||
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value
-	// 	) {
-	// 		let deniedByString = proposal.votes
-	// 			.filter((item: any) => item.vote == AW_WORKER_PROPOSALS.VOTE.VOTE_PROP_DENY.value)
-	// 			.map((item: any) => item.voter)
-	// 			.join(', ');
-	// 		return deniedByString;
-	// 	} else if (
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value ||
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value
-	// 	) {
-	// 		let deniedByString = proposal.votes
-	// 			.filter((item: any) => item.vote == AW_WORKER_PROPOSALS.VOTE.VOTE_FINAL_DENY.value)
-	// 			.map((item: any) => item.voter)
-	// 			.join(', ');
-	// 		return deniedByString;
-	// 	} else {
-	// 		return '';
-	// 	}
-	// }
-
-	// async function handleCreateProposalAction(proposal: any) {
-	// 	if (!$session) {
-	// 		toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
-	// 		return;
-	// 	}
-
-	// 	const { title, summary, arbiter, proposal_pay, arbiter_pay, content_hash, id, job_duration } =
-	// 		proposal;
-
-	// 	let actions = [
-	// 		{
-	// 			account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
-	// 			name: AW_WORKER_PROPOSALS.ACTIONS.CREATE_PROPOSAL,
-	// 			authorization: [
-	// 				{
-	// actor: String($session.actor),
-	// 				permission: String($session?.permission)
-	// 				}
-	// 			],
-	// 			data: {
-	// 				proposer: String($session.actor),
-	// 				title,
-	// 				summary,
-	// 				arbiter,
-	// 				proposal_pay: {
-	// 					quantity: `${proposal_pay.toFixed(4)} TLM`,
-	// 					contract: AW.CONTRACT_NAME
-	// 				},
-	// 				arbiter_pay: {
-	// 					quantity: `${arbiter_pay.toFixed(4)} TLM`,
-	// 					contract: AW.CONTRACT_NAME
-	// 				},
-	// 				content_hash,
-	// 				id,
-	// 				category: 0,
-	// 				job_duration,
-	// 				dac_id: $activePlanetStore.scope
-	// 			}
-	// 		}
-	// 	];
-	// 	return pushActions($session, actions);
-	// }
 </script>
 
 <div class="left-side">
@@ -256,18 +145,20 @@
 										<div>
 											#: <span class="text-white underline">{proposal.proposal_id}</span>
 										</div>
-										<div
-											class={`${
-												proposal.proposal_status == AW_MSIG.PROP_STATE.PENDING.value
-													? 'text-yellow-500 '
-													: proposal.proposal_status == AW_MSIG.PROP_STATE.EXECUTED.value
-														? 'text-blue-500'
-														: proposal.proposal_status == AW_MSIG.PROP_STATE.CANCELLED.value
-															? 'text-red-500'
-															: ''
-											}`}
-										>
-											{getStateName(proposal.proposal_status)}
+										<div>
+											<Badge
+												color={`${
+													proposal.proposal_status == AW_MSIG.PROP_STATE.PENDING.value
+														? 'yellow'
+														: proposal.proposal_status == AW_MSIG.PROP_STATE.EXECUTED.value
+															? 'blue'
+															: proposal.proposal_status == AW_MSIG.PROP_STATE.CANCELLED.value
+																? 'red'
+																: 'gray'
+												}`}
+											>
+												{getStateName(proposal.proposal_status)}
+											</Badge>
 										</div>
 									</div>
 									<div class="mx-3 flex-none basis-3/12 flex-col text-start">
