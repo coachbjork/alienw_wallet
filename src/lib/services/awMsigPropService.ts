@@ -47,23 +47,6 @@ export async function get_msig_cursor(activePlanet: string, next_key: any = unde
         params.to = next_key;
     }
     const cursor: any = await getMultiDataCursor(AW_MSIG.CONTRACT_NAME, planetScope, AW_MSIG.TABLES.PROPOSALS, params);
-    // const response = await cursor.next();
-    // console.log(response);
-    // console.log(String(response[0].proposal_name));
-    // console.log(parseInt(response[response.length - 1].modified_date.value));
-    // console.log(String(response[1].proposal_name));
-    // const cursor2: any = await getMultiDataCursor(AW_MSIG.CONTRACT_NAME, planetScope, AW_MSIG.TABLES.PROPOSALS, {
-    //     index_position: '3',
-    //     key_type: 'i64',
-    //     reverse: true,
-    //     rowsPerAPIRequest: 5,
-    //     to: parseInt(response[response.length - 1].modified_date.value) - 1,
-    // });
-    // const response2 = await cursor2.next();
-
-    // const response = await get_msigs(msigCursor);
-    // console.log(response2);
-    // console.log(String(response2[4].proposal_name));
     return cursor;
 }
 

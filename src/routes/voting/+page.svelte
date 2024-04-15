@@ -27,15 +27,18 @@
 	let staked: string = '';
 
 	onMount(async () => {
-		await fetchCandidates();
-		loading = false;
+		Promise.all([fetchCandidates(), fetchDacglobals()]).then(() => {
+			loading = false;
+		});
+		// await fetchCandidates();
+		// loading = false;
 
-		if ($session) {
-			await fetchVotedFor();
-			await fetchStaked();
-		}
+		// if ($session) {
+		// 	await fetchVotedFor();
+		// 	await fetchStaked();
+		// }
 
-		await fetchDacglobals();
+		// await fetchDacglobals();
 	});
 
 	afterUpdate(async () => {
@@ -45,15 +48,19 @@
 			selectedCandidates = [];
 			votedForCandidates = [];
 			staked = '';
-			await fetchCandidates();
-			loading = false;
+			Promise.all([fetchCandidates(), fetchDacglobals()]).then(() => {
+				loading = false;
+			});
+			// await fetchCandidates();
+			// loading = false;
 			if ($session) {
-				await fetchVotedFor();
-				await fetchStaked();
+				Promise.all([fetchVotedFor(), fetchStaked()]);
 			}
-			await fetchDacglobals();
+			// await fetchDacglobals();
 		}
 	});
+
+	$: $session && Promise.all([fetchVotedFor(), fetchStaked()]);
 
 	async function fetchCandidates() {
 		let response = await get_candidates($activePlanetStore.name);
