@@ -227,8 +227,26 @@
 			}
 		}
 		let tx_actions = [];
-		if (
-			!userDeposited ||
+		if (!userDeposited.account || !userDeposited.deposit) {
+			if (!config.fee[type_name].quantity.units.equals(0)) {
+				tx_actions.push({
+					account: config.fee[type_name].contract,
+					name: 'transfer',
+					authorization: [
+						{
+							actor: String($session.actor),
+							permission: String($session?.permission)
+						}
+					],
+					data: {
+						from: String($session.actor),
+						to: AW_REFERENDUM.CONTRACT_NAME,
+						quantity: String(config.fee[type_name].quantity),
+						memo: 'Deposit for referendum creation'
+					}
+				});
+			}
+		} else if (
 			userDeposited?.deposit?.contract != config.fee[type_name]?.contract ||
 			userDeposited?.deposit?.quantity.symbol.name != config.fee[type_name]?.quantity.symbol.name ||
 			userDeposited?.deposit?.quantity.symbol.precision !=
@@ -248,7 +266,7 @@
 					account: String($session.actor)
 				}
 			});
-			if (!config.fee[type_name].quantity.units.equals(0))
+			if (!config.fee[type_name].quantity.units.equals(0)) {
 				tx_actions.push({
 					account: config.fee[type_name].contract,
 					name: 'transfer',
@@ -265,6 +283,7 @@
 						memo: 'Deposit for referendum creation'
 					}
 				});
+			}
 		} else if (
 			userDeposited &&
 			parseInt(userDeposited?.deposit?.quantity.units) <

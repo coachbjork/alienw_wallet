@@ -131,7 +131,6 @@ export async function get_deposited_bal(user: string) {
         }
     }
 
-    console.log("bal: ", deserializedData);
     return deserializedData;
 }
 
