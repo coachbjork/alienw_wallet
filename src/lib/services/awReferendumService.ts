@@ -1,5 +1,5 @@
 import { AW_PLANETS, AW_REFERENDUM } from '$lib/constants';
-import { cursorNext, decodeAction, getMultiDataCursor } from '$lib/utils/wharfkit/contractKit';
+import { cursorNext, decodeAction, getMultiDataCursor, getSingleData } from '$lib/utils/wharfkit/contractKit';
 import Bluebird from 'bluebird';
 
 import _ from "lodash";
@@ -69,6 +69,85 @@ export async function get_referendums(cursor: any) {
             acts: actions,
         };
     }, { concurrency: 3 });
-    console.log("deserializedData", deserializedData);
     return { rows: deserializedData, next_key, planetName };
+}
+
+export async function get_ref_cfg(activePlanet: string) {
+    const planetScope = _.find(AW_PLANETS, (planet: any) => { return planet.name === activePlanet })?.scope || "";
+    const data: any = await getSingleData(AW_REFERENDUM.CONTRACT_NAME, planetScope, AW_REFERENDUM.TABLES.CONFIG);
+    if (!data) return {};
+    const deserializedData = {
+        fee: data.fee.reduce((acc: any, fee: any) => {
+            acc[String(fee.key)] = {
+                quantity: fee.value.quantity,
+                contract: String(fee.value.contract),
+            }
+            return acc;
+        }, {}),
+        pass: data.pass.map((pass: any) => {
+            return {
+                name: String(pass.key),
+                value: parseInt(pass.value),
+            };
+        }),
+        quorum_token: data.quorum_token.map((quorum: any) => {
+            return {
+                name: String(quorum.key),
+                value: parseInt(quorum.value),
+            };
+        }),
+        quorum_account: data.quorum_account.map((quorum: any) => {
+            return {
+                name: String(quorum.key),
+                value: parseInt(quorum.value),
+            };
+        }),
+        allow_per_account_voting: data.allow_per_account_voting.map((allow: any) => {
+
+            return {
+                name: String(allow.key),
+                value: allow.value,
+            };
+        }),
+        allow_vote_type: data.allow_vote_type.map((allow: any) => {
+            return {
+                name: String(allow.key),
+                value: allow.value,
+            };
+        }),
+        next_referendum_id: parseInt(data.next_referendum_id),
+    }
+    return deserializedData;
+}
+
+export async function get_deposited_bal(user: string) {
+    const data: any = await getSingleData(AW_REFERENDUM.CONTRACT_NAME, AW_REFERENDUM.CONTRACT_NAME, AW_REFERENDUM.TABLES.DEPOSITS, user);
+    if (!data) return {};
+    const deserializedData = {
+        account: String(data.account),
+        deposit: {
+            quantity: data.deposit.quantity,
+            contract: String(data.deposit.contract),
+        }
+    }
+
+    console.log("bal: ", deserializedData);
+    return deserializedData;
+}
+
+export async function get_votes_by_user(activePlanet: string, user: string) {
+    const planetScope = _.find(AW_PLANETS, (planet: any) => { return planet.name === activePlanet })?.scope || "";
+    const data: any = await getSingleData(AW_REFERENDUM.CONTRACT_NAME, planetScope, AW_REFERENDUM.TABLES.VOTES, user);
+    if (!data) return {};
+    const deserializedData = {
+        voter: String(data.voter),
+        votes: data.votes.map((vote: any) => {
+            return {
+                referendum_id: parseInt(vote.key),
+                vote: String(vote.value),
+            };
+        }),
+    }
+
+    return deserializedData;
 }

@@ -2,10 +2,15 @@
 	import LinearRatio from '$lib/components/LinearRatio.svelte';
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import RecursiveObjectDisplay from '$lib/components/RecursiveObjectDisplay.svelte';
+	import ReferendumAction from '$lib/components/SidePanel/ReferendumAction.svelte';
 	import Badge from '$lib/components/Text/Badge.svelte';
 	import { AW, AW_REFERENDUM, AW_WORKER_PROPOSALS, TOAST_TYPES } from '$lib/constants';
-	import { get_referendums, get_referundum_cursor } from '$lib/services/awReferendumService';
-	import { get_workerprop_cfg } from '$lib/services/awWorkerPropService';
+	import {
+		get_deposited_bal,
+		get_referendums,
+		get_referundum_cursor,
+		get_votes_by_user
+	} from '$lib/services/awReferendumService';
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import type { Planet } from '$lib/types';
 	import { pushActions } from '$lib/utils/wharfkit/session';
@@ -20,15 +25,18 @@
 	let loadingMore = true;
 	let selectedPlanet: Planet = $activePlanetStore;
 	let selectedRef: any = null;
-	let wpConfig: any = {};
+	// let config: any = {};
+	let userDeposited: any = {};
+	let userVotes: any = {};
 	let isModalOpen = false;
 	let isDelegateModalOpen = false;
 	let isDelegate = false;
 	let next_page_key: any = undefined;
 
 	onMount(async () => {
-		await fetchReferendums();
-		await fetchWorkerProposalCfgs();
+		Promise.all([fetchReferendums()]).then(() => {
+			loading = false;
+		});
 	});
 
 	afterUpdate(async () => {
@@ -36,11 +44,21 @@
 			selectedPlanet = $activePlanetStore;
 			selectedRef = null;
 			loading = true;
+			more = true;
+			loadingMore = true;
+			next_page_key = undefined;
 			refItems = [];
-			await fetchReferendums();
-			await fetchWorkerProposalCfgs();
+			Promise.all([fetchReferendums()]).then(() => {
+				loading = false;
+			});
+
+			if ($session) {
+				Promise.all([fetchUserVotes(), fetchUserDepositedBal()]);
+			}
 		}
 	});
+
+	$: $session && Promise.all([fetchUserVotes(), fetchUserDepositedBal()]);
 
 	async function fetchReferendums() {
 		loadingMore = true;
@@ -57,10 +75,24 @@
 		loadingMore = false;
 	}
 
-	async function fetchWorkerProposalCfgs() {
-		let response = await get_workerprop_cfg($activePlanetStore.name);
+	// async function fetchRefCfgs() {
+	// 	let response = await get_ref_cfg($activePlanetStore.name);
+	// 	if (!response) return;
+	// 	config = response;
+	// }
+
+	async function fetchUserDepositedBal() {
+		if (!$session) return;
+		let response = await get_deposited_bal(String($session.actor));
 		if (!response) return;
-		wpConfig = response;
+		userDeposited = response;
+	}
+
+	async function fetchUserVotes() {
+		if (!$session) return;
+		let response = await get_votes_by_user($activePlanetStore.name, String($session.actor));
+		if (!response) return;
+		userVotes = response;
 	}
 
 	function selectRefItem(item: any) {
@@ -104,19 +136,6 @@
 		}
 	}
 
-	function getRefTypeTip(type: string) {
-		switch (type) {
-			case AW_REFERENDUM.REF_TYPE.BINDING.value:
-				return AW_REFERENDUM.REF_TYPE.BINDING.tip;
-			case AW_REFERENDUM.REF_TYPE.SEMI_BINDING.value:
-				return AW_REFERENDUM.REF_TYPE.SEMI_BINDING.tip;
-			case AW_REFERENDUM.REF_TYPE.OPINION.value:
-				return AW_REFERENDUM.REF_TYPE.OPINION.tip;
-			default:
-				return 'Unknown';
-		}
-	}
-
 	function getRefCountTypeName(type: string) {
 		switch (type) {
 			case AW_REFERENDUM.COUNT_TYPE.TOKEN.value:
@@ -129,8 +148,16 @@
 		}
 	}
 
-	function getVoteRatio(votes: any) {
+	function getVoteRatio(votes: any, referendum_id: number) {
 		let data = votes.map((item: any) => {
+			let userVoted = false;
+			if (userVotes && userVotes.votes) {
+				let voteSelected = userVotes.votes.find((v: any) => v.referendum_id == referendum_id);
+
+				if (voteSelected) {
+					userVoted = voteSelected.vote == item.name;
+				}
+			}
 			return {
 				name: `${item.name.charAt(0).toUpperCase() + item.name.slice(1)}`,
 				ratio: item.value,
@@ -139,18 +166,11 @@
 						? 'green'
 						: item.name == AW_REFERENDUM.VOTE.NO.value
 							? 'red'
-							: 'gray'
+							: 'gray',
+				selected: userVoted
 			};
 		});
 
-		// sort by ratio name yes->no->abstain
-		data.sort((a: any, b: any) => {
-			if (a.name == AW_REFERENDUM.VOTE.YES.value) return -1;
-			if (b.name == AW_REFERENDUM.VOTE.YES.value) return 1;
-			if (a.name == AW_REFERENDUM.VOTE.NO.value) return -1;
-			if (b.name == AW_REFERENDUM.VOTE.NO.value) return 1;
-			return 0;
-		});
 		// if all 0, set all to 1
 		if (data.every((item: any) => item.ratio == 0)) {
 			data = data.map((item: any) => {
@@ -158,15 +178,6 @@
 			});
 		}
 		return data;
-	}
-
-	function handleNewProposal(event: any) {
-		isModalOpen = true;
-	}
-
-	function handleDelegate(event: any) {
-		isDelegateModalOpen = true;
-		isDelegate = event?.detail?.is_delegate;
 	}
 
 	async function handleCreateProposalAction(proposal: any) {
@@ -329,7 +340,7 @@
 													refItem.status == AW_REFERENDUM.STATUS.OPEN.value
 														? 'blue'
 														: refItem.status == AW_REFERENDUM.STATUS.PASSING.value
-															? 'green '
+															? 'green'
 															: refItem.status == AW_REFERENDUM.STATUS.FAILING.value
 																? 'yellow '
 																: refItem.status == AW_REFERENDUM.STATUS.QUORUM_UNMET.value
@@ -368,13 +379,26 @@
 											>
 										</div>
 									</div>
-									<div class="mx-auto flex flex-none basis-3/12 flex-col text-start">
-										<div>
-											Expired At: <span class="text-white">
+									<div class="mx-auto flex flex-none basis-3/12 flex-col text-center">
+										{#if refItem.voting_type == AW_REFERENDUM.COUNT_TYPE.TOKEN.value}
+											<div>
+												<LinearRatio
+													items={getVoteRatio(refItem.token_votes, refItem.referendum_id)}
+												/>
+											</div>
+										{/if}
+										{#if refItem.voting_type == AW_REFERENDUM.COUNT_TYPE.ACCOUNT.value}
+											<div>
+												<LinearRatio
+													items={getVoteRatio(refItem.account_votes, refItem.referendum_id)}
+												/>
+											</div>
+										{/if}
+										<div class="mt-1">
+											Expired At: <span class=" text-white">
 												{moment(refItem.expires).format('YYYY-MM-DD HH:mm:ss')}
 											</span>
 										</div>
-										<!-- </div> -->
 									</div>
 
 									<div
@@ -390,19 +414,6 @@
 												></a
 											>
 										</div>
-
-										{#if refItem.voting_type == AW_REFERENDUM.COUNT_TYPE.TOKEN.value}
-											<div class="w-1/2">
-												Token Votes:
-												<LinearRatio items={getVoteRatio(refItem.token_votes)} />
-											</div>
-										{/if}
-										{#if refItem.voting_type == AW_REFERENDUM.COUNT_TYPE.ACCOUNT.value}
-											<div class="w-1/2">
-												Account Votes:
-												<LinearRatio items={getVoteRatio(refItem.account_votes)} />
-											</div>
-										{/if}
 
 										<!-- for each actions in item -->
 										{#each refItem.acts as action}
@@ -452,25 +463,8 @@
 	<!-- {#if $session}{/if} -->
 </div>
 <div class="right-side">
-	<!-- <WorkerProposalAction
-		{selectedProposal}
-		on:new_proposal={handleNewProposal}
-		on:delegatevote={handleDelegate}
-	/> -->
+	<ReferendumAction selectedItem={selectedRef} />
 </div>
-
-<!-- <CreateWorkerProposalModal
-	isOpen={isModalOpen}
-	onClose={closeModal}
-	onCreateProposal={handleCreateProposalAction}
-/>
-
-<WPDelegateVoteModal
-	isOpen={isDelegateModalOpen}
-	{isDelegate}
-	onClose={closeDelegateModal}
-	onDelegate={handleDelegateAction}
-/> -->
 
 <style>
 </style>

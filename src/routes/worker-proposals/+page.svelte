@@ -31,9 +31,12 @@
 	let isDelegate = false;
 
 	onMount(async () => {
-		await fetchWorkerProposals();
-		await fetchWorkerProposalCfgs();
-		loading = false;
+		// await fetchWorkerProposals();
+		// await fetchWorkerProposalCfgs();
+		Promise.all([fetchWorkerProposals(), fetchWorkerProposalCfgs()]).then(() => {
+			loading = false;
+		});
+		// loading = false;
 	});
 
 	afterUpdate(async () => {
@@ -42,9 +45,9 @@
 			selectedProposal = null;
 			loading = true;
 			proposals = [];
-			await fetchWorkerProposals();
-			await fetchWorkerProposalCfgs();
-			loading = false;
+			Promise.all([fetchWorkerProposals(), fetchWorkerProposalCfgs()]).then(() => {
+				loading = false;
+			});
 		}
 	});
 

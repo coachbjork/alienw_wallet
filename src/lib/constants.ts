@@ -129,6 +129,10 @@ const AW_REFERENDUM = {
         VOTE: "vote",
         CANCEL: "cancel",
         EXECUTE: "exec",
+        DEPOSIT: "deposit",
+        REFUND: "refund",
+        UPDATE_STATUS: "updatestatus",
+        CLEAN: "clean",
     },
     STATUS: {
         OPEN: { name: "Open", value: "open" },

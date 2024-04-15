@@ -38,16 +38,9 @@
 			next_page_key = undefined;
 			proposals = [];
 			await fetchMsigs();
-
 			await fetchDacglobals();
 		}
 	});
-
-	async function fetchProposals() {
-		let api_response: any = await fetch(`/api/daoaw/msig_proposals/${$activePlanetStore.scope}`);
-		api_response = await api_response.json();
-		proposals = api_response;
-	}
 
 	async function fetchMsigs() {
 		loadingMore = true;
