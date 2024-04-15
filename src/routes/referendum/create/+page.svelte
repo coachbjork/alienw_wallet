@@ -203,6 +203,11 @@
 			return;
 		}
 
+		if (!config.fee) {
+			toastStore.add(`The planet hasn't setup creation config yet.`, TOAST_TYPES.WARNING);
+			return;
+		}
+
 		let actions_data: any = [];
 		for (let item of actions) {
 			try {
