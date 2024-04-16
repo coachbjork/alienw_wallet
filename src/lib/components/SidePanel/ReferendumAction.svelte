@@ -3,10 +3,11 @@
 	import { AW_REFERENDUM, TOAST_TYPES } from '$lib/constants';
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import { pushActions } from '$lib/utils/wharfkit/session';
-	import { afterUpdate, onMount } from 'svelte';
+	import { afterUpdate, createEventDispatcher, onMount } from 'svelte';
 
 	export let selectedItem: any = {};
 
+	const dispatch = createEventDispatcher();
 	let enableActions: any = [];
 
 	onMount(async () => {
@@ -67,47 +68,6 @@
 				],
 				data: {
 					account: String($session.actor)
-				}
-			}
-		];
-		await pushActions($session, actions);
-	}
-
-	async function onVote(type: string) {
-		if (!$session) {
-			toastStore.add('Please login to call action', TOAST_TYPES.WARNING);
-			return;
-		}
-
-		let actions = [
-			{
-				account: AW_REFERENDUM.CONTRACT_NAME,
-				name: AW_REFERENDUM.ACTIONS.CLEAN,
-				authorization: [
-					{
-						actor: String($session.actor),
-						permission: String($session?.permission)
-					}
-				],
-				data: {
-					account: String($session.actor),
-					dac_id: $activePlanetStore.scope
-				}
-			},
-			{
-				account: AW_REFERENDUM.CONTRACT_NAME,
-				name: AW_REFERENDUM.ACTIONS.VOTE,
-				authorization: [
-					{
-						actor: String($session.actor),
-						permission: String($session?.permission)
-					}
-				],
-				data: {
-					voter: String($session.actor),
-					referendum_id: selectedItem.referendum_id,
-					vote: type,
-					dac_id: $activePlanetStore.scope
 				}
 			}
 		];
@@ -241,25 +201,49 @@
 			{#if enableActions.includes(AW_REFERENDUM.ACTIONS.VOTE)}
 				<button
 					class="m-1 min-w-32 grow rounded-xl bg-green-500 p-2 font-bold text-white hover:bg-green-700"
-					on:click={() => onVote(AW_REFERENDUM.VOTE.YES.value)}
+					on:click={() => {
+						// onVote(AW_REFERENDUM.VOTE.YES.value)
+						dispatch('onVote', {
+							vote_type: AW_REFERENDUM.VOTE.YES.value,
+							referendum_id: selectedItem.referendum_id
+						});
+					}}
 				>
 					Vote Yes
 				</button>
 				<button
 					class="m-1 min-w-32 grow rounded-xl bg-red-500 p-2 font-bold text-white hover:bg-red-700"
-					on:click={() => onVote(AW_REFERENDUM.VOTE.NO.value)}
+					on:click={() => {
+						// onVote(AW_REFERENDUM.VOTE.NO.value)
+						dispatch('onVote', {
+							vote_type: AW_REFERENDUM.VOTE.NO.value,
+							referendum_id: selectedItem.referendum_id
+						});
+					}}
 				>
 					Vote No
 				</button>
 				<button
 					class="m-1 min-w-32 grow rounded-xl bg-gray-500 p-2 font-bold text-white hover:bg-gray-700"
-					on:click={() => onVote(AW_REFERENDUM.VOTE.ABSTAIN.value)}
+					on:click={() => {
+						//  onVote(AW_REFERENDUM.VOTE.ABSTAIN.value)
+						dispatch('onVote', {
+							vote_type: AW_REFERENDUM.VOTE.ABSTAIN.value,
+							referendum_id: selectedItem.referendum_id
+						});
+					}}
 				>
 					Vote Abstain
 				</button>
 				<button
 					class="m-1 min-w-32 grow rounded-xl bg-purple-500 p-2 font-bold text-white hover:bg-purple-700"
-					on:click={() => onVote(AW_REFERENDUM.VOTE.REMOVE.value)}
+					on:click={() => {
+						// onVote(AW_REFERENDUM.VOTE.REMOVE.value)
+						dispatch('onVote', {
+							vote_type: AW_REFERENDUM.VOTE.REMOVE.value,
+							referendum_id: selectedItem.referendum_id
+						});
+					}}
 				>
 					Remove Vote
 				</button>

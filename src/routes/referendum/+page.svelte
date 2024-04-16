@@ -1,10 +1,10 @@
 <script lang="ts">
-	import LinearRatio from '$lib/components/LinearRatio.svelte';
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import RecursiveObjectDisplay from '$lib/components/RecursiveObjectDisplay.svelte';
 	import ReferendumAction from '$lib/components/SidePanel/ReferendumAction.svelte';
 	import Badge from '$lib/components/Text/Badge.svelte';
-	import { AW, AW_REFERENDUM, AW_WORKER_PROPOSALS, TOAST_TYPES } from '$lib/constants';
+	import VoteLinearRatio from '$lib/components/VoteLinearRatio.svelte';
+	import { AW_REFERENDUM, TOAST_TYPES } from '$lib/constants';
 	import {
 		get_deposited_bal,
 		get_referendums,
@@ -28,9 +28,6 @@
 	// let config: any = {};
 	let userDeposited: any = {};
 	let userVotes: any = {};
-	let isModalOpen = false;
-	let isDelegateModalOpen = false;
-	let isDelegate = false;
 	let next_page_key: any = undefined;
 
 	onMount(async () => {
@@ -160,7 +157,8 @@
 			}
 			return {
 				name: `${item.name.charAt(0).toUpperCase() + item.name.slice(1)}`,
-				ratio: item.value,
+				vote_type: item.name,
+				value: item.value,
 				color:
 					item.name == AW_REFERENDUM.VOTE.YES.value
 						? 'green'
@@ -171,28 +169,19 @@
 			};
 		});
 
-		// if all 0, set all to 1
-		if (data.every((item: any) => item.ratio == 0)) {
-			data = data.map((item: any) => {
-				return { ...item, ratio: 1 };
-			});
-		}
 		return data;
 	}
 
-	async function handleCreateProposalAction(proposal: any) {
+	async function onVote(vote_type: string, referendum_id: number) {
 		if (!$session) {
-			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
+			toastStore.add('Please login to call action', TOAST_TYPES.WARNING);
 			return;
 		}
 
-		const { title, summary, arbiter, proposal_pay, arbiter_pay, content_hash, id, job_duration } =
-			proposal;
-
 		let actions = [
 			{
-				account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
-				name: AW_WORKER_PROPOSALS.ACTIONS.CREATE_PROPOSAL,
+				account: AW_REFERENDUM.CONTRACT_NAME,
+				name: AW_REFERENDUM.ACTIONS.CLEAN,
 				authorization: [
 					{
 						actor: String($session.actor),
@@ -200,54 +189,13 @@
 					}
 				],
 				data: {
-					proposer: String($session.actor),
-					title,
-					summary,
-					arbiter,
-					proposal_pay: {
-						quantity: `${proposal_pay.toFixed(4)} TLM`,
-						contract: AW.CONTRACT_NAME
-					},
-					arbiter_pay: {
-						quantity: `${arbiter_pay.toFixed(4)} TLM`,
-						contract: AW.CONTRACT_NAME
-					},
-					content_hash,
-					id,
-					category: 0,
-					job_duration,
+					account: String($session.actor),
 					dac_id: $activePlanetStore.scope
 				}
-			}
-		];
-		return pushActions($session, actions);
-	}
-
-	function closeModal() {
-		isModalOpen = false;
-	}
-
-	async function handleDelegateAction(data: any) {
-		if (!$session) {
-			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
-			return;
-		}
-
-		const { proposal_id, delegatee_custodian, delegate_mode, category } = data;
-		let action_name = delegate_mode
-			? delegate_mode == AW_WORKER_PROPOSALS.DELEGATE_MODE.PROPOSAL
-				? AW_WORKER_PROPOSALS.ACTIONS.DELEGATE_VOTE
-				: AW_WORKER_PROPOSALS.ACTIONS.DELEGATE_VOTE_CATEGORY
-			: AW_WORKER_PROPOSALS.ACTIONS.UNDELEGATE_VOTE;
-		let actionData = delegate_mode
-			? delegate_mode == AW_WORKER_PROPOSALS.DELEGATE_MODE.PROPOSAL
-				? { proposal_id, delegatee_custodian }
-				: { category, delegatee_custodian }
-			: { category };
-		let actions = [
+			},
 			{
-				account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
-				name: action_name,
+				account: AW_REFERENDUM.CONTRACT_NAME,
+				name: AW_REFERENDUM.ACTIONS.VOTE,
 				authorization: [
 					{
 						actor: String($session.actor),
@@ -255,18 +203,14 @@
 					}
 				],
 				data: {
-					...actionData,
-					custodian: $session.actor,
+					voter: String($session.actor),
+					referendum_id: referendum_id,
+					vote: vote_type,
 					dac_id: $activePlanetStore.scope
 				}
 			}
 		];
-		return pushActions($session, actions);
-	}
-
-	function closeDelegateModal() {
-		isDelegateModalOpen = false;
-		isDelegate = false;
+		await pushActions($session, actions);
 	}
 </script>
 
@@ -315,25 +259,6 @@
 										<div>
 											#: <span class="text-white underline">{refItem.referendum_id}</span>
 										</div>
-										<!-- <div
-											class={`${
-												refItem.status == AW_REFERENDUM.STATUS.OPEN.value
-													? 'text-blue-700'
-													: refItem.status == AW_REFERENDUM.STATUS.PASSING.value
-														? 'text-green-700 '
-														: refItem.status == AW_REFERENDUM.STATUS.FAILING.value
-															? 'text-yellow-700 '
-															: refItem.status == AW_REFERENDUM.STATUS.QUORUM_UNMET.value
-																? 'text-purple-700'
-																: refItem.status == AW_REFERENDUM.STATUS.EXPIRED.value
-																	? 'text-gray-700'
-																	: refItem.status == AW_REFERENDUM.STATUS.EXECUTED.value
-																		? 'text-blue-700'
-																		: ''
-											}`}
-										>
-											{getStatusName(refItem.status)}
-										</div> -->
 										<div>
 											<Badge
 												color={`${
@@ -380,20 +305,33 @@
 										</div>
 									</div>
 									<div class="mx-auto flex flex-none basis-3/12 flex-col text-center">
-										{#if refItem.voting_type == AW_REFERENDUM.COUNT_TYPE.TOKEN.value}
-											<div>
-												<LinearRatio
+										<!-- svelte-ignore a11y-click-events-have-key-events -->
+										<!-- svelte-ignore a11y-no-static-element-interactions -->
+										<div on:click|stopPropagation={() => {}}>
+											{#if refItem.voting_type == AW_REFERENDUM.COUNT_TYPE.TOKEN.value}
+												<VoteLinearRatio
 													items={getVoteRatio(refItem.token_votes, refItem.referendum_id)}
+													referendum_id={refItem.referendum_id}
+													on:onVote={(e) => {
+														if (e?.detail?.vote_type && e?.detail?.referendum_id) {
+															onVote(e.detail.vote_type, e.detail.referendum_id);
+														}
+													}}
 												/>
-											</div>
-										{/if}
-										{#if refItem.voting_type == AW_REFERENDUM.COUNT_TYPE.ACCOUNT.value}
-											<div>
-												<LinearRatio
+											{/if}
+											{#if refItem.voting_type == AW_REFERENDUM.COUNT_TYPE.ACCOUNT.value}
+												<VoteLinearRatio
 													items={getVoteRatio(refItem.account_votes, refItem.referendum_id)}
+													referendum_id={refItem.referendum_id}
+													on:onVote={(e) => {
+														if (e?.detail?.vote_type && e?.detail?.referendum_id) {
+															onVote(e.detail.vote_type, e.detail.referendum_id);
+														}
+													}}
 												/>
-											</div>
-										{/if}
+											{/if}
+										</div>
+
 										<div class="mt-1">
 											Expired At: <span class=" text-white">
 												{moment(refItem.expires).format('YYYY-MM-DD HH:mm:ss')}
@@ -405,7 +343,9 @@
 										class="mx-auto mb-3 mt-5 w-2/3 border-t-2 border-dotted border-gray-500"
 									></div>
 									<div class="w-full text-start">
-										<div>
+										<!-- svelte-ignore a11y-click-events-have-key-events -->
+										<!-- svelte-ignore a11y-no-static-element-interactions -->
+										<div on:click|stopPropagation={() => {}}>
 											Tx ID: <a
 												href={`https://waxblock.io/transaction/${refItem.content_ref}`}
 												target="_blank"
@@ -463,7 +403,14 @@
 	<!-- {#if $session}{/if} -->
 </div>
 <div class="right-side">
-	<ReferendumAction selectedItem={selectedRef} />
+	<ReferendumAction
+		selectedItem={selectedRef}
+		on:onVote={(e) => {
+			if (e?.detail?.vote_type && e?.detail?.referendum_id) {
+				onVote(e.detail.vote_type, e.detail.referendum_id);
+			}
+		}}
+	/>
 </div>
 
 <style>
