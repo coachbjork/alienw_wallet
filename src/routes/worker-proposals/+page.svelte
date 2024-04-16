@@ -51,6 +51,15 @@
 		}
 	});
 
+	async function refresh() {
+		selectedProposal = null;
+		loading = true;
+		proposals = [];
+		Promise.all([fetchWorkerProposals(), fetchWorkerProposalCfgs()]).then(() => {
+			loading = false;
+		});
+	}
+
 	async function fetchWorkerProposals() {
 		const cursor = await get_worker_proposals_cursor($activePlanetStore.name);
 		if (!cursor) return;
@@ -526,6 +535,7 @@
 		{selectedProposal}
 		on:new_proposal={handleNewProposal}
 		on:delegatevote={handleDelegate}
+		on:refresh={refresh}
 	/>
 </div>
 

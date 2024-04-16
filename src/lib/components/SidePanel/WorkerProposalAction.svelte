@@ -24,6 +24,10 @@
 		dispatch('delegatevote', { is_delegate });
 	}
 
+	function refresh() {
+		dispatch('refresh');
+	}
+
 	function setEnableActions() {
 		if (selectedProposal && $session) {
 			enableActions = [];
@@ -128,7 +132,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onArbiterVote(vote: string) {
@@ -165,7 +171,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onArbiterAgree() {
@@ -192,7 +200,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onCancel() {
@@ -230,7 +240,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onStartWork() {
@@ -264,7 +276,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onCompleteWork() {
@@ -297,7 +311,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onDispute() {
@@ -330,7 +346,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onFinalize() {
@@ -364,7 +382,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onClearExpired() {
@@ -397,7 +417,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 </script>
 

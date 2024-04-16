@@ -31,13 +31,8 @@
 
 	afterUpdate(async () => {
 		if (selectedPlanet !== $activePlanetStore) {
-			loading = true;
-			more = true;
 			selectedPlanet = $activePlanetStore;
-			selectedProposal = null;
-			next_page_key = undefined;
-			proposals = [];
-			await fetchMsigs();
+			refresh();
 			await fetchDacglobals();
 		}
 	});
@@ -55,6 +50,14 @@
 		}
 		loadingMore = false;
 		loading = false;
+	}
+	async function refresh() {
+		loading = true;
+		more = true;
+		selectedProposal = null;
+		next_page_key = undefined;
+		proposals = [];
+		await fetchMsigs();
 	}
 
 	async function fetchDacglobals() {
@@ -249,7 +252,7 @@
 </div>
 
 <div class="right-side">
-	<MsigProposalAction {selectedProposal} {ableToClaimBudget} />
+	<MsigProposalAction {selectedProposal} {ableToClaimBudget} on:refresh={refresh} />
 </div>
 
 <style>

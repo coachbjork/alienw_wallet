@@ -39,23 +39,27 @@
 	afterUpdate(async () => {
 		if (selectedPlanet !== $activePlanetStore) {
 			selectedPlanet = $activePlanetStore;
-			selectedRef = null;
-			loading = true;
-			more = true;
-			loadingMore = true;
-			next_page_key = undefined;
-			refItems = [];
-			Promise.all([fetchReferendums()]).then(() => {
-				loading = false;
-			});
-
-			if ($session) {
-				Promise.all([fetchUserVotes(), fetchUserDepositedBal()]);
-			}
+			await refresh();
 		}
 	});
 
 	$: $session && Promise.all([fetchUserVotes(), fetchUserDepositedBal()]);
+
+	async function refresh() {
+		selectedRef = null;
+		loading = true;
+		more = true;
+		loadingMore = true;
+		next_page_key = undefined;
+		refItems = [];
+		Promise.all([fetchReferendums()]).then(() => {
+			loading = false;
+		});
+
+		if ($session) {
+			Promise.all([fetchUserVotes(), fetchUserDepositedBal()]);
+		}
+	}
 
 	async function fetchReferendums() {
 		loadingMore = true;
@@ -342,36 +346,32 @@
 									<div
 										class="mx-auto mb-3 mt-5 w-2/3 border-t-2 border-dotted border-gray-500"
 									></div>
-									<div class="w-full text-start">
-										<!-- svelte-ignore a11y-click-events-have-key-events -->
-										<!-- svelte-ignore a11y-no-static-element-interactions -->
-										<div on:click|stopPropagation={() => {}}>
-											Tx ID: <a
-												href={`https://waxblock.io/transaction/${refItem.content_ref}`}
-												target="_blank"
-												><span class="italic text-blue-400 underline">
-													{refItem.content_ref}</span
-												></a
-											>
-										</div>
 
-										<!-- for each actions in item -->
-										{#each refItem.acts as action}
-											<div class="mt-2 flex flex-row flex-wrap">
-												<div class="flex-none basis-5/12">
-													Action: <span class="text-white"
-														>{action.contract_name} - {action.action_name}</span
-													>
-												</div>
-												<div class=" mx-auto basis-6/12 overflow-auto text-ellipsis">
-													Data: <span class=" text-white"
-														><RecursiveObjectDisplay data={action.action_data} /></span
-													>
-												</div>
-											</div>
-										{/each}
+									<!-- svelte-ignore a11y-click-events-have-key-events -->
+									<!-- svelte-ignore a11y-no-static-element-interactions -->
+									<div on:click|stopPropagation={() => {}} class=" text-start">
+										Tx ID: <a
+											href={`https://waxblock.io/transaction/${refItem.content_ref}`}
+											target="_blank"
+											><span class="italic text-blue-400 underline"> {refItem.content_ref}</span></a
+										>
 									</div>
-									<!-- </div> -->
+
+									<!-- for each actions in item -->
+									{#each refItem.acts as action}
+										<div class="mt-2 flex w-full flex-row flex-wrap text-start">
+											<div class="flex-none basis-5/12">
+												Action: <span class="text-white"
+													>{action.contract_name} - {action.action_name}</span
+												>
+											</div>
+											<div class=" mx-auto basis-6/12 overflow-auto text-ellipsis">
+												Data: <span class=" text-white"
+													><RecursiveObjectDisplay data={action.action_data} /></span
+												>
+											</div>
+										</div>
+									{/each}
 								</div>
 								<div class="w-8 flex-none"></div>
 							</div></button
@@ -410,6 +410,7 @@
 				onVote(e.detail.vote_type, e.detail.referendum_id);
 			}
 		}}
+		on:refresh={refresh}
 	/>
 </div>
 

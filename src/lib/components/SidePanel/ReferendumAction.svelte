@@ -18,6 +18,10 @@
 		setEnableActions();
 	});
 
+	function refresh() {
+		dispatch('refresh');
+	}
+
 	function setEnableActions() {
 		if ($session) {
 			enableActions = [];
@@ -71,7 +75,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onUpdateStatus() {
@@ -96,7 +102,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onCancel() {
@@ -121,7 +129,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onExecute() {
@@ -146,7 +156,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	function navigateToMsigCreate(isCopy: boolean = false) {
