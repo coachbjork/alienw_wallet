@@ -30,37 +30,30 @@
 		Promise.all([fetchCandidates(), fetchDacglobals()]).then(() => {
 			loading = false;
 		});
-		// await fetchCandidates();
-		// loading = false;
-
-		// if ($session) {
-		// 	await fetchVotedFor();
-		// 	await fetchStaked();
-		// }
-
-		// await fetchDacglobals();
 	});
 
 	afterUpdate(async () => {
 		if (selectedPlanet !== $activePlanetStore) {
 			selectedPlanet = $activePlanetStore;
-			loading = true;
-			selectedCandidates = [];
-			votedForCandidates = [];
-			staked = '';
-			Promise.all([fetchCandidates(), fetchDacglobals()]).then(() => {
-				loading = false;
-			});
-			// await fetchCandidates();
-			// loading = false;
-			if ($session) {
-				Promise.all([fetchVotedFor(), fetchStaked()]);
-			}
-			// await fetchDacglobals();
+			await refresh();
 		}
 	});
 
 	$: $session && Promise.all([fetchVotedFor(), fetchStaked()]);
+
+	async function refresh() {
+		loading = true;
+		selectedCandidates = [];
+		votedForCandidates = [];
+		staked = '';
+		Promise.all([fetchCandidates(), fetchDacglobals()]).then(() => {
+			loading = false;
+		});
+
+		if ($session) {
+			Promise.all([fetchVotedFor(), fetchStaked()]);
+		}
+	}
 
 	async function fetchCandidates() {
 		let response = await get_candidates($activePlanetStore.name);
@@ -146,7 +139,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 </script>
 
