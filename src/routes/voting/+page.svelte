@@ -148,14 +148,14 @@
 <div class="main-content py-6">
 	<div class="container">
 		<PlanetMenu />
-		<table class="mt-5 w-full table-auto text-left text-2xl">
+		<table class="text-default mt-5 w-full table-auto text-left text-lg">
 			<thead>
 				<tr>
 					<th>#</th>
 					<th>Rank</th>
 					<th>User</th>
 					<th>Account</th>
-					<th>Vote power</th>
+					<th>Vote Power</th>
 					<th class="hidden md:table-cell">Voters</th>
 					<th class="hidden md:table-cell">Vote Decay</th>
 				</tr>
@@ -169,7 +169,7 @@
 					</tr>
 				{:else}
 					{#each candidates as candidate, i}
-						<tr>
+						<tr class="odd:backdrop-brightness-150">
 							<td>
 								<input
 									type="checkbox"
@@ -243,14 +243,30 @@
 		{/if}
 	</div>
 </div>
-<div class="left-side">
+<div class="left-side hidden md:relative">
 	{#if $session}
 		<VotedFor custodians={votedForCandidates} {staked} />
 	{/if}
 </div>
-<div class="right-side"></div>
+<div class="right-side hidden md:relative"></div>
 
 <style>
+	/* Table */
+
+	table tbody tr {
+		@apply border-y border-solid border-gray-500;
+	}
+
+	table td {
+		@apply p-2;
+		/* padding: 0.75rem 0.75rem;
+		color: #b5b7bb; */
+	}
+
+	table th {
+		@apply pb-3 pl-3 pr-3 pt-0 text-left text-lg font-bold;
+	}
+
 	.vote1 {
 		color: #69b34c;
 	}
