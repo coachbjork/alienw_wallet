@@ -14,11 +14,9 @@
 			</div>
 		</div>
 		<div class="mt-1 flex flex-row md:flex-row-reverse">
-			<div class="basis-1/2">
-				<div class="mr-5 flex items-center justify-end">
-					<Login />
-					<EndpointCfg />
-				</div>
+			<div class="mr-5 flex items-center justify-end">
+				<Login />
+				<EndpointCfg />
 			</div>
 		</div>
 	</header>

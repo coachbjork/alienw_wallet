@@ -106,7 +106,7 @@
 				<span class=" rounded-lg border border-indigo-500 px-4 py-1"
 					>{$session.actor}
 					<!-- <Icon data={caretDown} /> -->
-					<AngleDownOutline class="inline-block" size="sm" />
+					<AngleDownOutline class="pointer-events-none inline-block" size="sm" />
 				</span>
 			</button>
 			{#if showDropdown}
@@ -119,7 +119,7 @@
 									removeUser(account);
 								}}
 							>
-								<Icon data={trash} class="m-2 text-red-500" />
+								<Icon data={trash} class="text-red-500" />
 							</button>
 						</div>
 					{/each}

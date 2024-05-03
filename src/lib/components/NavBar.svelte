@@ -23,7 +23,7 @@
 	<nav class="text-default mr-5 py-2">
 		<div class="flex items-center justify-between">
 			<button class="ml-5 md:hidden" on:click|stopPropagation={() => (isOpen = !isOpen)}>
-				<BarsSolid />
+				<BarsSolid class="pointer-events-none" />
 			</button>
 
 			{#if isOpen}
