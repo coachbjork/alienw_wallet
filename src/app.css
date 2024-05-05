@@ -2,13 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+@media (max-width: 768px) {
+	.menu-grid {
+		display: grid;
+		width: 100%;
+		grid-template-rows: 55px; /* Adjust row sizes */
+		grid-template-columns: auto; /* Stack columns into one */
+	}
+}
+
 body {
     background-color: #060C27;
     color: #b1bac7;
 }
 
 /* Header */
-
 .menu-grid {
 	display: grid;
 	width: 100%;
@@ -22,14 +30,7 @@ body {
 	box-shadow: rgb(165, 236, 248, 0.4) 1px 1px 2px 1px;
 }
 
-@media (max-width: 768px) {
-	.menu-grid {
-		display: grid;
-		width: 100%;
-		grid-template-rows: 55px; /* Adjust row sizes */
-		grid-template-columns: auto; /* Stack columns into one */
-	}
-}
+
 
 /* The Main Content */
 
@@ -46,13 +47,11 @@ body {
 	  "footer footer footer";
 	width: 100%;
 }
-
-
-
 @media (max-width: 768px) {
-    .fullpage {
+	.fullpage {
+		display: grid;
         grid-template-columns: auto; /* Stack columns into one */
-        grid-template-rows: 55px auto 55px; /* Adjust row sizes */
+        grid-template-rows: 110px auto 60px; /* Adjust row sizes */
         grid-template-areas:
           "menu-grid"
           "main-content"
@@ -98,7 +97,3 @@ body {
 	min-width:150px;
 	gap: 20px 0px;
 }
-
-
-
-

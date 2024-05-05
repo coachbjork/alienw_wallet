@@ -32,7 +32,7 @@
 					in:slide={{ axis: 'x', delay: 0, duration: 250 }}
 					out:slide={{ axis: 'x', delay: 0, duration: 250 }}
 					class={isOpen
-						? 'fixed bottom-0 left-0 top-16 w-48 bg-background-default shadow-lg md:hidden'
+						? 'fixed bottom-0 left-0 top-14 w-48 border-r border-gray-600 bg-background-default shadow-lg md:hidden'
 						: 'hidden'}
 					on:click|stopPropagation={() => {}}
 				>

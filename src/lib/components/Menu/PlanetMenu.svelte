@@ -31,7 +31,7 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="planet_menu rounded-xl border border-indigo-500">
+<div class="planet_menu mx-5 rounded-xl border border-indigo-500">
 	<ul>
 		{#each AW_PLANETS as planet}
 			<li class={$activePlanetStore.name === planet.name ? 'active' : ''}>
@@ -47,6 +47,7 @@
 		-moz-box-sizing: border-box;
 		-webkit-box-sizing: border-box;
 		margin-top: 20px;
+		max-width: 100vw;
 	}
 
 	.planet_menu ul {
