@@ -6,7 +6,10 @@
 	import { getAccountOnchain } from '$lib/utils/wharfkit/accountKit';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { ABI, Serializer } from '@wharfkit/antelope';
+	import { CommandOutline } from 'flowbite-svelte-icons';
 	import { afterUpdate, createEventDispatcher, onMount } from 'svelte';
+	import { cubicIn, cubicOut } from 'svelte/easing';
+	import { slide } from 'svelte/transition';
 
 	export let selectedProposal: any = {};
 	export let ableToClaimBudget: any = false;
@@ -15,6 +18,7 @@
 	let new_proposal_name: string = '';
 	let planetDAO_permissions: string[] = [];
 	const dispatch = createEventDispatcher();
+	let showActions = false;
 
 	onMount(async () => {
 		setEnableActions();
@@ -318,12 +322,116 @@
 			goto('/msig/create', { state: { data } });
 		} else goto('/msig/create');
 	}
+
+	function toggleActions() {
+		showActions = !showActions;
+	}
 </script>
 
-<div class="flex flex-col">
-	<p class=" text-center text-2xl underline underline-offset-4">Actions</p>
+<div class="fixed bottom-0 left-0 right-0 flex flex-col md:relative">
+	<!-- svelte-ignore a11y-click-events-have-key-events -->
+	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
+	<p class="hidden text-center text-2xl underline underline-offset-4 md:block">Actions</p>
+	<!-- Mobile view: Toggle button -->
+	<button
+		class="fixed bottom-5 right-5 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-white shadow-lg md:hidden"
+		class:bg-indigo-700={showActions}
+		on:click={toggleActions}
+	>
+		<CommandOutline class="pointer-events-none h-6 w-6" />
+	</button>
+	{#if $session && showActions}
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<div
+			on:click={() => (showActions = false)}
+			class:inset-0={showActions}
+			class="fixed bottom-14 left-5 right-5 z-50 content-end md:hidden"
+		>
+			<div class="flex flex-row-reverse flex-wrap justify-center gap-1 p-2 backdrop-blur-sm">
+				<button
+					on:click={() => navigateToMsigCreate()}
+					class=" min-w-8 basis-1/4 truncate text-wrap rounded-xl bg-indigo-500 p-2 text-center text-sm font-bold text-white hover:bg-indigo-700"
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					New Msig
+				</button>
+				<!-- {#if selectedProposal} -->
+				<button
+					class:hidden={!selectedProposal}
+					on:click={() => navigateToMsigCreate(true)}
+					class="min-w-8 basis-1/4 truncate text-wrap rounded-xl bg-gray-500 p-2 text-center text-sm font-bold text-white hover:bg-gray-700"
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Clone Msig
+				</button>
+				<!-- {/if} -->
+
+				<!-- {#if enableActions.includes(AW_DAO.ACTIONS.CLAIM_BUDGET)} -->
+				<button
+					class:hidden={!enableActions.includes(AW_DAO.ACTIONS.CLAIM_BUDGET)}
+					class={`min-w-8 basis-1/4 truncate text-wrap rounded-xl bg-teal-500 p-2 text-sm font-bold text-white  ${
+						!ableToClaimBudget ? 'opacity-50' : 'hover:bg-teal-700'
+					}`}
+					disabled={!ableToClaimBudget}
+					on:click={() => onProposeClaimBudget()}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Claim Budget
+				</button>
+				<!-- {/if} -->
+				<!-- {#if enableActions.includes(AW_MSIG.ACTIONS.APPROVE)} -->
+				<button
+					class:hidden={!enableActions.includes(AW_MSIG.ACTIONS.APPROVE)}
+					class="min-w-8 basis-1/4 truncate text-wrap rounded-xl bg-green-500 p-2 text-sm font-bold text-white hover:bg-green-700"
+					on:click={() => onApprove()}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Approve
+				</button>
+				<!-- {/if} -->
+				<!-- {#if enableActions.includes(AW_MSIG.ACTIONS.UNAPPROVE)} -->
+				<button
+					class:hidden={!enableActions.includes(AW_MSIG.ACTIONS.UNAPPROVE)}
+					class="min-w-8 basis-1/4 truncate text-wrap rounded-xl bg-yellow-500 p-2 text-sm font-bold text-white hover:bg-yellow-700"
+					on:click={() => onRevoke()}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Unapprove
+				</button>
+				<!-- {/if} -->
+				<!-- {#if enableActions.includes(AW_MSIG.ACTIONS.EXECUTE)} -->
+				<button
+					class:hidden={!enableActions.includes(AW_MSIG.ACTIONS.EXECUTE)}
+					class="min-w-8 basis-1/4 truncate text-wrap rounded-xl bg-blue-500 p-2 text-sm font-bold text-white hover:bg-blue-700"
+					on:click={() => onExecute()}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Execute
+				</button>
+				<!-- {/if} -->
+				<!-- {#if enableActions.includes(AW_MSIG.ACTIONS.CANCEL)} -->
+				<button
+					class:hidden={!enableActions.includes(AW_MSIG.ACTIONS.CANCEL)}
+					class="min-w-8 basis-1/4 truncate text-wrap rounded-xl bg-red-500 p-2 text-sm font-bold text-white hover:bg-red-700"
+					on:click={() => onCancel()}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Cancel
+				</button>
+				<!-- {/if} -->
+			</div>
+		</div>
+	{/if}
 	{#if $session}
-		<div class="mt-5 flex max-w-32 flex-wrap justify-center">
+		<div class="mt-5 hidden max-w-32 flex-wrap justify-center md:flex">
 			<button
 				on:click={() => navigateToMsigCreate()}
 				class="m-1 min-w-32 grow rounded-xl bg-indigo-500 p-2 text-center font-bold text-white hover:bg-indigo-700"

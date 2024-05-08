@@ -113,7 +113,7 @@
 
 	.modal-content {
 		margin: auto;
-		padding: 30px;
+		padding: 15px;
 		border: 1px solid #888;
 		width: 80%;
 		max-width: 300px;

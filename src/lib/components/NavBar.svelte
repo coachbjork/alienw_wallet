@@ -58,7 +58,10 @@
 										<div class=" mx-3 rounded-lg bg-background-default shadow-md">
 											{#each route.group as groupItem}
 												<div
-													on:click|stopPropagation={() => goto(groupItem.path)}
+													on:click|stopPropagation={() => {
+														isOpen = false;
+														goto(groupItem.path);
+													}}
 													class={` cursor-pointer rounded-lg px-4 py-2 ${
 														activeUrl === groupItem.path
 															? 'font-semibold text-orange-500 backdrop-brightness-200'
@@ -72,7 +75,10 @@
 									{/if}
 								{:else}
 									<div
-										on:click|stopPropagation={() => goto(route.path)}
+										on:click|stopPropagation={() => {
+											isOpen = false;
+											goto(route.path);
+										}}
 										class={`cursor-pointer px-4 py-2 ${
 											activeUrl.includes(route.path)
 												? 'font-semibold text-orange-500 backdrop-brightness-200'
