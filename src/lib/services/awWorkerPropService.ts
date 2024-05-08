@@ -5,7 +5,6 @@ import _ from "lodash";
 
 export async function get_worker_proposals(cursor: any, activePlanet: string) {
     const data: any = await cursorAll(cursor);
-
     const deserializedData: any = [];
 
     for (const item of data) {

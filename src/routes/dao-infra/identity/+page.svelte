@@ -63,9 +63,9 @@
 </script>
 
 <div class="main-content py-6">
-	<div class="container">
+	<div class="container relative overflow-x-hidden">
 		<PlanetMenu />
-		<div class="pt-10">
+		<div class="mt-10 overflow-x-auto">
 			{#if loading}
 				<div class="flex justify-center">
 					<Spinner color="purple" />

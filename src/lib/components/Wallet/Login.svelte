@@ -106,29 +106,32 @@
 				<span class=" rounded-lg border border-indigo-500 px-4 py-1"
 					>{$session.actor}
 					<!-- <Icon data={caretDown} /> -->
-					<AngleDownOutline class="inline-block" size="sm" />
+					<AngleDownOutline class="pointer-events-none inline-block" size="sm" />
 				</span>
 			</button>
 			{#if showDropdown}
-				<div class="dropdown">
+				<div class="dropdown absolute -right-8 top-10">
 					{#each $allSessions as account}
-						<div class="flex flex-row">
+						<div class="flex flex-row px-2 py-1">
 							<button on:click={() => selectUser(account)}>{account.actor} </button>
 							<button
 								on:click={() => {
 									removeUser(account);
 								}}
+								class="ml-auto"
 							>
-								<Icon data={trash} class="m-2 text-red-500" />
+								<Icon data={trash} class="text-red-500" />
 							</button>
 						</div>
 					{/each}
-					<button
-						on:click={addAccount}
-						class="rounded-none border-t-2 border-solid"
-						style="border-color: rgb(165, 236, 248, 0.4);">Add Account</button
-					>
-					<button on:click={logout} class="text-red-500">Logout</button>
+					<div class="flex flex-row px-2 py-1">
+						<button
+							on:click={addAccount}
+							class="rounded-none border-t-2 border-solid"
+							style="border-color: rgb(165, 236, 248, 0.4);">Add Account</button
+						>
+						<button on:click={logout} class="ml-auto text-red-500">Logout</button>
+					</div>
 				</div>
 			{/if}
 		</div>
@@ -148,9 +151,6 @@
 		display: inline-block;
 	}
 	.dropdown {
-		position: absolute;
-		left: -10px;
-		margin-top: 20px; /* Adjusted for padding */
 		background-color: #13215b; /* Light background for the dropdown */
 		box-shadow: 0px 8px 16px 0px rgba(114, 112, 207, 0.2); /* Add some shadow for depth */
 		z-index: 1; /* Ensure it's above other items */
@@ -159,11 +159,7 @@
 	}
 
 	.dropdown button {
-		display: block;
-		width: 100%; /* Make buttons expand to the full width */
-		text-align: left; /* Align text to the left */
 		background-color: transparent; /* Transparent background */
-		padding: 4px 20px; /* Padding inside buttons */
 		cursor: pointer; /* Change mouse cursor on hover */
 	}
 </style>
