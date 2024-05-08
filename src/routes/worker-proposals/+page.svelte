@@ -33,10 +33,10 @@
 	onMount(async () => {
 		// await fetchWorkerProposals();
 		// await fetchWorkerProposalCfgs();
+		// loading = false;
 		Promise.all([fetchWorkerProposals(), fetchWorkerProposalCfgs()]).then(() => {
 			loading = false;
 		});
-		// loading = false;
 	});
 
 	afterUpdate(async () => {
@@ -65,6 +65,7 @@
 		if (!cursor) return;
 		proposalCursor = cursor;
 		let response = await get_worker_proposals(proposalCursor, $activePlanetStore.name);
+
 		if (!response) return;
 		proposals = response;
 	}
@@ -359,9 +360,9 @@
 </script>
 
 <div class="main-content py-6">
-	<div class="container">
+	<div class="container relative overflow-x-hidden">
 		<PlanetMenu />
-		<div class="pt-10">
+		<div class="mt-10 overflow-x-auto">
 			{#if loading}
 				<div class="flex justify-center">
 					<Spinner color="purple" />
@@ -527,10 +528,8 @@
 		</div>
 	</div>
 </div>
-<div class="left-side">
-	<!-- {#if $session}{/if} -->
-</div>
-<div class="right-side">
+<div class="left-side md:flex"></div>
+<div class="right-side md:flex">
 	<WorkerProposalAction
 		{selectedProposal}
 		on:new_proposal={handleNewProposal}

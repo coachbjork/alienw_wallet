@@ -213,7 +213,7 @@
 				<input class=" text-black" type="text" bind:value={id} placeholder="ID" />
 				
 			</div> -->
-			<div class="flex flex-row gap-5">
+			<div class="flex flex-col md:flex-row md:gap-5">
 				<!-- <input class="text-black" type="number" bind:value={category} placeholder="Category Num" /> -->
 
 				<input id="title" class="text-black" type="text" bind:value={title} placeholder="Title" />
@@ -227,7 +227,7 @@
 				/>
 			</div>
 
-			<div class="flex flex-row gap-5">
+			<div class="flex flex-col md:flex-row md:gap-5">
 				<input
 					class="text-black"
 					type="text"
@@ -238,7 +238,7 @@
 				<input class="text-black" type="text" bind:value={arbiter} placeholder="Arbiter" />
 			</div>
 
-			<div class="flex flex-row gap-5">
+			<div class="flex flex-col md:flex-row md:gap-5">
 				<input
 					class="text-black"
 					type="number"
@@ -339,7 +339,7 @@
 
 	.modal-content {
 		margin: auto;
-		padding: 30px;
+		padding: 15px;
 		border: 1px solid #888;
 		width: 80%;
 		max-width: 500px;

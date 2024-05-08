@@ -146,10 +146,10 @@
 </script>
 
 <div class="main-content py-6">
-	<div class="container relative">
+	<div class="container relative overflow-x-hidden">
 		<PlanetMenu />
-		<div class="overflow-x-auto">
-			<table class="text-default mt-5 w-full table-auto text-left text-lg">
+		<div class="mt-10 overflow-x-auto">
+			<table class="text-default w-full table-auto text-left text-lg">
 				<thead>
 					<tr>
 						<th>#</th>
@@ -157,8 +157,8 @@
 						<th>User</th>
 						<th>Account</th>
 						<th>Vote Power</th>
-						<th class="hidden md:table-cell">Voters</th>
-						<th class="hidden md:table-cell">Vote Decay</th>
+						<th class="">Voters</th>
+						<th class="">Vote Decay</th>
 					</tr>
 				</thead>
 				<tbody class="text-2xl">
@@ -205,9 +205,9 @@
 										candidate.total_vote_power.toFixed(0)
 									)}</td
 								>
-								<td class="hidden md:table-cell">{candidate.number_voters}</td>
+								<td class="">{candidate.number_voters}</td>
 								<td
-									class={`hidden md:table-cell ${
+									class={` ${
 										candidate.vote_decay > 50
 											? 'vote6'
 											: candidate.vote_decay > 40
@@ -252,18 +252,18 @@
 		{/if}
 	</div>
 </div>
-<div class="left-side hidden md:relative">
+<div class="left-side hidden md:flex">
 	{#if $session}
 		<VotedFor custodians={votedForCandidates} {staked} />
 	{/if}
 </div>
-<div class="right-side hidden md:relative"></div>
+<div class="right-side hidden md:flex"></div>
 
 <style>
-	.container {
+	/* .container {
 		max-width: 100%;
-		overflow-x: hidden; /* Prevent horizontal overflow at the container level */
-	}
+		overflow-x: hidden;
+	} */
 	/* Table */
 	table tbody tr {
 		@apply border-y border-solid border-gray-500;

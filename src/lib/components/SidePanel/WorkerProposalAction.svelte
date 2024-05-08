@@ -2,11 +2,15 @@
 	import { AW_WORKER_PROPOSALS, TOAST_TYPES } from '$lib/constants';
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import { pushActions } from '$lib/utils/wharfkit/session';
+	import { CommandOutline } from 'flowbite-svelte-icons';
 	import { afterUpdate, createEventDispatcher, onMount } from 'svelte';
+	import { quadIn, quadOut } from 'svelte/easing';
+	import { slide } from 'svelte/transition';
 
 	export let selectedProposal: any = {};
 	let enableActions: any = [];
 	const dispatch = createEventDispatcher();
+	let showActions = false;
 
 	onMount(async () => {
 		setEnableActions();
@@ -421,17 +425,157 @@
 			refresh();
 		});
 	}
+
+	function toggleActions() {
+		showActions = !showActions;
+	}
 </script>
 
-<div class="flex flex-col">
+<div class="fixed bottom-0 left-0 right-0 flex flex-col md:relative">
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-	<p class=" text-center text-2xl underline underline-offset-4">
-		<!-- on:click={() => dispatch('mockdata', {})} -->
-		Actions
-	</p>
+	<p class="hidden text-center text-2xl underline underline-offset-4 md:block">Actions</p>
+	<!-- Mobile view: Toggle button -->
+	<button
+		class="fixed bottom-5 right-5 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-white shadow-lg md:hidden"
+		class:bg-indigo-700={showActions}
+		on:click={toggleActions}
+	>
+		<CommandOutline class="pointer-events-none h-6 w-6" />
+	</button>
+	{#if $session && showActions}
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<div
+			on:click={() => (showActions = false)}
+			class:inset-0={showActions}
+			class="fixed bottom-14 right-5 z-50 content-end md:hidden"
+		>
+			<div class="flex flex-row-reverse flex-wrap justify-center gap-1 p-2">
+				<button
+					class="min-w-8 basis-1/4 rounded-xl bg-indigo-500 p-2 text-sm font-bold text-white hover:bg-indigo-700"
+					on:click|stopPropagation={() => {
+						showActions = false;
+						onNewProposal();
+					}}
+					in:slide={{ axis: 'y', duration: 250, easing: quadIn }}
+					out:slide={{ axis: 'y', duration: 250, easing: quadOut }}
+				>
+					New Proposal
+				</button>
+
+				{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL) || enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL)}
+					<button
+						class="min-w-8 basis-1/4 rounded-xl bg-green-500 p-2 text-sm font-bold text-white hover:bg-green-700"
+						on:click|stopPropagation={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
+						in:slide={{ axis: 'y', duration: 250, easing: quadIn }}
+						out:slide={{ axis: 'y', duration: 250, easing: quadOut }}
+					>
+						Approve
+					</button>
+					<button
+						class="min-w-8 basis-1/4 rounded-xl bg-red-500 p-2 text-sm font-bold text-white hover:bg-red-700"
+						on:click|stopPropagation={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value)}
+						in:slide={{ axis: 'y', duration: 250, easing: quadIn }}
+						out:slide={{ axis: 'y', duration: 250, easing: quadOut }}
+					>
+						Deny
+					</button>
+				{/if}
+				{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.ARBITATOR_AGREE)}
+					<button
+						class="min-w-8 basis-1/4 rounded-xl bg-blue-500 p-2 text-sm font-bold text-white hover:bg-green-700"
+						on:click|stopPropagation={() => onArbiterAgree()}
+						in:slide={{ axis: 'y', duration: 250, easing: quadIn }}
+						out:slide={{ axis: 'y', duration: 250, easing: quadOut }}
+					>
+						Agree
+					</button>
+				{/if}
+				{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.ARBIRATOR_VOTE)}
+					<button
+						class="min-w-8 basis-1/4 rounded-xl bg-green-500 p-2 text-sm font-bold text-white hover:bg-green-700"
+						on:click|stopPropagation={() =>
+							onArbiterVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
+						in:slide={{ axis: 'y', duration: 250, easing: quadIn }}
+						out:slide={{ axis: 'y', duration: 250, easing: quadOut }}
+					>
+						Approve
+					</button>
+					<button
+						class="min-w-8 basis-1/4 rounded-xl bg-red-500 p-2 text-sm font-bold text-white hover:bg-red-700"
+						on:click|stopPropagation={() => onArbiterVote(AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value)}
+						in:slide={{ axis: 'y', duration: 250, easing: quadIn }}
+						out:slide={{ axis: 'y', duration: 250, easing: quadOut }}
+					>
+						Deny
+					</button>
+				{/if}
+				{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_PROPOSAL) || enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_WIP_PROPOSAL)}
+					<button
+						class="min-w-8 basis-1/4 rounded-xl bg-gray-500 p-2 text-sm font-bold text-white hover:bg-gray-700"
+						on:click|stopPropagation={() => onCancel()}
+						in:slide={{ axis: 'y', duration: 250, easing: quadIn }}
+						out:slide={{ axis: 'y', duration: 250, easing: quadOut }}
+					>
+						Cancel
+					</button>
+				{/if}
+				{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.START_WORK)}
+					<button
+						class="min-w-8 basis-1/4 rounded-xl bg-blue-500 p-2 text-sm font-bold text-white hover:bg-blue-700"
+						on:click|stopPropagation={() => onStartWork()}
+						in:slide={{ axis: 'y', duration: 250, easing: quadIn }}
+						out:slide={{ axis: 'y', duration: 250, easing: quadOut }}
+					>
+						Start Work
+					</button>
+				{/if}
+				{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.COMPLETE_WORK)}
+					<button
+						class="min-w-8 basis-1/4 rounded-xl bg-teal-500 p-2 text-sm font-bold text-white hover:bg-teal-700"
+						on:click|stopPropagation={() => onCompleteWork()}
+						in:slide={{ axis: 'y', duration: 250, easing: quadIn }}
+						out:slide={{ axis: 'y', duration: 250, easing: quadOut }}
+					>
+						Complete
+					</button>
+				{/if}
+				{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.DISPUTE_UNAPPROVED_PROPOSAL)}
+					<button
+						class="min-w-8 basis-1/4 rounded-xl bg-purple-500 p-2 text-sm font-bold text-white hover:bg-purple-700"
+						on:click|stopPropagation={() => onDispute()}
+						in:slide={{ axis: 'y', duration: 250, easing: quadIn }}
+						out:slide={{ axis: 'y', duration: 250, easing: quadOut }}
+					>
+						Dispute
+					</button>
+				{/if}
+				{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL)}
+					<button
+						class="min-w-8 basis-1/4 rounded-xl bg-yellow-500 p-2 text-sm font-bold text-white hover:bg-yellow-700"
+						on:click|stopPropagation={() => onFinalize()}
+						in:slide={{ axis: 'y', duration: 250, easing: quadIn }}
+						out:slide={{ axis: 'y', duration: 250, easing: quadOut }}
+					>
+						Finalize
+					</button>
+				{/if}
+				{#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CLEAR_EXPIRED_PROPOSAL)}
+					<button
+						class="min-w-8 basis-1/4 rounded-xl bg-red-500 p-2 text-sm font-bold text-white hover:bg-red-700"
+						on:click|stopPropagation={() => onClearExpired()}
+						in:slide={{ axis: 'y', duration: 250, easing: quadIn }}
+						out:slide={{ axis: 'y', duration: 250, easing: quadOut }}
+					>
+						Clear
+					</button>
+				{/if}
+			</div>
+		</div>
+	{/if}
 	{#if $session}
-		<div class="mt-5 flex max-w-32 flex-wrap justify-center">
+		<div class="mt-5 hidden max-w-32 flex-wrap justify-center md:flex">
 			<button
 				class="m-1 min-w-32 grow rounded-xl bg-indigo-500 p-2 font-bold text-white hover:bg-indigo-700"
 				on:click={() => onNewProposal()}
@@ -547,4 +691,7 @@
 </div>
 
 <style>
+	.test {
+		grid-column-start: 3;
+	}
 </style>
