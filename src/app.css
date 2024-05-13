@@ -3,10 +3,11 @@
 @tailwind utilities;
 
 
-
 body {
-    background: linear-gradient(0.25turn, #060C27, #0A2342,#060C27);
+    /* background: linear-gradient(0.25turn, #060C27, #0A2342, #060C27); */
     color: #b1bac7;
+	font-family: 'Roboto', sans-serif;
+	background-color: #060C27;
 }
 
 /* Header */
@@ -15,12 +16,14 @@ body {
 	width: 100%;
 	grid-template-columns: auto;
 	grid-template-rows: auto auto;
-	background: linear-gradient(0.25turn, #060C27, #0A2342,#060C27);
+	/* background: linear-gradient(0.25turn, #060C27, #0A2342, #060C27); */
+	background-color: #060C27;
 	gap: 0px 0px;
 	z-index: 100;
 	grid-auto-flow: row;
 	position:fixed;
 	box-shadow: rgb(165, 236, 248, 0.4) 1px 1px 2px 1px;
+	/* backdrop-filter: blur(100px); */
 }
 
 @media (max-width: 767px) {
@@ -40,6 +43,7 @@ body {
 	grid-template-columns: 0.3fr 1fr 0.3fr ;
 	grid-template-rows: 110px auto 60px;
 	min-height: 100vh;
+	margin: 0;
 	gap: 0px 20px;
 	grid-auto-flow: row;
 	grid-template-areas:
@@ -102,6 +106,7 @@ body {
   	grid-area: main-content;
   	min-height: 100vh; 
 	width: 100%;
+	margin: 0;
 }
 
 .side-column {

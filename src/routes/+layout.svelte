@@ -4,7 +4,7 @@
 	import '../app.css';
 </script>
 
-<div class="fullpage">
+<div class="fullpage antialiased">
 	<Header />
 	<Toast />
 	<slot />
