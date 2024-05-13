@@ -3,7 +3,7 @@
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import CreateWorkerProposalModal from '$lib/components/Modal/CreateWorkerProposalModal.svelte';
 	import WPDelegateVoteModal from '$lib/components/Modal/WPDelegateVoteModal.svelte';
-	import WorkerProposalAction from '$lib/components/SidePanel/WorkerProposalAction.svelte';
+	import WorkerProposalAction from '$lib/components/SidePanel/Actions/WorkerProposalAction.svelte';
 	import Badge from '$lib/components/Text/Badge.svelte';
 	import { AW, AW_WORKER_PROPOSALS, TOAST_TYPES } from '$lib/constants';
 	import {

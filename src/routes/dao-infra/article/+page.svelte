@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import ArticleModal from '$lib/components/Modal/ArticleModal.svelte';
-	import ArticleAction from '$lib/components/SidePanel/ArticleAction.svelte';
+	import ArticleAction from '$lib/components/SidePanel/Actions/ArticleAction.svelte';
 	import {
 		get_article_cursor,
 		get_articles,

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import SetIndentityModal from '$lib/components/Modal/SetIndentityModal.svelte';
-	import IdentityAction from '$lib/components/SidePanel/IdentityAction.svelte';
+	import IdentityAction from '$lib/components/SidePanel/Actions/IdentityAction.svelte';
 	import { AW_DAO_INFRA } from '$lib/constants';
 	import { get_identities, get_identity_cursor } from '$lib/services/awDaoInfraService';
 	import { activePlanetStore, session } from '$lib/stores';

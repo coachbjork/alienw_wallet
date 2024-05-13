@@ -8,7 +8,7 @@
 	<header>
 		<div class="flex flex-row justify-between md:flex-col">
 			<div class="mt-1 flex flex-row md:flex-row-reverse">
-				<div class="basis-1/2">
+				<div>
 					<div class="flex items-center md:justify-end">
 						<NavBar />
 					</div>

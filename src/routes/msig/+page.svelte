@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import RecursiveObjectDisplay from '$lib/components/RecursiveObjectDisplay.svelte';
-	import MsigProposalAction from '$lib/components/SidePanel/MsigProposalAction.svelte';
+	import MsigProposalAction from '$lib/components/SidePanel/Actions/MsigProposalAction.svelte';
 	import Badge from '$lib/components/Text/Badge.svelte';
 	import { AW_MSIG } from '$lib/constants';
 	import { get_msig_cursor, get_msigs } from '$lib/services/awMsigPropService';

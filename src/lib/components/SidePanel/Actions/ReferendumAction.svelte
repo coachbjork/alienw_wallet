@@ -3,10 +3,10 @@
 	import { AW_REFERENDUM, TOAST_TYPES } from '$lib/constants';
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import { pushActions } from '$lib/utils/wharfkit/session';
-	import { CommandOutline } from 'flowbite-svelte-icons';
 	import { afterUpdate, createEventDispatcher, onMount } from 'svelte';
 	import { cubicIn, cubicOut } from 'svelte/easing';
 	import { slide } from 'svelte/transition';
+	import Actions from './Actions.svelte';
 
 	export let selectedItem: any = {};
 
@@ -182,27 +182,16 @@
 	}
 </script>
 
-<div class="fixed bottom-0 left-0 right-0 flex flex-col md:relative">
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-	<p class="hidden text-center text-2xl underline underline-offset-4 md:block">Actions</p>
-	<!-- Mobile view: Toggle button -->
-	<button
-		class="fixed bottom-5 right-5 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-white shadow-lg md:hidden"
-		class:bg-indigo-700={showActions}
-		on:click={toggleActions}
-	>
-		<CommandOutline class="pointer-events-none h-6 w-6" />
-	</button>
+<Actions bind:showActions>
 	{#if $session && showActions}
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
 			on:click={() => (showActions = false)}
 			class:inset-0={showActions}
-			class="fixed bottom-14 left-5 right-5 z-50 content-end md:hidden"
+			class="fixed bottom-0 left-0 right-0 z-50 content-end md:hidden"
 		>
-			<div class="flex flex-row-reverse flex-wrap justify-center gap-1 p-2 backdrop-blur-sm">
+			<div class="mb-20 flex flex-row-reverse flex-wrap justify-center gap-1 p-2 backdrop-blur-sm">
 				<button
 					on:click={() => navigateToMsigCreate()}
 					class=" min-w-8 basis-1/4 truncate text-wrap rounded-xl bg-indigo-500 p-2 text-center text-sm font-bold text-white hover:bg-indigo-700"
@@ -431,7 +420,7 @@
 	{:else}
 		<p class="mt-5 text-center">Login to call actions</p>
 	{/if}
-</div>
+</Actions>
 
 <style>
 </style>

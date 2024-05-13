@@ -2,12 +2,12 @@
 	import { AW_DAO_INFRA, TOAST_TYPES } from '$lib/constants';
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import { pushActions } from '$lib/utils/wharfkit/session';
-	import { CommandOutline } from 'flowbite-svelte-icons';
 	import { afterUpdate, createEventDispatcher, onMount } from 'svelte';
 	import { cubicIn, cubicOut } from 'svelte/easing';
 	import { slide } from 'svelte/transition';
+	import Actions from './Actions.svelte';
 
-	export let selectedArticle: any = {};
+	export let selectedIdentity: any = {};
 	export let user_identity: any = {};
 
 	const dispatch = createEventDispatcher();
@@ -17,15 +17,15 @@
 
 	afterUpdate(async () => {});
 
-	function onSet(article: any) {
-		dispatch('set', { article });
+	function onSetIdentity(identity: any) {
+		dispatch('set_identity', { identity });
 	}
 
 	function refresh() {
 		dispatch('refresh');
 	}
 
-	async function onRemove() {
+	async function onRemoveIdentity() {
 		if (!$session) {
 			toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
 			return;
@@ -34,7 +34,7 @@
 		let actions = [
 			{
 				account: AW_DAO_INFRA.CONTRACT_NAME,
-				name: AW_DAO_INFRA.ACTIONS.REMOVE_ARTICLE,
+				name: AW_DAO_INFRA.ACTIONS.REMOVE_IDENTITY,
 				authorization: [
 					{
 						actor: String($session.actor),
@@ -44,7 +44,7 @@
 				data: {
 					dac_id: $activePlanetStore.scope,
 					executor: String($session.actor),
-					article_id: selectedArticle.article_id
+					wallet: selectedIdentity.wallet
 				}
 			}
 		];
@@ -57,60 +57,50 @@
 	}
 </script>
 
-<div class="fixed bottom-0 left-0 right-0 flex flex-col md:relative">
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-	<p class="hidden text-center text-2xl underline underline-offset-4 md:block">Actions</p>
-	<!-- Mobile view: Toggle button -->
-	<button
-		class="fixed bottom-5 right-5 z-50 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-white shadow-lg md:hidden"
-		class:bg-indigo-700={showActions}
-		on:click={toggleActions}
-	>
-		<CommandOutline class="pointer-events-none h-6 w-6" />
-	</button>
+<Actions bind:showActions>
 	{#if $session && showActions}
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
 			on:click={() => (showActions = false)}
 			class:inset-0={showActions}
-			class="fixed bottom-14 left-5 right-5 z-50 content-end md:hidden"
+			class="fixed bottom-0 left-0 right-0 z-50 content-end md:hidden"
 		>
-			<div class="flex flex-row-reverse flex-wrap justify-center gap-1 p-2 backdrop-blur-sm">
-				<!-- {#if user_identity && user_identity?.wallet == String($session.actor)} -->
+			<div class="mb-20 flex flex-row-reverse flex-wrap justify-center gap-1 p-2 backdrop-blur-sm">
+				<!-- {#if user_identity?.permission_level == AW_DAO_INFRA.PERMISSION_LEVEL.PARENT} -->
 				<button
-					class:hidden={!(user_identity && user_identity?.wallet == String($session.actor))}
+					class:hidden={user_identity?.permission_level != AW_DAO_INFRA.PERMISSION_LEVEL.PARENT}
 					class="min-w-8 basis-1/4 rounded-xl bg-indigo-500 p-2 text-sm font-bold text-white hover:bg-indigo-700"
-					on:click={() => onSet(null)}
+					on:click={() => onSetIdentity(null)}
 					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
 					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
 				>
 					Create New
 				</button>
-				<!-- {/if} -->
-				<!-- {#if selectedArticle && (selectedArticle?.creator == user_identity?.wallet || user_identity?.permission_level == AW_DAO_INFRA.PERMISSION_LEVEL.PARENT)} -->
+				<!-- {/if}
+				{#if selectedIdentity && (selectedIdentity?.wallet == user_identity?.wallet || user_identity?.permission_level == AW_DAO_INFRA.PERMISSION_LEVEL.PARENT)} -->
 				<button
 					class:hidden={!(
-						selectedArticle &&
-						(selectedArticle?.creator == user_identity?.wallet ||
+						selectedIdentity &&
+						(selectedIdentity?.wallet == user_identity?.wallet ||
 							user_identity?.permission_level == AW_DAO_INFRA.PERMISSION_LEVEL.PARENT)
 					)}
 					class="min-w-8 basis-1/4 rounded-xl bg-yellow-500 p-2 text-sm font-bold text-white hover:bg-yellow-700"
-					on:click={() => onSet(selectedArticle)}
+					on:click={() => onSetIdentity(selectedIdentity)}
 					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
 					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
 				>
 					Update
 				</button>
+				<!-- {/if}
+				{#if selectedIdentity && user_identity?.permission_level == AW_DAO_INFRA.PERMISSION_LEVEL.PARENT} -->
 				<button
 					class:hidden={!(
-						selectedArticle &&
-						(selectedArticle?.creator == user_identity?.wallet ||
-							user_identity?.permission_level == AW_DAO_INFRA.PERMISSION_LEVEL.PARENT)
+						selectedIdentity &&
+						user_identity?.permission_level == AW_DAO_INFRA.PERMISSION_LEVEL.PARENT
 					)}
 					class="min-w-8 basis-1/4 rounded-xl bg-red-500 p-2 text-sm font-bold text-white hover:bg-red-700"
-					on:click={() => onRemove()}
+					on:click={() => onRemoveIdentity()}
 					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
 					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
 				>
@@ -122,24 +112,26 @@
 	{/if}
 	{#if $session}
 		<div class="mt-5 hidden max-w-32 flex-wrap justify-center md:flex">
-			{#if user_identity && user_identity?.wallet == String($session.actor)}
+			{#if user_identity?.permission_level == AW_DAO_INFRA.PERMISSION_LEVEL.PARENT}
 				<button
 					class="m-1 min-w-32 grow rounded-xl bg-indigo-500 p-2 font-bold text-white hover:bg-indigo-700"
-					on:click={() => onSet(null)}
+					on:click={() => onSetIdentity(null)}
 				>
 					Create New
 				</button>
 			{/if}
-			{#if selectedArticle && (selectedArticle?.creator == user_identity?.wallet || user_identity?.permission_level == AW_DAO_INFRA.PERMISSION_LEVEL.PARENT)}
+			{#if selectedIdentity && (selectedIdentity?.wallet == user_identity?.wallet || user_identity?.permission_level == AW_DAO_INFRA.PERMISSION_LEVEL.PARENT)}
 				<button
 					class="m-1 min-w-32 grow rounded-xl bg-yellow-500 p-2 font-bold text-white hover:bg-yellow-700"
-					on:click={() => onSet(selectedArticle)}
+					on:click={() => onSetIdentity(selectedIdentity)}
 				>
 					Update
 				</button>
+			{/if}
+			{#if selectedIdentity && user_identity?.permission_level == AW_DAO_INFRA.PERMISSION_LEVEL.PARENT}
 				<button
 					class="m-1 min-w-32 grow rounded-xl bg-red-500 p-2 font-bold text-white hover:bg-red-700"
-					on:click={() => onRemove()}
+					on:click={() => onRemoveIdentity()}
 				>
 					Remove
 				</button>
@@ -148,7 +140,7 @@
 	{:else}
 		<p class="mt-5 text-center">Login to call actions</p>
 	{/if}
-</div>
+</Actions>
 
 <style>
 </style>

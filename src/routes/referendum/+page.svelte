@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import RecursiveObjectDisplay from '$lib/components/RecursiveObjectDisplay.svelte';
-	import ReferendumAction from '$lib/components/SidePanel/ReferendumAction.svelte';
+	import ReferendumAction from '$lib/components/SidePanel/Actions/ReferendumAction.svelte';
 	import Badge from '$lib/components/Text/Badge.svelte';
 	import VoteLinearRatio from '$lib/components/VoteLinearRatio.svelte';
 	import { AW_REFERENDUM, TOAST_TYPES } from '$lib/constants';
