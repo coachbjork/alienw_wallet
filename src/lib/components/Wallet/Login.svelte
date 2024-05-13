@@ -41,6 +41,7 @@
 
 				if (restored) {
 					session.set(restored);
+					sessionKit.persistSession(restored, true);
 				}
 				if (allRestoreds) {
 					allSessions.set(allRestoreds);
@@ -87,7 +88,8 @@
 
 	async function selectUser(account: Session) {
 		session.set(account);
-		sessionKit.persistSession(account);
+		sessionKit.persistSession(account, true);
+		showDropdown = false;
 	}
 
 	async function removeUser(account: Session) {
