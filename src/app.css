@@ -4,9 +4,9 @@
 
 
 body {
-    /* background: linear-gradient(0.25turn, #060C27, #0A2342, #060C27); */
+    background: linear-gradient(to bottom, #060C27, #0A2342, #060C27);
     color: #b1bac7;
-	font-family: 'Roboto', sans-serif;
+	
 	background-color: #060C27;
 }
 

@@ -15,9 +15,9 @@
 	import type { Planet } from '$lib/types';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { Spinner } from 'flowbite-svelte';
-	import LabelSolid from 'flowbite-svelte-icons/LabelSolid.svelte';
 	import moment from 'moment';
 	import { afterUpdate, onMount } from 'svelte';
+	import CrosshairsSolid from 'svelte-awesome-icons/CrosshairsSolid.svelte';
 
 	let proposals: any = [];
 
@@ -285,7 +285,7 @@
 				}
 			}
 		];
-		return pushActions($session, actions);
+		return await pushActions($session, actions);
 	}
 
 	function closeModal() {
@@ -333,6 +333,49 @@
 		isDelegateModalOpen = false;
 		isDelegate = false;
 	}
+
+	function getProposalStateClasses(state: any) {
+		switch (state) {
+			case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value:
+				return 'border-purple-700 shadow-purple-700';
+			case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value:
+				return 'border-green-700 shadow-green-700';
+			case AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value:
+				return 'border-blue-700 shadow-blue-700';
+			case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value:
+				return 'border-yellow-700 shadow-yellow-700';
+			case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value:
+				return 'border-teal-700 shadow-teal-700';
+			case AW_WORKER_PROPOSALS.PROP_STATE.EXPIRED.value:
+				return 'border-gray-700 shadow-gray-700';
+			case AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value:
+				return 'border-red-700 shadow-red-700';
+			default:
+				return '';
+		}
+	}
+
+	function getBadgeColor(state: any) {
+		switch (state) {
+			case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value:
+				return 'gray';
+			case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value:
+				return 'green';
+			case AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value:
+				return 'blue';
+			case AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value:
+				return 'yellow';
+			case AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value:
+				return 'teal';
+			case AW_WORKER_PROPOSALS.PROP_STATE.EXPIRED.value:
+				return 'red';
+			case AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value:
+				return 'purple';
+			default:
+				return 'gray';
+		}
+	}
+
 	// async function onVote() {
 	// 	if (!$session) {
 	// 		toastStore.add('Please login to vote', TOAST_TYPES.ERROR);
@@ -370,78 +413,43 @@
 			{:else if proposals.length == 0}
 				<div class="flex justify-center">No Data</div>
 			{:else}
-				<div class="flex flex-col gap-6">
+				<div class="my-4 flex flex-col gap-6 md:my-5">
 					{#each proposals as proposal}
-						<button class="flex flex-row" on:click={() => selectProposal(proposal)}>
-							<div class="w-8 flex-none place-self-center">
-								{#if selectedProposal && selectedProposal.proposal_id == proposal?.proposal_id}
-									<LabelSolid class="text-stone-300 h-5 w-5 " />
-								{/if}
-							</div>
+						<button class=" flex flex-row" on:click={() => selectProposal(proposal)}>
 							<div
-								class={`flex-grow rounded-2xl border border-solid p-5 shadow-md   ${
-									proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value
-										? 'border-purple-700 shadow-purple-700 '
-										: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value
-											? 'border-green-700 shadow-green-700'
-											: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value
-												? 'border-blue-700 shadow-blue-700'
-												: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value
-													? 'border-yellow-700 shadow-yellow-700'
-													: proposal.state ==
-														  AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value
-														? 'border-teal-700 shadow-teal-700'
-														: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.EXPIRED.value
-															? 'border-gray-700 shadow-gray-700'
-															: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value
-																? 'border-red-700 shadow-red-700'
-																: ''
-								} ${
-									proposal.proposal_id == selectedProposal?.proposal_id
-										? 'backdrop-brightness-200'
-										: 'backdrop-brightness-125'
-								}`}
+								class={`relative mx-5  basis-full  rounded-2xl border border-solid p-4 shadow-md md:p-5 ${getProposalStateClasses(proposal.state)} ${proposal.proposal_id == selectedProposal?.proposal_id ? 'backdrop-brightness-200' : 'backdrop-brightness-125'}`}
 							>
-								<div class="flex flex-row flex-wrap">
-									<div class="flex flex-none basis-2/12 flex-col text-start">
-										<div>
-											#: <span class="text-white underline">{proposal.proposal_id}</span>
-										</div>
-										<div>
-											<Badge
-												color={`${
-													proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value
-														? 'gray'
-														: proposal.state ==
-															  AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value
-															? 'green'
-															: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value
-																? 'blue'
-																: proposal.state ==
-																	  AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value
-																	? 'yellow'
-																	: proposal.state ==
-																		  AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value
-																		? 'teal'
-																		: proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.EXPIRED.value
-																			? 'red'
-																			: proposal.state ==
-																				  AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value
-																				? 'purple'
-																				: 'gray'
-												}`}
+								<div class="absolute right-2 top-2">
+									{#if selectedProposal && selectedProposal.proposal_id == proposal?.proposal_id}
+										<CrosshairsSolid color="#ecc94b" size="24" />
+									{/if}
+								</div>
+								<div
+									class="mx-auto flex basis-full flex-col flex-wrap justify-between text-start md:flex-row md:gap-4"
+								>
+									<div class="mb-3 flex basis-full flex-col md:mb-0 md:basis-2/12">
+										<div class="text-sm md:text-base">
+											#: <span class="text-base font-semibold text-white underline md:text-lg"
+												>{proposal.proposal_id}</span
 											>
-												{getStateName(proposal.state)}
-											</Badge>
 										</div>
-										<div>{getApprovalState(proposal)}</div>
+										<div class="mt-1 text-sm md:text-base">
+											<Badge color={getBadgeColor(proposal.state)}
+												>{getStateName(proposal.state)}</Badge
+											>
+										</div>
+										<div class="mt-1 text-sm md:text-base">{getApprovalState(proposal)}</div>
 									</div>
-									<div class="mx-3 flex-none basis-3/12 flex-col text-start">
-										<div>Proposer: <span class="text-white">{proposal.proposer}</span></div>
-										<div>
+									<div class="mb-3 flex basis-full flex-col md:mb-0 md:basis-3/12">
+										<div class="text-sm md:text-base">
+											Proposer: <span class="text-base font-semibold text-white md:text-lg"
+												>{proposal.proposer}</span
+											>
+										</div>
+										<div class="mt-1 text-sm md:text-base">
 											Proposer Pay: <span class="text-white">{proposal.proposal_pay.quantity}</span>
 										</div>
-										<div>
+										<div class="mt-1 text-sm md:text-base">
 											Document: <a
 												class="text-blue-400 underline"
 												target="_blank"
@@ -450,77 +458,68 @@
 											>
 										</div>
 									</div>
-									<div class="mx-3 flex flex-1 flex-col text-start">
-										<div>
-											Arbiter: <span class="text-white">{proposal.arbiter}</span>
+									<div class="mb-3 flex basis-full flex-col md:mb-0 md:basis-3/12">
+										<div class="text-sm md:text-base">
+											Arbiter: <span class="text-base font-semibold text-white md:text-lg"
+												>{proposal.arbiter}</span
+											>
 											<span
 												class={`${proposal.arbiter_agreed ? 'text-green-400' : 'text-yellow-400'}`}
 												>({proposal.arbiter_agreed ? 'Agreed' : 'Waiting'})</span
 											>
 										</div>
-										<div>
+										<div class="mt-1 text-sm md:text-base">
 											Arbiter Pay: <span class="text-white">{proposal.arbiter_pay.quantity}</span>
 										</div>
 									</div>
-									<div class="flex flex-none basis-3/12 flex-col text-end">
-										<div>Expired At</div>
-										<div class="text-white">
-											{moment(`${proposal.expiry}`).format('YYYY-MM-DD HH:mm:ss')}
+									<div class="flex basis-full flex-col md:basis-3/12">
+										<div class="text-sm md:text-base">
+											Expired At: <span class="text-white"
+												>{moment(`${proposal.expiry}`).format('YYYY-MM-DD HH:mm:ss')}</span
+											>
 										</div>
-										<div>
+										<!-- <div class="text-white">
+											{moment(`${proposal.expiry}`).format('YYYY-MM-DD HH:mm:ss')}
+										</div> -->
+										<div class="mt-1 text-sm md:text-base">
 											Duration: <span class="text-white"
 												>{convertSecondsToComplexTime(proposal.job_duration)}</span
 											>
 										</div>
 									</div>
 								</div>
-								<!-- <div class="flex justify-between">
-									<div>
-										Content Hash: <a
-											class="text-blue-400 underline"
-											target="_blank"
-											href={`${PUBLIC_PINATA_GATEWAY}/ipfs/${proposal.content_hash}/?pinataGatewayToken=${PUBLIC_PINATA_GATEWAY_KEY}`}
-											>{proposal.content_hash}</a
-										>
-									</div>
-									<div>
-										Duration: <span class="text-white">{secondsToHHMM(proposal.job_duration)}</span>
-									</div>
-								</div> -->
-								<div class="mx-auto mt-5 w-2/3 border-t-2 border-dotted border-gray-500"></div>
+								<div
+									class="mx-auto mt-5 w-full border-t-2 border-dotted border-gray-500 md:w-2/3"
+								></div>
 								<div class="mt-2 text-start">
-									<div>
-										Title: <span class="text-white">
-											{#each proposal?.title?.split('\n') as line}
-												{line}
-												<br />
-											{/each}</span
+									<div class="text-sm md:text-base">
+										Title: <span class="text-white"
+											>{#each proposal?.title?.split('\n') as line}{line}<br />{/each}</span
 										>
 									</div>
-									<div class="mt-1">
-										Summary: <span class="text-white">
-											{#each proposal?.summary?.split('\n') as line}
-												{line}
-												<br />
-											{/each}
-										</span>
+									<div class="mt-1 text-sm md:text-base">
+										Summary: <span class="text-white"
+											>{#each proposal?.summary?.split('\n') as line}{line}<br />{/each}</span
+										>
 									</div>
 								</div>
 								{#if proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.EXPIRED.value || proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value}
 									<div></div>
 								{:else}
-									<div class="mx-auto mt-5 w-2/3 border-t-2 border-dotted border-gray-500"></div>
+									<div
+										class="mx-auto mt-5 w-full border-t-2 border-dotted border-gray-500 md:w-2/3"
+									></div>
 									<div class="mt-2 text-start">
-										<div>
+										<div class="text-sm md:text-base">
 											Approved by: <span class="text-white">{getApprovedBy(proposal)}</span>
 										</div>
-										<div class="mt-1">
+										<div class="mt-1 text-sm md:text-base">
 											Denied by: <span class="text-white">{getDeniedBy(proposal)}</span>
 										</div>
 									</div>
 								{/if}
 							</div>
-							<div class="w-8 flex-none"></div>
+							<!-- <div class="w-full md:w-8"></div> -->
 						</button>
 					{/each}
 				</div>

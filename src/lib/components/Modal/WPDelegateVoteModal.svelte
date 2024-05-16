@@ -121,8 +121,7 @@
 		border-radius: 8px;
 	}
 
-	input,
-	textarea {
+	input {
 		width: 100%;
 		margin: 8px 0;
 		display: inline-block;
