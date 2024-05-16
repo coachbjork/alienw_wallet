@@ -425,7 +425,7 @@
 									{/if}
 								</div>
 								<div
-									class="mx-auto flex basis-full flex-col flex-wrap justify-between text-start md:flex-row md:gap-4"
+									class="mx-auto flex basis-full flex-col justify-between text-start md:flex-row md:gap-4"
 								>
 									<div class="mb-3 flex basis-full flex-col md:mb-0 md:basis-2/12">
 										<div class="text-sm md:text-base">
