@@ -414,8 +414,8 @@
 
 		{#if $session}
 			<div class="mx-auto flex w-2/3 flex-col gap-y-2 rounded-lg border p-5">
-				<div class="flex flex-row">
-					<div class="flex w-2/3 flex-col">
+				<div class="flex flex-col flex-wrap gap-4 md:flex-row">
+					<div class="flex grow flex-col">
 						<label for="title" class="text-base font-semibold"> Title </label>
 						<input
 							type="text"
@@ -425,7 +425,7 @@
 							class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 						/>
 					</div>
-					<div class="ml-3 flex w-1/3 flex-col">
+					<div class="flex flex-col">
 						<label for="proposer" class="text-base font-semibold"> Proposer </label>
 						<input
 							type="text"
