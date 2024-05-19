@@ -27,16 +27,16 @@
 <div class="relative flex flex-col overflow-hidden rounded-lg">
 	<!-- Total vote -->
 	<div
-		class=" text-sx flex w-full items-center justify-center
-		 bg-gray-800 bg-opacity-80 px-2 py-0.5 text-white"
+		class=" flex w-full items-center justify-center bg-gray-800
+		 bg-opacity-80 px-2 py-0.5 text-sm text-white md:text-base"
 	>
 		<p>Total Vote {total}</p>
 	</div>
-	<div class="flex flex-row">
+	<div class="flex flex-col md:flex-row">
 		{#each items as item}
 			<button
 				class={`flex  items-center justify-center px-2 py-0.5 
-            text-xs font-bold text-white bg-${item.color}-500
+            text-sm font-bold text-white md:text-base bg-${item.color}-500
              w-full overflow-hidden text-wrap opacity-80 hover:opacity-100
              `}
 				on:click={() => {
@@ -49,7 +49,7 @@
 				<div class="flex flex-col">
 					<p>{item.name}</p>
 					<p>{((total != 0 ? item.value / total : 0) * 100).toFixed(2)}%</p>
-					<p class="text-xs italic">({item.value})</p>
+					<p class="text-sm italic md:text-base">({item.value})</p>
 				</div>
 			</button>
 		{/each}

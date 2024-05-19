@@ -415,15 +415,15 @@
 			{:else}
 				<div class="my-4 flex flex-col gap-6 md:my-5">
 					{#each proposals as proposal}
-						<button class=" flex flex-row" on:click={() => selectProposal(proposal)}>
+						<button class="flex flex-row p-1" on:click={() => selectProposal(proposal)}>
+							<div class="w-8 flex-none place-self-center">
+								{#if selectedProposal && selectedProposal.proposal_id == proposal?.proposal_id}
+									<CrosshairsSolid color="#ecc94b" size="24" />
+								{/if}
+							</div>
 							<div
-								class={`relative mx-5  basis-full  rounded-2xl border border-solid p-4 shadow-md md:p-5 ${getProposalStateClasses(proposal.state)} ${proposal.proposal_id == selectedProposal?.proposal_id ? 'backdrop-brightness-200' : 'backdrop-brightness-125'}`}
+								class={`basis-full rounded-2xl border border-solid p-4 shadow-md md:p-5 ${getProposalStateClasses(proposal.state)} ${proposal.proposal_id == selectedProposal?.proposal_id ? 'backdrop-brightness-200' : 'backdrop-brightness-125'} whitespace-normal break-words break-all`}
 							>
-								<div class="absolute right-2 top-2">
-									{#if selectedProposal && selectedProposal.proposal_id == proposal?.proposal_id}
-										<CrosshairsSolid color="#ecc94b" size="24" />
-									{/if}
-								</div>
 								<div
 									class="mx-auto flex basis-full flex-col justify-between text-start md:flex-row md:gap-4"
 								>
@@ -479,8 +479,8 @@
 											>
 										</div>
 										<!-- <div class="text-white">
-											{moment(`${proposal.expiry}`).format('YYYY-MM-DD HH:mm:ss')}
-										</div> -->
+										{moment(`${proposal.expiry}`).format('YYYY-MM-DD HH:mm:ss')}
+									</div> -->
 										<div class="mt-1 text-sm md:text-base">
 											Duration: <span class="text-white"
 												>{convertSecondsToComplexTime(proposal.job_duration)}</span
@@ -488,10 +488,8 @@
 										</div>
 									</div>
 								</div>
-								<div
-									class="mx-auto mt-5 w-full border-t-2 border-dotted border-gray-500 md:w-2/3"
-								></div>
-								<div class="mt-2 text-start">
+								<div class="mx-auto mt-5 border-t-2 border-dotted border-gray-500 md:w-2/3"></div>
+								<div class="mt-2 basis-full text-start">
 									<div class="text-sm md:text-base">
 										Title: <span class="text-white"
 											>{#each proposal?.title?.split('\n') as line}{line}<br />{/each}</span
@@ -506,9 +504,7 @@
 								{#if proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.EXPIRED.value || proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.DISPUTED.value}
 									<div></div>
 								{:else}
-									<div
-										class="mx-auto mt-5 w-full border-t-2 border-dotted border-gray-500 md:w-2/3"
-									></div>
+									<div class="mx-auto mt-5 border-t-2 border-dotted border-gray-500 md:w-2/3"></div>
 									<div class="mt-2 text-start">
 										<div class="text-sm md:text-base">
 											Approved by: <span class="text-white">{getApprovedBy(proposal)}</span>
@@ -519,7 +515,7 @@
 									</div>
 								{/if}
 							</div>
-							<!-- <div class="w-full md:w-8"></div> -->
+							<div class="w-8 flex-none place-self-center"></div>
 						</button>
 					{/each}
 				</div>

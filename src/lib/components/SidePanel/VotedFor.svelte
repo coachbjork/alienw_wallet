@@ -138,9 +138,9 @@
 		text-align: center;
 	}
 
-	.council_side_panel p#hl {
+	/* .council_side_panel p#hl {
 		text-decoration: underline;
-	}
+	} */
 	.staked_value {
 		@apply mb-4 text-lg font-semibold text-white;
 	}

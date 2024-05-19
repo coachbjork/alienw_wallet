@@ -15,9 +15,9 @@
 	import type { Planet } from '$lib/types';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { Spinner } from 'flowbite-svelte';
-	import { LabelSolid } from 'flowbite-svelte-icons';
 	import moment from 'moment';
 	import { afterUpdate, onMount } from 'svelte';
+	import CrosshairsSolid from 'svelte-awesome-icons/CrosshairsSolid.svelte';
 
 	let refItems: any = [];
 	let more: boolean = true;
@@ -216,6 +216,44 @@
 		];
 		await pushActions($session, actions);
 	}
+
+	function getRefStatusClasses(status: any) {
+		switch (status) {
+			case AW_REFERENDUM.STATUS.OPEN.value:
+				return 'border-blue-700 shadow-blue-700';
+			case AW_REFERENDUM.STATUS.PASSING.value:
+				return 'border-green-700 shadow-green-700';
+			case AW_REFERENDUM.STATUS.FAILING.value:
+				return 'border-yellow-700 shadow-yellow-700';
+			case AW_REFERENDUM.STATUS.QUORUM_UNMET.value:
+				return 'border-purple-700 shadow-purple-700';
+			case AW_REFERENDUM.STATUS.EXPIRED.value:
+				return 'border-gray-700 shadow-gray-700';
+			case AW_REFERENDUM.STATUS.EXECUTED.value:
+				return 'border-blue-700 shadow-blue-700';
+			default:
+				return '';
+		}
+	}
+
+	function getBadgeColor(status: any) {
+		switch (status) {
+			case AW_REFERENDUM.STATUS.OPEN.value:
+				return 'blue';
+			case AW_REFERENDUM.STATUS.PASSING.value:
+				return 'green';
+			case AW_REFERENDUM.STATUS.FAILING.value:
+				return 'yellow';
+			case AW_REFERENDUM.STATUS.QUORUM_UNMET.value:
+				return 'purple';
+			case AW_REFERENDUM.STATUS.EXPIRED.value:
+				return 'gray';
+			case AW_REFERENDUM.STATUS.EXECUTED.value:
+				return 'blue';
+			default:
+				return 'gray';
+		}
+	}
 </script>
 
 <div class="main-content py-6">
@@ -223,92 +261,70 @@
 		<PlanetMenu />
 		<div class="mt-10 overflow-x-auto">
 			{#if loading}
-				<div class="flex justify-center">
+				<div class="my-4 flex justify-center md:my-5">
 					<Spinner color="purple" />
 				</div>
 			{:else if refItems.length == 0}
-				<div class="flex justify-center">No Data</div>
+				<div class="my-4 flex justify-center md:my-5">No Data</div>
 			{:else}
-				<div class="flex flex-col gap-6">
+				<div class="my-4 flex flex-col gap-6 md:my-5">
 					{#each refItems as refItem}
-						<button class="flex flex-row" on:click={() => selectRefItem(refItem)}>
+						<button class="flex flex-row p-1" on:click={() => selectRefItem(refItem)}>
 							<div class="w-8 flex-none place-self-center">
 								{#if selectedRef && selectedRef.referendum_id == refItem?.referendum_id}
-									<LabelSolid class="text-stone-300 h-5 w-5 " />
+									<CrosshairsSolid color="#ecc94b" size="24" />
 								{/if}
 							</div>
 							<div
-								class={`grow rounded-2xl border border-solid p-5 shadow-md  ${
-									refItem.status == AW_REFERENDUM.STATUS.OPEN.value
-										? 'border-blue-700 shadow-blue-700'
-										: refItem.status == AW_REFERENDUM.STATUS.PASSING.value
-											? 'border-green-700 shadow-green-700'
-											: refItem.status == AW_REFERENDUM.STATUS.FAILING.value
-												? 'border-yellow-700 shadow-yellow-700'
-												: refItem.status == AW_REFERENDUM.STATUS.QUORUM_UNMET.value
-													? 'border-purple-700 shadow-purple-700'
-													: refItem.status == AW_REFERENDUM.STATUS.EXPIRED.value
-														? 'border-gray-700 shadow-gray-700'
-														: refItem.status == AW_REFERENDUM.STATUS.EXECUTED.value
-															? 'border-blue-700 shadow-blue-700'
-															: ''
-								} ${
+								class={`basis-full rounded-2xl border border-solid p-4 shadow-md md:p-5 
+								${getRefStatusClasses(refItem.status)} 
+								${
 									refItem.referendum_id == selectedRef?.referendum_id
 										? 'backdrop-brightness-200'
 										: 'backdrop-brightness-125'
 								}`}
 							>
-								<div class="flex flex-row flex-wrap">
-									<div class="flex flex-none basis-2/12 flex-col text-start">
-										<div>
-											#: <span class="text-white underline">{refItem.referendum_id}</span>
-										</div>
-										<div>
-											<Badge
-												color={`${
-													refItem.status == AW_REFERENDUM.STATUS.OPEN.value
-														? 'blue'
-														: refItem.status == AW_REFERENDUM.STATUS.PASSING.value
-															? 'green'
-															: refItem.status == AW_REFERENDUM.STATUS.FAILING.value
-																? 'yellow '
-																: refItem.status == AW_REFERENDUM.STATUS.QUORUM_UNMET.value
-																	? 'purple'
-																	: refItem.status == AW_REFERENDUM.STATUS.EXPIRED.value
-																		? 'gray'
-																		: refItem.status == AW_REFERENDUM.STATUS.EXECUTED.value
-																			? 'blue'
-																			: 'gray'
-												}`}
+								<div
+									class="mx-auto flex basis-full flex-col justify-between text-start md:flex-row md:gap-4"
+								>
+									<div class="mb-3 flex basis-full flex-col md:mb-0 md:basis-2/12">
+										<div class="text-sm md:text-base">
+											#: <span class="text-base font-semibold text-white underline md:text-lg"
+												>{refItem.referendum_id}</span
 											>
+										</div>
+										<div class="mt-1 text-sm md:text-base">
+											<Badge color={`${getBadgeColor(refItem.status)}`}>
 												{getStatusName(refItem.status)}
 											</Badge>
 										</div>
 									</div>
-									<div class="mx-3 flex-none basis-3/12 flex-col text-start">
-										<div>
+									<div class="mb-3 flex basis-full flex-col md:mb-0 md:basis-3/12">
+										<div class="text-sm md:text-base">
 											Title:
-											<span class="text-white">
+											<span class="text-base font-semibold text-white md:text-lg">
 												{refItem.title}
 											</span>
 										</div>
-										<div>
-											Proposer: <span class="text-white">{refItem.proposer}</span>
+										<div class="mt-1 text-sm md:text-base">
+											Proposer: <span class="text-base font-semibold text-white md:text-lg"
+												>{refItem.proposer}</span
+											>
 										</div>
 									</div>
-									<div class="mx-3 flex flex-1 flex-col text-start">
-										<div>
+									<div class="mb-3 flex basis-full flex-col md:mb-0 md:basis-3/12">
+										<div class="text-sm md:text-base">
 											Type: <span class="text-white">
 												{getRefTypeName(refItem.type)}
 											</span>
 										</div>
-										<div>
+										<div class="text-sm md:text-base">
 											Counting Method: <span class="text-white"
 												>{getRefCountTypeName(refItem.voting_type)}</span
 											>
 										</div>
 									</div>
-									<div class="mx-auto flex flex-none basis-3/12 flex-col text-center">
+									<div class="flex basis-full flex-col md:basis-3/12">
 										<!-- svelte-ignore a11y-click-events-have-key-events -->
 										<!-- svelte-ignore a11y-no-static-element-interactions -->
 										<div on:click|stopPropagation={() => {}}>
@@ -342,40 +358,39 @@
 											</span>
 										</div>
 									</div>
-
-									<div
-										class="mx-auto mb-3 mt-5 w-2/3 border-t-2 border-dotted border-gray-500"
-									></div>
-
-									<!-- svelte-ignore a11y-click-events-have-key-events -->
-									<!-- svelte-ignore a11y-no-static-element-interactions -->
-									<div on:click|stopPropagation={() => {}} class=" text-start">
-										Tx ID: <a
-											href={`https://waxblock.io/transaction/${refItem.content_ref}`}
-											target="_blank"
-											><span class="italic text-blue-400 underline"> {refItem.content_ref}</span></a
-										>
-									</div>
-
-									<!-- for each actions in item -->
-									{#each refItem.acts as action}
-										<div class="mt-2 flex w-full flex-row flex-wrap text-start">
-											<div class="flex-none basis-5/12">
-												Action: <span class="text-white"
-													>{action.contract_name} - {action.action_name}</span
-												>
-											</div>
-											<div class=" mx-auto basis-6/12 overflow-auto text-ellipsis">
-												Data: <span class=" text-white"
-													><RecursiveObjectDisplay data={action.action_data} /></span
-												>
-											</div>
-										</div>
-									{/each}
 								</div>
-								<div class="w-8 flex-none"></div>
-							</div></button
-						>
+								<div
+									class="mx-auto mb-3 mt-5 w-full border-t-2 border-dotted border-gray-500 md:w-2/3"
+								></div>
+
+								<!-- svelte-ignore a11y-click-events-have-key-events -->
+								<!-- svelte-ignore a11y-no-static-element-interactions -->
+								<div on:click|stopPropagation={() => {}} class=" text-start">
+									Tx ID: <a
+										href={`https://waxblock.io/transaction/${refItem.content_ref}`}
+										target="_blank"
+										><span class="italic text-blue-400 underline"> {refItem.content_ref}</span></a
+									>
+								</div>
+
+								<!-- for each actions in item -->
+								{#each refItem.acts as action}
+									<div class="mt-2 flex w-full flex-row flex-wrap text-start">
+										<div class="flex-none basis-full md:basis-5/12">
+											Action: <span class="text-white"
+												>{action.contract_name} - {action.action_name}</span
+											>
+										</div>
+										<div class=" mx-auto basis-full overflow-auto text-ellipsis md:basis-6/12">
+											Data: <span class=" text-white"
+												><RecursiveObjectDisplay data={action.action_data} /></span
+											>
+										</div>
+									</div>
+								{/each}
+							</div>
+							<div class="w-8 flex-none place-self-center"></div>
+						</button>
 					{/each}
 					<!-- Load More button -->
 					<div class="flex justify-center">

@@ -195,7 +195,7 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 {#if isOpen}
-	<div class="modal" on:click={close}>
+	<div class="modal">
 		<div class="modal-content bg-background-default-lighter" on:click|stopPropagation>
 			<div class="mb-5 flex flex-row">
 				<h2 class=" text-white underline decoration-white underline-offset-4">
