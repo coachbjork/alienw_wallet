@@ -413,7 +413,7 @@
 		</div>
 
 		{#if $session}
-			<div class="mx-auto flex w-2/3 flex-col gap-y-2 rounded-lg border p-5">
+			<div class="mx-auto flex w-2/3 flex-col gap-y-2 rounded-lg p-5">
 				<div class="flex flex-col flex-wrap gap-4 md:flex-row">
 					<div class="flex grow flex-col">
 						<label for="title" class="text-base font-semibold"> Title </label>
