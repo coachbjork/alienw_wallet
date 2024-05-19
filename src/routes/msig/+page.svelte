@@ -9,9 +9,9 @@
 	import { activePlanetStore } from '$lib/stores';
 	import type { Planet } from '$lib/types';
 	import { Spinner } from 'flowbite-svelte';
-	import LabelSolid from 'flowbite-svelte-icons/LabelSolid.svelte';
 	import moment from 'moment';
 	import { afterUpdate, onMount } from 'svelte';
+	import CrosshairsSolid from 'svelte-awesome-icons/CrosshairsSolid.svelte';
 
 	let proposals: any = [];
 	let next_page_key: any = undefined;
@@ -103,22 +103,25 @@
 		<PlanetMenu />
 		<div class="mt-10 overflow-x-auto">
 			{#if loading}
-				<div class="flex justify-center">
+				<div class="my-4 flex justify-center md:my-5">
 					<Spinner color="purple" />
 				</div>
 			{:else if proposals.length == 0}
-				<div class="flex justify-center">No Data</div>
+				<div class="my-4 flex justify-center md:my-5">No Data</div>
 			{:else}
-				<div class="flex flex-col gap-6">
+				<div class="my-4 flex flex-col gap-6 md:my-5">
 					{#each proposals as proposal}
-						<button class="flex flex-row" on:click={() => selectProposal(proposal)}>
-							<div class="w-8 flex-none place-self-center">
+						<button
+							class="flex w-full flex-row items-center"
+							on:click={() => selectProposal(proposal)}
+						>
+							<div class="w-8 flex-none">
 								{#if selectedProposal && selectedProposal.proposal_id == proposal?.proposal_id}
-									<LabelSolid class="text-stone-300 h-5 w-5 " />
+									<CrosshairsSolid color="#ecc94b" size="24" />
 								{/if}
 							</div>
 							<div
-								class={`grow rounded-2xl border border-solid p-5 shadow-md  ${
+								class={`flex-grow whitespace-normal break-words break-all rounded-2xl border p-4 shadow-md ${
 									proposal.proposal_status == AW_MSIG.PROP_STATE.PENDING.value
 										? 'border-yellow-700 shadow-yellow-700'
 										: proposal.proposal_status == AW_MSIG.PROP_STATE.EXECUTED.value
@@ -132,10 +135,12 @@
 										: 'backdrop-brightness-125'
 								}`}
 							>
-								<div class="flex flex-row flex-wrap">
-									<div class="flex flex-none basis-2/12 flex-col text-start">
-										<div>
-											#: <span class="text-white underline">{proposal.proposal_id}</span>
+								<div class="flex flex-col justify-between gap-4 md:flex-row">
+									<div class="flex flex-col text-start">
+										<div class="text-sm md:text-base">
+											#: <span class="text-base font-semibold text-white underline md:text-lg"
+												>{proposal.proposal_id}</span
+											>
 										</div>
 										<div>
 											<Badge
@@ -153,47 +158,38 @@
 											</Badge>
 										</div>
 									</div>
-									<div class="mx-3 flex-none basis-3/12 flex-col text-start">
-										<div>
+									<div class="flex flex-col text-start">
+										<div class="text-sm md:text-base">
 											Title: <span class="text-white">{proposal.proposal_title}</span>
 										</div>
-										<div>
+										<div class="text-sm md:text-base">
 											Approved by: <span class="text-white">{getApprovedBy(proposal)}</span>
 										</div>
-
-										<!-- <div>
-											Proposer Pay: <span class="text-white">{proposal.proposal_pay.quantity}</span>
-										</div>
-										<div>
-											Document: <a
-												class="text-blue-400 underline"
-												target="_blank"
-												href={`${PUBLIC_PINATA_GATEWAY}/ipfs/${proposal.content_hash}/?pinataGatewayToken=${PUBLIC_PINATA_GATEWAY_KEY}`}
-												>Get File</a
+									</div>
+									<div class="flex flex-col text-start">
+										<div class="text-sm md:text-base">
+											Proposer: <span
+												class="text-base font-semibold text-white underline md:text-lg"
+												>{proposal.proposer}</span
 											>
-										</div> -->
+										</div>
 									</div>
-									<div class="mx-3 flex flex-1 flex-col text-start">
-										<div>Proposer: <span class="text-white">{proposal.proposer}</span></div>
-									</div>
-									<div class="mx-auto flex flex-none basis-3/12 flex-col text-start">
-										<div>
+									<div class="flex flex-col text-start">
+										<div class="text-sm md:text-base">
 											Updated At: <span class="text-white">
 												{moment(proposal.modified_date).format('YYYY-MM-DD HH:mm:ss')}
 											</span>
 										</div>
-
-										<div>
+										<div class="text-sm md:text-base">
 											Expired At: <span class="text-white">
 												{moment(proposal.expiration).format('YYYY-MM-DD HH:mm:ss')}
 											</span>
 										</div>
 									</div>
 								</div>
-
-								<div class="mx-auto mb-3 mt-5 w-2/3 border-t-2 border-dotted border-gray-500"></div>
+								<div class="mx-auto my-3 w-2/3 border-t-2 border-dotted border-gray-500"></div>
 								<div class="text-start">
-									<div>
+									<div class="text-sm md:text-base">
 										Description: <span class="text-white">
 											{#each proposal.description.split('\n') as line}
 												{line}
@@ -201,24 +197,22 @@
 											{/each}</span
 										>
 									</div>
-
-									<!-- <div class="mt-2"> -->
-									<!-- for each actions in proposal -->
 									{#each proposal.actions as action}
 										<div class="mt-2 flex flex-row flex-wrap">
-											<div class="flex-none basis-5/12">
+											<div class="basis-full text-sm md:basis-3/12 md:text-base">
 												Action: <span class="text-white"
 													>{action.contract_name} - {action.action_name}</span
 												>
 											</div>
-											<div class=" mx-auto basis-6/12 overflow-auto text-ellipsis">
-												Data: <span class=" text-white"
+											<div
+												class="basis-full overflow-auto text-ellipsis text-sm md:basis-6/12 md:text-base"
+											>
+												Data: <span class="text-white"
 													><RecursiveObjectDisplay data={action.action_data} /></span
 												>
 											</div>
 										</div>
 									{/each}
-									<!-- </div> -->
 								</div>
 							</div>
 							<div class="w-8 flex-none"></div>

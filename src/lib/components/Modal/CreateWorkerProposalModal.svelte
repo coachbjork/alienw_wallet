@@ -201,7 +201,7 @@
 				<h2 class=" text-white underline decoration-white underline-offset-4">
 					New Worker Proposal
 				</h2>
-				<div class="flex-grow"></div>
+				<div class="grow"></div>
 				<CloseOutline
 					class="text-red-500 hover:cursor-pointer"
 					size="lg"

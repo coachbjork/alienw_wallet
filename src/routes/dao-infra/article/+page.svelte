@@ -10,9 +10,9 @@
 	import { activePlanetStore, session } from '$lib/stores';
 	import type { Planet } from '$lib/types';
 	import { Spinner } from 'flowbite-svelte';
-	import { LabelSolid } from 'flowbite-svelte-icons';
 	import moment from 'moment';
 	import { afterUpdate, onMount } from 'svelte';
+	import CrosshairsSolid from 'svelte-awesome-icons/CrosshairsSolid.svelte';
 
 	let selectedPlanet: Planet = $activePlanetStore;
 	let loading = true;
@@ -73,22 +73,23 @@
 		<PlanetMenu />
 		<div class="mt-10 overflow-x-auto">
 			{#if loading}
-				<div class="flex justify-center">
+				<div class="my-4 flex justify-center md:my-5">
 					<Spinner color="purple" />
 				</div>
 			{:else if articles.length == 0}
-				<div class="flex justify-center">No Data</div>
+				<div class="my-4 flex justify-center md:my-5">No Data</div>
 			{:else}
-				<div class="flex flex-col gap-6">
+				<div class="my-4 flex flex-col gap-6 md:my-5">
 					{#each articles as article}
 						<button class="flex flex-row" on:click={() => selectArticle(article)}>
 							<div class="w-8 flex-none place-self-center">
 								{#if selectedArticle && selectedArticle.article_id == article?.article_id}
-									<LabelSolid class="text-stone-300 h-5 w-5 " />
+									<CrosshairsSolid color="#ecc94b" size="24" />
 								{/if}
 							</div>
 							<div
-								class={`flex-grow rounded-2xl border border-solid border-gray-700 p-5 shadow-md shadow-gray-700  
+								class={`flex-grow whitespace-normal break-words break-all
+								rounded-2xl border border-solid border-gray-700 p-5 shadow-md shadow-gray-700  
 								${
 									article?.article_id == selectedArticle?.article_id
 										? 'backdrop-brightness-200'
