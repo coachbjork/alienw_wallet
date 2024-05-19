@@ -422,7 +422,11 @@
 								{/if}
 							</div>
 							<div
-								class={`basis-full rounded-2xl border border-solid p-4 shadow-md md:p-5 ${getProposalStateClasses(proposal.state)} ${proposal.proposal_id == selectedProposal?.proposal_id ? 'backdrop-brightness-200' : 'backdrop-brightness-125'} whitespace-normal break-words break-all`}
+								class={`basis-full whitespace-normal break-words break-all 
+								rounded-2xl border border-solid
+								p-4 shadow-md md:p-5
+								 ${getProposalStateClasses(proposal.state)} 
+								${proposal.proposal_id == selectedProposal?.proposal_id ? 'backdrop-brightness-200' : 'backdrop-brightness-125'} `}
 							>
 								<div
 									class="mx-auto flex basis-full flex-col justify-between text-start md:flex-row md:gap-4"

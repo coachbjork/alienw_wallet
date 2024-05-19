@@ -276,7 +276,8 @@
 								{/if}
 							</div>
 							<div
-								class={`basis-full rounded-2xl border border-solid p-4 shadow-md md:p-5 
+								class={`basis-full whitespace-normal break-words break-all
+								 rounded-2xl border border-solid p-4 shadow-md md:p-5 
 								${getRefStatusClasses(refItem.status)} 
 								${
 									refItem.referendum_id == selectedRef?.referendum_id

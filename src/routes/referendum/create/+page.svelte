@@ -356,10 +356,10 @@
 		</div>
 
 		{#if $session}
-			<div class="mx-auto flex w-2/3 flex-col gap-y-2 rounded-lg border p-5">
-				<div class="flex flex-row">
-					<div class="flex w-2/3 flex-col">
-						<label for="title" class="text-base font-semibold"> Title </label>
+			<div class="mx-auto flex w-4/5 flex-col gap-y-4 p-5">
+				<div class="flex flex-col flex-wrap gap-4 md:flex-row">
+					<div class="flex grow flex-col">
+						<label for="title" class="text-base font-semibold">Title</label>
 						<input
 							type="text"
 							id="title"
@@ -368,8 +368,8 @@
 							class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 						/>
 					</div>
-					<div class="ml-3 flex w-1/3 flex-col">
-						<label for="proposer" class="text-base font-semibold"> Proposer </label>
+					<div class="flex flex-col">
+						<label for="proposer" class="text-base font-semibold">Proposer</label>
 						<input
 							type="text"
 							id="proposer"
@@ -380,83 +380,74 @@
 						/>
 					</div>
 				</div>
-				<div class=" flex w-full flex-col">
-					<label for="content" class="text-base font-semibold"> Content </label>
+				<div class="flex flex-col">
+					<label for="content" class="text-base font-semibold">Content</label>
 					<textarea
 						rows="9"
 						bind:value={content}
-						class="w-full rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+						class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 						placeholder="Enter Value"
 						on:input={autoResize}
 						on:focusin={() => autoResize(event)}
 						on:focusout={() => resetHeight(event)}
 					/>
 				</div>
-
-				<div class="mt-3 flex w-full flex-row flex-wrap place-content-between">
-					<div class="mt-1 flex flex-row flex-wrap">
-						<div class=" flex flex-col">
-							<label for="ref-type" class="text-base font-semibold">Voting Type </label>
-
-							<select
-								id={`ref-type`}
-								name={`ref-type`}
-								bind:value={type_name}
-								on:change={(event) => {
-									if (event?.target?.value) {
-										type_name = event?.target?.value;
-									}
-								}}
-								class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+				<div class="flex flex-col gap-4 md:flex-row">
+					<div class="flex flex-1 flex-col">
+						<label for="ref-type" class="text-base font-semibold">Voting Type</label>
+						<select
+							id="ref-type"
+							name="ref-type"
+							bind:value={type_name}
+							on:change={(event) => {
+								if (event?.target?.value) {
+									type_name = event?.target?.value;
+								}
+							}}
+							class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+						>
+							<option value="" selected>Select a type</option>
+							<option value={AW_REFERENDUM.REF_TYPE.BINDING.value}
+								>{AW_REFERENDUM.REF_TYPE.BINDING.name}</option
 							>
-								<option value="" selected>Select a type</option>
-
-								<option value={AW_REFERENDUM.REF_TYPE.BINDING.value}
-									>{AW_REFERENDUM.REF_TYPE.BINDING.name}</option
-								>
-								<option value={AW_REFERENDUM.REF_TYPE.SEMI_BINDING.value}
-									>{AW_REFERENDUM.REF_TYPE.SEMI_BINDING.name}</option
-								>
-								<option value={AW_REFERENDUM.REF_TYPE.OPINION.value}
-									>{AW_REFERENDUM.REF_TYPE.OPINION.name}</option
-								>
-							</select>
-						</div>
-						<div class=" flex flex-col">
-							<label for="ref-counting-type" class="text-base font-semibold">
-								Counting Method
-							</label>
-
-							<select
-								id={`ref-counting-type`}
-								name={`ref-counting-type`}
-								bind:value={voting_type_name}
-								on:change={(event) => {
-									if (event?.target?.value) {
-										voting_type_name = event?.target?.value;
-									}
-								}}
-								class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+							<option value={AW_REFERENDUM.REF_TYPE.SEMI_BINDING.value}
+								>{AW_REFERENDUM.REF_TYPE.SEMI_BINDING.name}</option
 							>
-								<option value="" selected>Select a type</option>
-
-								<option value={AW_REFERENDUM.COUNT_TYPE.ACCOUNT.value}
-									>{AW_REFERENDUM.COUNT_TYPE.ACCOUNT.name}</option
-								>
-								<option value={AW_REFERENDUM.COUNT_TYPE.TOKEN.value}
-									>{AW_REFERENDUM.COUNT_TYPE.TOKEN.name}</option
-								>
-							</select>
-						</div>
+							<option value={AW_REFERENDUM.REF_TYPE.OPINION.value}
+								>{AW_REFERENDUM.REF_TYPE.OPINION.name}</option
+							>
+						</select>
+					</div>
+					<div class="flex flex-1 flex-col">
+						<label for="ref-counting-type" class="text-base font-semibold">Counting Method</label>
+						<select
+							id="ref-counting-type"
+							name="ref-counting-type"
+							bind:value={voting_type_name}
+							on:change={(event) => {
+								if (event?.target?.value) {
+									voting_type_name = event?.target?.value;
+								}
+							}}
+							class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+						>
+							<option value="" selected>Select a type</option>
+							<option value={AW_REFERENDUM.COUNT_TYPE.ACCOUNT.value}
+								>{AW_REFERENDUM.COUNT_TYPE.ACCOUNT.name}</option
+							>
+							<option value={AW_REFERENDUM.COUNT_TYPE.TOKEN.value}
+								>{AW_REFERENDUM.COUNT_TYPE.TOKEN.name}</option
+							>
+						</select>
 					</div>
 				</div>
 				{#if type_name != AW_REFERENDUM.REF_TYPE.OPINION.value}
 					<!-- Action Data -->
-					<div class="mt-3 flex flex-col">
-						<div class=" flex w-full flex-row border-b border-gray-500">
-							<label for="action-data" class="text-base font-semibold">Action(s) </label>
+					<div class="mt-4 flex flex-col">
+						<div class="flex flex-row border-b border-gray-500">
+							<label for="action-data" class="text-base font-semibold">Action(s)</label>
 						</div>
-						<div class="mt-1 flex flex-row">
+						<div class="mt-2 flex flex-row gap-2">
 							<button
 								class="rounded-lg bg-gray-500 p-1 text-center text-base text-white hover:bg-gray-700"
 								on:click={() => {
@@ -465,14 +456,7 @@
 							>
 								Transfer TLM
 							</button>
-							<!-- <button
-								class="ml-2 rounded-lg bg-gray-500 p-1 text-center text-base text-white hover:bg-gray-700"
-								on:click={() => {
-									new_multi_transfer_action();
-								}}
-							>
-								Multi Transfer
-							</button> -->
+
 							<button
 								class="ml-2 rounded-lg bg-gray-500 p-1 text-center text-base text-white hover:bg-gray-700"
 								on:click={() => {
@@ -485,11 +469,11 @@
 						{#each actions as action, index}
 							<label
 								for="action"
-								class="mt-1 w-full border-t border-gray-500 text-base italic underline"
+								class="mt-1 basis-full border-t border-gray-500 text-base italic underline"
 							>
 								Action {index + 1}
 							</label>
-							<div class="mt-2 flex flex-row flex-wrap">
+							<div class="mt-2 flex flex-col gap-2 md:flex-row">
 								<input
 									type="text"
 									bind:value={action.sc_account}
@@ -506,14 +490,13 @@
 									on:change={(event) => {
 										on_change_action_name(event?.target?.value, index);
 									}}
-									class=" m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+									class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 								>
 									<option value="" selected>Select an action...</option>
 									{#each action.sc_actions as item}
 										<option value={item.name}>{item.name}</option>
 									{/each}
 								</select>
-
 								<button
 									class="close-button"
 									on:click={() => {
@@ -531,7 +514,7 @@
 										<label for={`field_${index}_${index2}`} class="mt-1 text-base italic underline">
 											{field.name}
 										</label>
-										<div class="flex flex-row">
+										<div class="flex flex-col gap-2 md:flex-row">
 											<textarea
 												rows="1"
 												id={`field_${index}_${index2}`}
@@ -569,14 +552,13 @@
 										</button>
 									</div>
 									{#each action.action.authorization as auth_item, auth_index}
-										<div class="mt-1 flex flex-row flex-wrap">
+										<div class="mt-1 flex flex-col gap-2 md:flex-row">
 											<input
 												type="text"
 												bind:value={auth_item.actor}
 												class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 												placeholder="Account Name"
 											/>
-
 											<input
 												type="text"
 												bind:value={auth_item.permission}
