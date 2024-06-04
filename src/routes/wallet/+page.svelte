@@ -38,19 +38,17 @@
 
 	async function fetchBalance() {
 		loading = true;
-		const response = await get_balances('3.haw.wam');
-		// const response = await get_balances(String($session?.actor));
+		// const response = await get_balances('3.haw.wam');
+		const response = await get_balances(String($session?.actor));
 		if (!response) return;
-		console.log('balances: ', response);
 		balances = response.balances;
 		tlm_balance = response.tlm_balance;
 	}
 
 	async function fetchMemberInfo() {
-		const response = await get_member_info('3.haw.wam');
-		// const response = await get_balances(String($session?.actor));
+		// const response = await get_member_info('3.haw.wam');
+		const response = await get_member_info(String($session?.actor));
 		if (!response) return;
-		console.log('member: ', response);
 		memberInfo = response;
 	}
 
@@ -60,8 +58,7 @@
 
 	function getStakeTime(item: any) {
 		let stakeTime =
-			_.find(memberInfo, (info: any) => info.planet.scope === item.dac_id)?.stake_time || 0;
-		console.log('stakeTime', stakeTime);
+			_.find(memberInfo, (info: any) => info?.planet?.scope === item?.dac_id)?.stake_time || 0;
 		let stakeDays = `${stakeTime / 86400 != 0 ? stakeTime / 86400 : '00'} days`;
 		return stakeDays;
 	}

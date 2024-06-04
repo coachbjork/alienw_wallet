@@ -136,7 +136,7 @@
 				>
 					Stake Time
 				</button>
-				{#if !_.find(memberInfo, (info) => info.planet.scope === selectedItem?.dac_id)}
+				{#if !_.find(memberInfo, (info) => info?.planet?.scope === selectedItem?.dac_id)}
 					<button
 						class="min-w-8 basis-1/4 rounded-xl bg-green-500 p-2 text-sm font-bold text-white hover:bg-green-700"
 						on:click={() => onRegisterMember()}
@@ -177,7 +177,7 @@
 			>
 				Stake Time
 			</button>
-			{#if !_.find(memberInfo, (info) => info.planet.scope === selectedItem?.dac_id)}
+			{#if !_.find(memberInfo, (info) => info?.planet?.scope === selectedItem?.dac_id)}
 				<button
 					class="m-1 min-w-32 grow rounded-xl bg-green-500 p-2 font-bold text-white hover:bg-green-700"
 					on:click={() => onRegisterMember()}
