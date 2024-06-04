@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
-	import { ROUTES } from '$lib/constants';
+	import ROUTES from '$lib/routes';
 	import { AngleDownOutline, AngleRightOutline } from 'flowbite-svelte-icons';
 	import BarsSolid from 'svelte-awesome-icons/BarsSolid.svelte';
 	import { slide } from 'svelte/transition';

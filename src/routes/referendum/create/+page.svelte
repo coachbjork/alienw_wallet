@@ -107,7 +107,7 @@
 			{
 				sc_account: AW.CONTRACT_NAME,
 				action: { name: '', fields: [], authorization: [], base: '' },
-				sc_actions: AW.ACTIONS,
+				sc_actions: AW.ACTIONS_ABI,
 				data: {}
 			}
 		];
@@ -130,7 +130,7 @@
 	// 			{
 	// 				sc_account: AW.CONTRACT_NAME,
 	// 				action: { name: '', fields: [], authorization: [], base: '' },
-	// 				sc_actions: AW.ACTIONS,
+	// 				sc_actions: AW.ACTIONS_ABI,
 	// 				data: {}
 	// 			}
 	// 		];

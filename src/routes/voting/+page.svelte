@@ -149,7 +149,7 @@
 	<div class="container relative overflow-x-hidden">
 		<PlanetMenu />
 		<div class="mt-10 overflow-x-auto">
-			<table class="text-default w-full table-auto text-left text-lg">
+			<table class="text-default w-full table-auto text-left text-lg md:text-xl">
 				<thead>
 					<tr>
 						<th>#</th>
@@ -161,7 +161,7 @@
 						<th class="">Vote Decay</th>
 					</tr>
 				</thead>
-				<tbody class="text-2xl">
+				<tbody class="text-lg md:text-xl">
 					{#if loading}
 						<tr>
 							<td colspan="7" class="text-center">
@@ -231,6 +231,7 @@
 										animation: 'puff'
 									}}>-{candidate.vote_decay}%</td
 								>
+								<!-- TODO: fix tooltip position bugs -->
 							</tr>
 						{/each}
 					{/if}

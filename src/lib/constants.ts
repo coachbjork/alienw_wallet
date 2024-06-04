@@ -86,19 +86,37 @@ const AW_WORKER_PROPOSALS = {
 };
 
 const AW_PLANETS = [
-    { name: "Kavian", scope: "kavian", account: "kavian.dac" },
-    { name: "Eyeke", scope: "eyeke", account: "eyeke.dac" },
-    { name: "Neri", scope: "nerix", account: "neri.dac" },
-    { name: "Veles", scope: "veles", account: "veles.dac" },
-    { name: "Naron", scope: "naron", account: "naron.dac" },
-    { name: "Magor", scope: "magor", account: "magor.dac" },
-    { name: "Testa", scope: "testa", account: "testadacdacc" },
+    { name: "Kavian", scope: "kavian", account: "kavian.dac", token_symbol: "KAV", planet_name: "kavian.world" },
+    { name: "Eyeke", scope: "eyeke", account: "eyeke.dac", token_symbol: "EYE", planet_name: "eyeke.world" },
+    { name: "Neri", scope: "nerix", account: "neri.dac", token_symbol: "NER", planet_name: "neri.world" },
+    { name: "Veles", scope: "veles", account: "veles.dac", token_symbol: "VEL", planet_name: "veles.world" },
+    { name: "Naron", scope: "naron", account: "naron.dac", token_symbol: "NAR", planet_name: "naron.world" },
+    { name: "Magor", scope: "magor", account: "magor.dac", token_symbol: "MAG", planet_name: "magor.world" },
+    { name: "Testa", scope: "testa", account: "testadacdacc", token_symbol: "TESTA", planet_name: "testa.world" },
 ];
 
 const AW_TOKEN = {
     CONTRACT_NAME: "token.worlds",
     TABLES: {
         STAKES: "stakes",
+        UNSTAKES: "unstakes",
+        ACCOUNTS: "accounts",
+        MEMBERS: "members",
+        STAKE_TIME: "staketime",
+        STAKE_CONFIG: "stakeconfig"
+    },
+    ACTIONS: {
+        STAKE: "stake",
+        UNSTAKE: "unstake",
+        CLAIM_UNSTAKE: "claimunstkes",
+        REGISTER_MEMBER: "memberreg",
+        STAKE_TIME: "staketime",
+    }
+};
+const AW_STAKE = {
+    CONTRACT_NAME: "stake.worlds",
+    ACTIONS: {
+        STAKE: "stake",
     }
 };
 
@@ -182,7 +200,13 @@ const AW_MSIG = {
 const AW = {
     CONTRACT_NAME: "alien.worlds",
     TOKEN: { NAME: "TLM", },
-    ACTIONS: [
+    TABLES: {
+        ACCOUNTS: "accounts",
+    },
+    ACTIONS: {
+        TRANSFER: "transfer",
+    },
+    ACTIONS_ABI: [
         {
             "name": "addvesting",
             "fields": [
@@ -329,38 +353,6 @@ const TOAST_TYPES = {
     WARNING: "warning",
 };
 
-const ROUTES = [
-    {
-        name: "Voting",
-        path: "/voting",
-    },
-    {
-        name: "Worker Proposals",
-        path: "/worker-proposals",
-    },
-    {
-        name: "Msig",
-        path: "/msig",
-    },
-    {
-        name: "DAO Infra",
-        path: "/dao-infra",
-        group: [
-            {
-                name: "Article",
-                path: "/dao-infra/article",
-            },
-            {
-                name: "Identity",
-                path: "/dao-infra/identity",
-            },
-        ],
-    },
-    {
-        name: "Referendum",
-        path: "/referendum",
-    },
-];
 
 const LOCAL_STORAGE_KEYS = {
     ACTIVE_PLANET: "activePlanetStore",
@@ -372,11 +364,9 @@ export {
     AW,
     AW_DAO,
     AW_DAO_INFRA,
-    AW_MSIG,
-    AW_PLANETS, AW_REFERENDUM, AW_TOKEN,
+    AW_MSIG, AW_PLANETS, AW_REFERENDUM, AW_STAKE, AW_TOKEN,
     AW_WORKER_PROPOSALS,
     LOCAL_STORAGE_KEYS,
-    ROUTES,
     TOAST_TYPES, blockchain_endpoints
 };
 

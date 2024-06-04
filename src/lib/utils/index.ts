@@ -9,3 +9,21 @@ export function voteDecayFormula(voteDate: string, votePower: number): number {
     const decayedVotePower = votePower * Z;
     return decayedVotePower;
 }
+
+export function retryAsync(fn: any, retries = 3, delay = 30) {
+    return new Promise((resolve, reject) => {
+        const attempt = () => {
+            fn().then(resolve).catch((error: any) => {
+                if (retries === 0) {
+                    reject(error);
+                } else {
+                    setTimeout(() => {
+                        retries--;
+                        attempt();
+                    }, delay);
+                }
+            });
+        };
+        attempt();
+    });
+}
