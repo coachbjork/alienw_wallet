@@ -106,8 +106,8 @@
 										/>
 									</td>
 									<td>{String(item.balance)}</td>
-									<td>{String(item.liquid)} ({getStakeTime(item)})</td>
-									<td>{String(item.staked)}</td>
+									<td>{String(item.liquid)}</td>
+									<td>{String(item.staked)} ({getStakeTime(item)})</td>
 									<td>{String(item.total_unstaking)}</td>
 									<td>{String(item.total_refund)}</td>
 								</tr>
