@@ -1,35 +1,36 @@
+import { base } from '$app/paths';
 const ROUTES = [
     {
         name: "Voting",
-        path: "/voting",
+        path: `${base}/voting`,
     },
     {
         name: "Worker Proposals",
-        path: "/worker-proposals",
+        path: `${base}/worker-proposals`,
     },
     {
         name: "Msig",
-        path: "/msig",
+        path: `${base}/msig`,
     },
     {
         name: "DAO Infra",
-        path: "/dao-infra",
+        path: `${base}/dao-infra`,
         group: [
             {
                 name: "Article",
-                path: "/dao-infra/article",
+                path: `${base}/dao-infra/article`,
             },
             {
                 name: "Identity",
-                path: "/dao-infra/identity",
+                path: `${base}/dao-infra/identity`,
             },
         ],
     },
     {
         name: "Referendum",
-        path: "/referendum",
+        path: `${base}/referendum`,
     },
-    { name: "Wallet", path: "/wallet" },
+    { name: "Wallet", path: `${base}/wallet` },
 ];
 
 export default ROUTES;
