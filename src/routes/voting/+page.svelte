@@ -12,7 +12,6 @@
 	import type { Planet } from '$lib/types';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { tooltip } from '@svelte-plugins/tooltips';
-	import { json } from '@sveltejs/kit';
 	import axios from 'axios';
 	import { Spinner } from 'flowbite-svelte';
 	import _ from 'lodash';
@@ -61,24 +60,27 @@
 		let response = await get_candidates($activePlanetStore.name);
 		if (!response) return;
 		let api_response: any = await axios.get(
-			`https://alienw.com/api/v0/candidates/${$activePlanetStore.scope}`
+			`https://api.alienw.com/custodians/${$activePlanetStore.scope}`
 		);
-		api_response = json(api_response.data);
-		// let api_response: any = await fetch(
-		// 	`/api/daoaw/candidates?activePlanet=${$activePlanetStore.scope}`
-		// );
-		// api_response = await api_response.json();
-		if (api_response) {
+		const { data } = api_response;
+
+		if (data) {
 			response = response.map((item: any) => {
 				return {
 					...item,
-					description: api_response[String(item.candidate_name)]?.description || '',
-					image: api_response[String(item.candidate_name)]?.image || '',
-					name: api_response[String(item.candidate_name)]?.name || String(item.candidate_name)
+					// description: data[String(item.candidate_name)]?.cand_desc || '',
+					// image: data[String(item.candidate_name)]?.cand_img || '',
+					// name: data[String(item.candidate_name)]?.cand_name || String(item.candidate_name)
+					description: _.find(data, { cand_acc: String(item.candidate_name) })?.cand_desc || '',
+					image: _.find(data, { cand_acc: String(item.candidate_name) })?.cand_img || '',
+					name:
+						_.find(data, { cand_acc: String(item.candidate_name) })?.cand_name ||
+						String(item.candidate_name)
 				};
 			});
 		}
 		candidates = response;
+		console.log('candidates', candidates);
 	}
 
 	async function fetchDacglobals() {
