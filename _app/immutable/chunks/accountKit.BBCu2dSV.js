@@ -1,0 +1,1 @@
+import{k as n,l as c}from"./bundle-mjs.fLspV5ki.js";import{H as r}from"./scheduler.BGxGHEAh.js";import{A as a,C as e}from"./account.m.FlQbJtp6.js";const m=async o=>{try{return await new a(e.WAX,{client:new n({url:r(c)})}).load(o)}catch(t){console.log("Error",t);return}};export{m as g};
