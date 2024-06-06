@@ -4,6 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev --port 5000",
+		"build": "vite build",
 		"build-stag": "vite build --mode stagging && touch build/.nojekyll",
 		"build-client": "vite build --mode production && touch build/.nojekyll",
 		"preview": "vite preview",
