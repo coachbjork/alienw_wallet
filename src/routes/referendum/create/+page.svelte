@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import { AW, AW_REFERENDUM, TOAST_TYPES } from '$lib/constants';
 	import { get_deposited_bal, get_ref_cfg } from '$lib/services/awReferendumService';
@@ -348,7 +349,7 @@
 	<div class="container">
 		<PlanetMenu />
 		<div class="flex flex-row items-center justify-center">
-			<a href="/referendum">
+			<a href={`${base}/referendum`}>
 				<ArrowLeftOutline class="h-14 w-14 text-indigo-400 hover:contrast-200 " />
 			</a>
 			<!-- Title of the feature -->

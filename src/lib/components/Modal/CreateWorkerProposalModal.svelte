@@ -140,47 +140,47 @@
 		file_content = file;
 	}
 
-	async function uploadFileToIPFS() {
-		try {
-			if (!file_content) {
-				toastStore.add('Please select a file to upload', TOAST_TYPES.ERROR);
-			}
-			let formData = new FormData();
-			formData.append('file', file_content);
-			const response = await fetch('/api/ipfs/pin', {
-				method: 'POST',
-				body: formData
-			});
+	// async function uploadFileToIPFS() {
+	// 	try {
+	// 		if (!file_content) {
+	// 			toastStore.add('Please select a file to upload', TOAST_TYPES.ERROR);
+	// 		}
+	// 		let formData = new FormData();
+	// 		formData.append('file', file_content);
+	// 		const response = await fetch('/api/ipfs/pin', {
+	// 			method: 'POST',
+	// 			body: formData
+	// 		});
 
-			const { ipfsHash } = await response.json();
-			if (ipfsHash) {
-				content_hash = ipfsHash;
-			}
-		} catch (error) {
-			console.error('Error:', error);
-		}
-	}
+	// 		const { ipfsHash } = await response.json();
+	// 		if (ipfsHash) {
+	// 			content_hash = ipfsHash;
+	// 		}
+	// 	} catch (error) {
+	// 		console.error('Error:', error);
+	// 	}
+	// }
 
-	async function removeFileFromIPFS() {
-		try {
-			if (content_hash) {
-				const response = await fetch('/api/ipfs/unpin', {
-					method: 'POST',
-					body: JSON.stringify({ content_hash }),
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				});
+	// async function removeFileFromIPFS() {
+	// 	try {
+	// 		if (content_hash) {
+	// 			const response = await fetch('/api/ipfs/unpin', {
+	// 				method: 'POST',
+	// 				body: JSON.stringify({ content_hash }),
+	// 				headers: {
+	// 					'Content-Type': 'application/json'
+	// 				}
+	// 			});
 
-				const { ipfsHash } = await response.json();
-				if (ipfsHash) {
-					content_hash = ipfsHash;
-				}
-			}
-		} catch (error) {
-			console.error('Error:', error);
-		}
-	}
+	// 			const { ipfsHash } = await response.json();
+	// 			if (ipfsHash) {
+	// 				content_hash = ipfsHash;
+	// 			}
+	// 		}
+	// 	} catch (error) {
+	// 		console.error('Error:', error);
+	// 	}
+	// }
 
 	function autoResize(event: any) {
 		event.target.style.height = 'auto'; // Reset height to recalculate

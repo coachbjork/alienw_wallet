@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import { page } from '$app/stores';
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import { AW, AW_MSIG, TOAST_TYPES } from '$lib/constants';
@@ -405,7 +406,7 @@
 	<div class="container">
 		<PlanetMenu />
 		<div class="flex flex-row items-center justify-center">
-			<a href="/msig">
+			<a href={`${base}/msig`}>
 				<ArrowLeftOutline class="h-14 w-14 text-indigo-400 hover:contrast-200 " />
 			</a>
 			<!-- Title of the feature -->

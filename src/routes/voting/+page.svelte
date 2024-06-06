@@ -12,6 +12,8 @@
 	import type { Planet } from '$lib/types';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { tooltip } from '@svelte-plugins/tooltips';
+	import { json } from '@sveltejs/kit';
+	import axios from 'axios';
 	import { Spinner } from 'flowbite-svelte';
 	import _ from 'lodash';
 	import { afterUpdate, onMount } from 'svelte';
@@ -58,10 +60,14 @@
 	async function fetchCandidates() {
 		let response = await get_candidates($activePlanetStore.name);
 		if (!response) return;
-		let api_response: any = await fetch(
-			`/api/daoaw/candidates?activePlanet=${$activePlanetStore.name}`
+		let api_response: any = await axios.get(
+			`https://alienw.com/api/v0/candidates/${$activePlanetStore.scope}`
 		);
-		api_response = await api_response.json();
+		api_response = json(api_response.data);
+		// let api_response: any = await fetch(
+		// 	`/api/daoaw/candidates?activePlanet=${$activePlanetStore.scope}`
+		// );
+		// api_response = await api_response.json();
 		if (api_response) {
 			response = response.map((item: any) => {
 				return {
