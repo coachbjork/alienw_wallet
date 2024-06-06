@@ -4,10 +4,10 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
-		"dev-stag": "vite dev --port 5000",
+		"dev-stag": "vite dev --port 8001",
 		"build": "vite build",
 		"build-stag": "vite build --mode stagging && touch build/.nojekyll",
-		"build-client": "vite build --mode production && touch build/.nojekyll",
+		"build-client": "vite build --mode client && touch build/.nojekyll",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",

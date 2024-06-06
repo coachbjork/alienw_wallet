@@ -80,7 +80,6 @@
 			});
 		}
 		candidates = response;
-		console.log('candidates', candidates);
 	}
 
 	async function fetchDacglobals() {
