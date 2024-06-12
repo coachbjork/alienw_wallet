@@ -93,6 +93,8 @@
 					</ul>
 				</div>
 			{:else}
+				<!-- Desktop Menu -->
+
 				<div class="hidden rounded-xl border border-indigo-500 p-2 md:flex">
 					{#each ROUTES as route}
 						<!-- svelte-ignore a11y-no-static-element-interactions -->

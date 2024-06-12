@@ -92,7 +92,6 @@ export async function get_balances(account: string) {
                 return Asset.fromUnits(acc.units.adding(item.stake.units), acc.symbol);
             }, Asset.fromUnits(0, balance.symbol));
             const liquid = Asset.fromUnits(balance.units.subtracting(staked.stake.units).subtracting(total_unstaking.units), balance.symbol);
-            console.log("dac_id", planet.scope);
             return {
                 planet_name: planet.planet_name,
                 dac_id: planet.scope,
@@ -131,7 +130,7 @@ export async function get_member_info(user: string) {
 
             // get default stake time config
             const res: any = await retryAsync(() => getSingleData(AW_TOKEN.CONTRACT_NAME, item.planet.scope, AW_TOKEN.TABLES.STAKE_CONFIG));
-            stake_time = parseInt(res.min_stake_time);
+            stake_time = parseInt(res?.min_stake_time);
         } else {
             stake_time = parseInt(stake_time.delay);
         }
