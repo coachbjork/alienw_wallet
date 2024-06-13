@@ -25,7 +25,6 @@
 				{planet_balance}
 				<span class="font-bold">TLM</span>
 			</div>
-			<!-- <div class="ml-2 text-lg font-bold">{awSummaryStore.balance}</div> -->
 		</div>
 	{/if}
 </div>
