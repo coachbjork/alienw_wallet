@@ -6,6 +6,7 @@
 	export { className as class };
 
 	let planet_balance = 0;
+	$: $activePlanetStore && awSummaryStore.fetch();
 	$: $awSummaryStore &&
 		(planet_balance =
 			$activePlanetStore.scope == 'testa'

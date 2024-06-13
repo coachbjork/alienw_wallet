@@ -10,7 +10,6 @@ function createAwSummaryStore() {
         set,
         fetch: async () => {
             const response = await axios.get(`https://api.alienw.com/summary`);
-            console.log("summary", response.data);
             set(response.data);
         }
     };
