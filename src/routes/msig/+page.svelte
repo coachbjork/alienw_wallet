@@ -1,93 +1,63 @@
 <script lang="ts">
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import RecursiveObjectDisplay from '$lib/components/RecursiveObjectDisplay.svelte';
-	import MsigProposalAction from '$lib/components/SidePanel/MsigProposalAction.svelte';
+	import MsigProposalAction from '$lib/components/SidePanel/Actions/MsigProposalAction.svelte';
+	import Badge from '$lib/components/Text/Badge.svelte';
 	import { AW_MSIG } from '$lib/constants';
+	import { get_msig_cursor, get_msigs } from '$lib/services/awMsigPropService';
 	import { get_dacglobals } from '$lib/services/awdaoService';
 	import { activePlanetStore } from '$lib/stores';
 	import type { Planet } from '$lib/types';
 	import { Spinner } from 'flowbite-svelte';
-	import LabelSolid from 'flowbite-svelte-icons/LabelSolid.svelte';
 	import moment from 'moment';
-	import { onMount } from 'svelte';
+	import { afterUpdate, onMount } from 'svelte';
+	import CrosshairsSolid from 'svelte-awesome-icons/CrosshairsSolid.svelte';
 
 	let proposals: any = [];
-	function handleMockData() {
-		proposals = [
-			{
-				_num: 313,
-				schema_version: 1,
-				planet: 'kavian',
-				proposal_title: '- No title -',
-				proposal_id: 'kv43aluty5aa',
-				proposer: 'hweaq.wam',
-				trx_contracts: {
-					'0': {
-						'dao.worlds': 'claimbudget'
-					}
-				},
-				trx_actions: {
-					'0': {
-						dac_id: 'kavian'
-					}
-				},
-				trx_packed: {
-					'0': '000000004ce3b681'
-				},
-				actions: [
-					{
-						contract_name: 'dao.worlds',
-						action_name: 'claimbudget',
-						action_data: {
-							dac_id: 'kavian'
-						}
-					}
-				],
-				description: '- No description -',
-				proposal_status: 0,
-				approved_by: [],
-				created: '2024-02-14T07:53:08',
-				modified: '2024-02-14T07:53:08',
-				expiration: '2024-02-21T07:53:04',
-				trx_id: '8af5f3d4e52387e8a6154843debb6d200c25edfe8a5d779b437eccf2f62fa3dd',
-				unique_hash: '8af5f3d4e52387e8a6154843debb6d200c25edfe8a5d779b437eccf2f62fa3ddkv43aluty5aa'
-			}
-		];
-	}
-
+	let next_page_key: any = undefined;
+	let more: boolean = true;
 	let loading = true;
+	let loadingMore = true;
 	let selectedPlanet: Planet = $activePlanetStore;
 	let selectedProposal: any = null;
 	let ableToClaimBudget = false;
 	let lastclaimbudgettime = new Date(0);
 	let lastperiodtime = new Date(0);
 
-	$: selectedPlanet !== $activePlanetStore && updateData();
-
 	onMount(async () => {
-		await fetchPendingProposals();
+		await fetchMsigs();
 		await fetchDacglobals();
-		loading = false;
 	});
 
-	async function updateData() {
-		{
-			loading = true;
+	afterUpdate(async () => {
+		if (selectedPlanet !== $activePlanetStore) {
 			selectedPlanet = $activePlanetStore;
-			selectedProposal = null;
-			proposals = [];
-			await fetchPendingProposals();
+			refresh();
 			await fetchDacglobals();
-			loading = false;
 		}
-	}
+	});
 
-	async function fetchPendingProposals() {
-		let api_response: any = await fetch(
-			`/api/daoaw/msig_proposals/pending/${$activePlanetStore.scope}`
-		);
-		api_response = await api_response.json();
-		proposals = api_response;
+	async function fetchMsigs() {
+		loadingMore = true;
+		const cursor = await get_msig_cursor($activePlanetStore.name, next_page_key, 10);
+		if (!cursor) return;
+		if (more) {
+			const { rows, next_key, planetName } = await get_msigs(cursor);
+			if (planetName !== $activePlanetStore.name) return;
+			proposals = [...proposals, ...rows];
+			next_page_key = next_key;
+			more = rows.length >= 10;
+		}
+		loadingMore = false;
+		loading = false;
+	}
+	async function refresh() {
+		loading = true;
+		more = true;
+		selectedProposal = null;
+		next_page_key = undefined;
+		proposals = [];
+		await fetchMsigs();
 	}
 
 	async function fetchDacglobals() {
@@ -123,187 +93,103 @@
 		}
 	}
 
-	// function getApprovalState(proposal: any) {
-	// 	if (
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value ||
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value ||
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value
-	// 	) {
-	// 		// calculate how many approved vote
-	// 		let approvedVotes = proposal.votes.filter(
-	// 			(item: any) => item.vote == AW_WORKER_PROPOSALS.VOTE.VOTE_PROP_APPROVE.value
-	// 		);
-	// 		return `(${approvedVotes.length}/${wpConfig.proposal_threshold})`;
-	// 	} else if (
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value ||
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value
-	// 	) {
-	// 		// calculate how many approved vote
-	// 		let approvedVotes = proposal.votes.filter(
-	// 			(item: any) => item.vote == AW_WORKER_PROPOSALS.VOTE.VOTE_FINAL_APPROVE.value
-	// 		);
-	// 		return `(${approvedVotes.length}/${wpConfig.finalize_threshold})`;
-	// 	} else {
-	// 		return '';
-	// 	}
-	// }
-
 	function getApprovedBy(proposal: any) {
-		return proposal.approved_by.join(', ');
+		return proposal?.approved_by?.join(', ') || '';
 	}
-
-	// function getDeniedBy(proposal: any) {
-	// 	if (
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_APPROVAL.value ||
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_APP_VOTES.value ||
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.IN_PROGRESS.value
-	// 	) {
-	// 		let deniedByString = proposal.votes
-	// 			.filter((item: any) => item.vote == AW_WORKER_PROPOSALS.VOTE.VOTE_PROP_DENY.value)
-	// 			.map((item: any) => item.voter)
-	// 			.join(', ');
-	// 		return deniedByString;
-	// 	} else if (
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.PENDING_FINALIZE.value ||
-	// 		proposal.state == AW_WORKER_PROPOSALS.PROP_STATE.HAS_ENOUGH_FIN_VOTES.value
-	// 	) {
-	// 		let deniedByString = proposal.votes
-	// 			.filter((item: any) => item.vote == AW_WORKER_PROPOSALS.VOTE.VOTE_FINAL_DENY.value)
-	// 			.map((item: any) => item.voter)
-	// 			.join(', ');
-	// 		return deniedByString;
-	// 	} else {
-	// 		return '';
-	// 	}
-	// }
-
-	// async function handleCreateProposalAction(proposal: any) {
-	// 	if (!$session) {
-	// 		toastStore.add('Please login to vote', TOAST_TYPES.WARNING);
-	// 		return;
-	// 	}
-
-	// 	const { title, summary, arbiter, proposal_pay, arbiter_pay, content_hash, id, job_duration } =
-	// 		proposal;
-
-	// 	let actions = [
-	// 		{
-	// 			account: AW_WORKER_PROPOSALS.CONTRACT_NAME,
-	// 			name: AW_WORKER_PROPOSALS.ACTIONS.CREATE_PROPOSAL,
-	// 			authorization: [
-	// 				{
-	// actor: String($session.actor),
-	// 				permission: String($session?.permission)
-	// 				}
-	// 			],
-	// 			data: {
-	// 				proposer: String($session.actor),
-	// 				title,
-	// 				summary,
-	// 				arbiter,
-	// 				proposal_pay: {
-	// 					quantity: `${proposal_pay.toFixed(4)} TLM`,
-	// 					contract: AW.CONTRACT_NAME
-	// 				},
-	// 				arbiter_pay: {
-	// 					quantity: `${arbiter_pay.toFixed(4)} TLM`,
-	// 					contract: AW.CONTRACT_NAME
-	// 				},
-	// 				content_hash,
-	// 				id,
-	// 				category: 0,
-	// 				job_duration,
-	// 				dac_id: $activePlanetStore.scope
-	// 			}
-	// 		}
-	// 	];
-	// 	return pushActions($session, actions);
-	// }
 </script>
 
 <div class="main-content py-6">
-	<div class="container">
+	<div class="container relative overflow-x-hidden">
 		<PlanetMenu />
-		<div class="pt-10">
+		<div class="mt-10 overflow-x-auto">
 			{#if loading}
-				<div class="flex justify-center">
+				<div class="my-4 flex justify-center md:my-5">
 					<Spinner color="purple" />
 				</div>
 			{:else if proposals.length == 0}
-				<div class="flex justify-center">No Data</div>
+				<div class="my-4 flex justify-center md:my-5">No Data</div>
 			{:else}
-				<div class="flex flex-col gap-6">
+				<div class="my-4 flex flex-col gap-6 md:my-5">
 					{#each proposals as proposal}
-						<button class="flex flex-row" on:click={() => selectProposal(proposal)}>
-							<div class="w-8 flex-none place-self-center">
+						<button
+							class="flex w-full flex-row items-center"
+							on:click={() => selectProposal(proposal)}
+						>
+							<div class="w-8 flex-none">
 								{#if selectedProposal && selectedProposal.proposal_id == proposal?.proposal_id}
-									<LabelSolid class="text-stone-300 h-5 w-5 " />
+									<CrosshairsSolid color="#ecc94b" size="24" />
 								{/if}
 							</div>
 							<div
-								class={`flex-grow rounded-2xl border border-solid p-5 shadow-md  ${
-									proposal.state == AW_MSIG.PROP_STATE.PENDING.value
+								class={`flex-grow whitespace-normal break-words break-all rounded-2xl border p-4 shadow-md ${
+									proposal.proposal_status == AW_MSIG.PROP_STATE.PENDING.value
 										? 'border-yellow-700 shadow-yellow-700'
-										: proposal.state == AW_MSIG.PROP_STATE.EXECUTED.value
+										: proposal.proposal_status == AW_MSIG.PROP_STATE.EXECUTED.value
 											? 'border-blue-700 shadow-blue-700'
-											: proposal.state == AW_MSIG.PROP_STATE.CANCELLED.value
+											: proposal.proposal_status == AW_MSIG.PROP_STATE.CANCELLED.value
 												? 'border-red-700 shadow-red-700'
 												: ''
+								} ${
+									proposal.proposal_id == selectedProposal?.proposal_id
+										? 'backdrop-brightness-200'
+										: 'backdrop-brightness-125'
 								}`}
 							>
-								<div class="flex flex-row flex-wrap">
-									<div class="flex flex-none basis-2/12 flex-col text-start">
-										<div>
-											#: <span class="text-white underline">{proposal.proposal_id}</span>
+								<div class="flex flex-col justify-between gap-4 md:flex-row">
+									<div class="flex flex-col text-start">
+										<div class="text-sm md:text-base">
+											#: <span class="text-base font-semibold text-white underline md:text-lg"
+												>{proposal.proposal_id}</span
+											>
 										</div>
-										<div
-											class={`${
-												proposal.proposal_status == AW_MSIG.PROP_STATE.PENDING.value
-													? 'text-yellow-500 '
-													: proposal.proposal_status == AW_MSIG.PROP_STATE.EXECUTED.value
-														? 'text-blue-500'
-														: proposal.proposal_status == AW_MSIG.PROP_STATE.CANCELLED.value
-															? 'text-red-500'
-															: ''
-											}`}
-										>
-											{getStateName(proposal.proposal_status)}
+										<div>
+											<Badge
+												color={`${
+													proposal.proposal_status == AW_MSIG.PROP_STATE.PENDING.value
+														? 'yellow'
+														: proposal.proposal_status == AW_MSIG.PROP_STATE.EXECUTED.value
+															? 'blue'
+															: proposal.proposal_status == AW_MSIG.PROP_STATE.CANCELLED.value
+																? 'red'
+																: 'gray'
+												}`}
+											>
+												{getStateName(proposal.proposal_status)}
+											</Badge>
 										</div>
 									</div>
-									<div class="mx-3 flex-none basis-3/12 flex-col text-start">
-										<div>
+									<div class="flex flex-col text-start">
+										<div class="text-sm md:text-base">
 											Title: <span class="text-white">{proposal.proposal_title}</span>
 										</div>
-										<div>
+										<div class="text-sm md:text-base">
 											Approved by: <span class="text-white">{getApprovedBy(proposal)}</span>
 										</div>
-
-										<!-- <div>
-											Proposer Pay: <span class="text-white">{proposal.proposal_pay.quantity}</span>
-										</div>
-										<div>
-											Document: <a
-												class="text-blue-400 underline"
-												target="_blank"
-												href={`${PUBLIC_PINATA_GATEWAY}/ipfs/${proposal.content_hash}/?pinataGatewayToken=${PUBLIC_PINATA_GATEWAY_KEY}`}
-												>Get File</a
+									</div>
+									<div class="flex flex-col text-start">
+										<div class="text-sm md:text-base">
+											Proposer: <span
+												class="text-base font-semibold text-white underline md:text-lg"
+												>{proposal.proposer}</span
 											>
-										</div> -->
+										</div>
 									</div>
-									<div class="mx-3 flex flex-1 flex-col text-start">
-										<div>Proposer: <span class="text-white">{proposal.proposer}</span></div>
-									</div>
-									<div class="flex flex-none basis-3/12 flex-col text-end">
-										<div>Expiration At</div>
-										<div class="text-white">
-											{moment(`${proposal.expiration}Z`).format('YYYY-MM-DD HH:mm:ss')}
+									<div class="flex flex-col text-start">
+										<div class="text-sm md:text-base">
+											Updated At: <span class="text-white">
+												{moment(proposal.modified_date).format('YYYY-MM-DD HH:mm:ss')}
+											</span>
+										</div>
+										<div class="text-sm md:text-base">
+											Expired At: <span class="text-white">
+												{moment(proposal.expiration).format('YYYY-MM-DD HH:mm:ss')}
+											</span>
 										</div>
 									</div>
 								</div>
-
-								<div class="mx-auto mb-3 mt-5 w-2/3 border-t-2 border-dotted border-gray-500"></div>
+								<div class="mx-auto my-3 w-2/3 border-t-2 border-dotted border-gray-500"></div>
 								<div class="text-start">
-									<div>
+									<div class="text-sm md:text-base">
 										Description: <span class="text-white">
 											{#each proposal.description.split('\n') as line}
 												{line}
@@ -311,39 +197,52 @@
 											{/each}</span
 										>
 									</div>
-
-									<div class="mt-2">
-										<!-- for each actions in proposal -->
-										{#each proposal.actions as action}
-											<div class="flex flex-row">
-												<div class="flex-none basis-5/12">
-													Action: <span class="text-white"
-														>{action.contract_name} - {action.action_name}</span
-													>
-												</div>
-												<div class="ml-10 flex flex-1">
-													Data: <span class="text-white"
-														><RecursiveObjectDisplay data={action.action_data} /></span
-													>
-												</div>
+									{#each proposal.actions as action}
+										<div class="mt-2 flex flex-row flex-wrap">
+											<div class="basis-full text-sm md:basis-3/12 md:text-base">
+												Action: <span class="text-white"
+													>{action.contract_name} - {action.action_name}</span
+												>
 											</div>
-										{/each}
-									</div>
+											<div
+												class="basis-full overflow-auto text-ellipsis text-sm md:basis-6/12 md:text-base"
+											>
+												Data: <span class="text-white"
+													><RecursiveObjectDisplay data={action.action_data} /></span
+												>
+											</div>
+										</div>
+									{/each}
 								</div>
 							</div>
 							<div class="w-8 flex-none"></div>
 						</button>
 					{/each}
+					<!-- Load More button -->
+					<div class="flex justify-center">
+						{#if loadingMore}
+							<div class="flex justify-center">
+								<Spinner color="purple" />
+							</div>
+						{:else}
+							<button
+								class="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+								on:click={() => {
+									fetchMsigs();
+								}}
+							>
+								Load More
+							</button>
+						{/if}
+					</div>
 				</div>
 			{/if}
 		</div>
 	</div>
 </div>
-<div class="left-side">
-	<!-- {#if $session}{/if} -->
-</div>
-<div class="right-side">
-	<MsigProposalAction {selectedProposal} {ableToClaimBudget} on:mockdata={handleMockData} />
+<div class="left-side md:flex"></div>
+<div class="right-side md:flex">
+	<MsigProposalAction {selectedProposal} {ableToClaimBudget} on:refresh={refresh} />
 </div>
 
 <style>

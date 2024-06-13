@@ -31,11 +31,13 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="planet_menu rounded-xl border border-indigo-500">
-	<ul>
+<div class="planet_menu mx-5 rounded-xl border border-indigo-500">
+	<ul class="grid grid-cols-3 justify-center p-1 md:flex md:flex-row md:flex-wrap">
 		{#each AW_PLANETS as planet}
 			<li class={$activePlanetStore.name === planet.name ? 'active' : ''}>
-				<span class="text-default" on:click={handleClick(planet)}>{planet.name}</span>
+				<span class="text-default text-lg md:text-xl" on:click={handleClick(planet)}
+					>{planet.name}</span
+				>
 			</li>
 		{/each}
 	</ul>
@@ -47,32 +49,33 @@
 		-moz-box-sizing: border-box;
 		-webkit-box-sizing: border-box;
 		margin-top: 20px;
+		max-width: 100vw;
 	}
-
+	/* 
 	.planet_menu ul {
 		flex-direction: row;
 		align-items: flex-start;
-		flex-wrap: nowrap;
+		flex-wrap: wrap;
 		display: flex;
 		padding: 5px;
 		margin: 0;
 		gap: 20px;
 		justify-content: center;
-	}
+	} */
 
 	.planet_menu li {
 		display: block;
 		text-decoration: none;
-		padding: 5px;
+		padding: 2px;
 		justify-content: space-evenly;
 		margin: auto;
 	}
 
-	.planet_menu span {
+	/* .planet_menu span {
 		text-decoration: none;
 		padding: 10px;
 		font-size: 20px;
-	}
+	} */
 
 	.planet_menu ul > li.active {
 		border-bottom: 1px solid rgb(221, 244, 248, 0.2);

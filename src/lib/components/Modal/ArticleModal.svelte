@@ -3,7 +3,7 @@
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { Spinner } from 'flowbite-svelte';
-	import XSolid from 'flowbite-svelte-icons/XSolid.svelte';
+	import CloseOutline from 'flowbite-svelte-icons/CloseOutline.svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
 
 	const dispatch = createEventDispatcher();
@@ -109,6 +109,14 @@
 		author = '';
 		isOpen = false;
 	}
+	function autoResize(event: any) {
+		event.target.style.height = 'auto'; // Reset height to recalculate
+		event.target.style.height = event.target.scrollHeight + 'px'; // Set new height
+	}
+
+	function resetHeight(event: any) {
+		event.target.style.height = 'auto'; // Reset height to recalculate
+	}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -125,7 +133,7 @@
 					{/if}
 				</h2>
 				<div class="flex-grow"></div>
-				<XSolid
+				<CloseOutline
 					class="text-red-500 hover:cursor-pointer"
 					size="lg"
 					strokeWidth="3"
@@ -176,7 +184,14 @@
 			</div>
 
 			<div class="flex flex-row">
-				<textarea class="text-black" bind:value={description} placeholder="Description"></textarea>
+				<textarea
+					class="text-black"
+					bind:value={description}
+					placeholder="Description"
+					on:input={autoResize}
+					on:focusin={() => autoResize(event)}
+					on:focusout={() => resetHeight(event)}
+				></textarea>
 				<span
 					class="my-2 ml-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"
 				>
@@ -217,7 +232,7 @@
 
 	.modal-content {
 		margin: auto;
-		padding: 30px;
+		padding: 15px;
 		border: 1px solid #888;
 		width: 80%;
 		max-width: 500px;

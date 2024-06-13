@@ -17,6 +17,7 @@ export async function pushActions(session: any, actions: any[]) {
             `<div>Executed: <a class="underline underline-offset-2" href="https://waxblock.io/transaction/${res.response.transaction_id}" target={"_blank"}>View Tx</a></div>`,
             TOAST_TYPES.SUCCESS
         );
+        return res;
     } catch (error: any) {
         toastStore.add(error.message, TOAST_TYPES.ERROR);
     }

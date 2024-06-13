@@ -3,10 +3,14 @@
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { afterUpdate, createEventDispatcher, onMount } from 'svelte';
+	import { cubicIn, cubicOut } from 'svelte/easing';
+	import { slide } from 'svelte/transition';
+	import Actions from './Actions.svelte';
 
 	export let selectedProposal: any = {};
 	let enableActions: any = [];
 	const dispatch = createEventDispatcher();
+	let showActions = false;
 
 	onMount(async () => {
 		setEnableActions();
@@ -22,6 +26,10 @@
 
 	function onDelegate(is_delegate: boolean) {
 		dispatch('delegatevote', { is_delegate });
+	}
+
+	function refresh() {
+		dispatch('refresh');
 	}
 
 	function setEnableActions() {
@@ -128,7 +136,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onArbiterVote(vote: string) {
@@ -165,7 +175,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onArbiterAgree() {
@@ -192,7 +204,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onCancel() {
@@ -230,7 +244,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onStartWork() {
@@ -264,7 +280,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onCompleteWork() {
@@ -297,7 +315,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onDispute() {
@@ -330,7 +350,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onFinalize() {
@@ -364,7 +386,9 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 
 	async function onClearExpired() {
@@ -397,21 +421,172 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
+	}
+
+	function toggleActions() {
+		showActions = !showActions;
 	}
 </script>
 
-<div class="flex flex-col">
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-	<p
-		class=" text-center text-2xl underline underline-offset-4"
-		on:click={() => dispatch('mockdata', {})}
-	>
-		Actions
-	</p>
+<Actions bind:showActions>
+	{#if $session && showActions}
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<div
+			on:click={() => (showActions = false)}
+			class:inset-0={showActions}
+			class="fixed bottom-0 left-0 right-0 z-50 content-end md:hidden"
+		>
+			<div class="mb-20 flex flex-row-reverse flex-wrap justify-center gap-1 p-2 backdrop-blur-sm">
+				<button
+					class="min-w-8 basis-1/4 rounded-xl bg-indigo-500 p-2 text-sm font-bold text-white hover:bg-indigo-700"
+					on:click|stopPropagation={() => {
+						showActions = false;
+						onNewProposal();
+					}}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					New Proposal
+				</button>
+
+				<!-- {#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL) || enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL)} -->
+				<button
+					class:hidden={!(
+						enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL) ||
+						enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL)
+					)}
+					class="min-w-8 basis-1/4 rounded-xl bg-green-500 p-2 text-sm font-bold text-white hover:bg-green-700"
+					on:click|stopPropagation={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Approve
+				</button>
+				<button
+					class:hidden={!(
+						enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_PROPOSAL) ||
+						enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.VOTE_FINISH_PROPOSAL)
+					)}
+					class="min-w-8 basis-1/4 rounded-xl bg-red-500 p-2 text-sm font-bold text-white hover:bg-red-700"
+					on:click|stopPropagation={() => onVote(AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value)}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Deny
+				</button>
+				<!-- {/if} -->
+				<!-- {#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.ARBITATOR_AGREE)} -->
+				<button
+					class:hidden={!enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.ARBITATOR_AGREE)}
+					class="min-w-8 basis-1/4 rounded-xl bg-blue-500 p-2 text-sm font-bold text-white hover:bg-green-700"
+					on:click|stopPropagation={() => onArbiterAgree()}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Agree
+				</button>
+				<!-- {/if} -->
+				<!-- {#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.ARBIRATOR_VOTE)} -->
+				<button
+					class:hidden={!enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.ARBIRATOR_VOTE)}
+					class="min-w-8 basis-1/4 rounded-xl bg-green-500 p-2 text-sm font-bold text-white hover:bg-green-700"
+					on:click|stopPropagation={() =>
+						onArbiterVote(AW_WORKER_PROPOSALS.VOTE.VOTE_APPROVE.value)}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Approve
+				</button>
+				<button
+					class:hidden={!enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.ARBIRATOR_VOTE)}
+					class="min-w-8 basis-1/4 rounded-xl bg-red-500 p-2 text-sm font-bold text-white hover:bg-red-700"
+					on:click|stopPropagation={() => onArbiterVote(AW_WORKER_PROPOSALS.VOTE.VOTE_DENY.value)}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Deny
+				</button>
+				<!-- {/if} -->
+				<!-- {#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_PROPOSAL) || enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_WIP_PROPOSAL)} -->
+				<button
+					class:hidden={!(
+						enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_PROPOSAL) ||
+						enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CANCEL_WIP_PROPOSAL)
+					)}
+					class="min-w-8 basis-1/4 rounded-xl bg-gray-500 p-2 text-sm font-bold text-white hover:bg-gray-700"
+					on:click|stopPropagation={() => onCancel()}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Cancel
+				</button>
+				<!-- {/if} -->
+				<!-- {#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.START_WORK)} -->
+				<button
+					class:hidden={!enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.START_WORK)}
+					class="min-w-8 basis-1/4 rounded-xl bg-blue-500 p-2 text-sm font-bold text-white hover:bg-blue-700"
+					on:click|stopPropagation={() => onStartWork()}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Start Work
+				</button>
+				<!-- {/if} -->
+				<!-- {#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.COMPLETE_WORK)} -->
+				<button
+					class:hidden={!enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.COMPLETE_WORK)}
+					class="min-w-8 basis-1/4 rounded-xl bg-teal-500 p-2 text-sm font-bold text-white hover:bg-teal-700"
+					on:click|stopPropagation={() => onCompleteWork()}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Complete
+				</button>
+				<!-- {/if} -->
+				<!-- {#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.DISPUTE_UNAPPROVED_PROPOSAL)} -->
+				<button
+					class:hidden={!enableActions.includes(
+						AW_WORKER_PROPOSALS.ACTIONS.DISPUTE_UNAPPROVED_PROPOSAL
+					)}
+					class="min-w-8 basis-1/4 rounded-xl bg-purple-500 p-2 text-sm font-bold text-white hover:bg-purple-700"
+					on:click|stopPropagation={() => onDispute()}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Dispute
+				</button>
+				<!-- {/if} -->
+				<!-- {#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL)} -->
+				<button
+					class:hidden={!enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.FINALIZE_PROPOSAL)}
+					class="min-w-8 basis-1/4 rounded-xl bg-yellow-500 p-2 text-sm font-bold text-white hover:bg-yellow-700"
+					on:click|stopPropagation={() => onFinalize()}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Finalize
+				</button>
+				<!-- {/if} -->
+				<!-- {#if enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CLEAR_EXPIRED_PROPOSAL)} -->
+				<button
+					class:hidden={!enableActions.includes(AW_WORKER_PROPOSALS.ACTIONS.CLEAR_EXPIRED_PROPOSAL)}
+					class="min-w-8 basis-1/4 rounded-xl bg-red-500 p-2 text-sm font-bold text-white hover:bg-red-700"
+					on:click|stopPropagation={() => onClearExpired()}
+					in:slide={{ axis: 'y', duration: 100, easing: cubicIn }}
+					out:slide={{ axis: 'y', duration: 100, easing: cubicOut }}
+				>
+					Clear
+				</button>
+				<!-- {/if} -->
+			</div>
+		</div>
+	{/if}
 	{#if $session}
-		<div class="mt-5 flex max-w-32 flex-wrap justify-center">
+		<div class="mt-5 hidden max-w-32 flex-wrap justify-center md:flex">
 			<button
 				class="m-1 min-w-32 grow rounded-xl bg-indigo-500 p-2 font-bold text-white hover:bg-indigo-700"
 				on:click={() => onNewProposal()}
@@ -524,7 +699,7 @@
 	{:else}
 		<p class="mt-5 text-center">Login to call actions</p>
 	{/if}
-</div>
+</Actions>
 
 <style>
 </style>

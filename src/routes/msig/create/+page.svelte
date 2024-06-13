@@ -1,14 +1,16 @@
 <script lang="ts">
+	import { base } from '$app/paths';
+	import { page } from '$app/stores';
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
-	import { AW_MSIG, TOAST_TYPES } from '$lib/constants';
+	import { AW, AW_MSIG, TOAST_TYPES } from '$lib/constants';
 	import { get_msig_proposal_by_id } from '$lib/services/awMsigPropService';
-	import { activePlanetStore, session, toastStore } from '$lib/stores';
+	import { activePlanetStore, custodiansStore, session, toastStore } from '$lib/stores';
 	import type { Authorization, Planet, Transaction_Action } from '$lib/types';
 	import { getAccountOnchain } from '$lib/utils/wharfkit/accountKit';
-	import { getActionsOfSmartContract } from '$lib/utils/wharfkit/contractKit';
+	import { encodeAction, getActionsOfSmartContract } from '$lib/utils/wharfkit/contractKit';
 	import { pushActions } from '$lib/utils/wharfkit/session';
-	import { ABI, Serializer } from '@wharfkit/antelope';
-	import { ArrowLeftSolid, CirclePlusSolid, XCircleSolid } from 'flowbite-svelte-icons';
+	import { Name } from '@wharfkit/antelope';
+	import { ArrowLeftOutline, CirclePlusSolid, CloseCircleSolid } from 'flowbite-svelte-icons';
 	import { onMount } from 'svelte';
 
 	let loading = true;
@@ -25,12 +27,20 @@
 	let metadata: any = [];
 	let actions: Transaction_Action[] = [];
 	let planetDAO_permissions: string[] = [];
+	let title = '- No Title -';
+	let description = '- No Description -';
+	let custom_metadata = false;
+	let custom_requested_approvals = false;
 
 	onMount(async () => {
-		await generateRandomProposalId();
 		if ($activePlanetStore) {
+			requested_approvals = [
+				{
+					actor: $activePlanetStore ? $activePlanetStore.account : '',
+					permission: planetDAO_permissions[0] ? planetDAO_permissions[0] : ''
+				}
+			];
 			await getAccountInstance($activePlanetStore.account);
-
 			requested_approvals = [
 				{
 					actor: $activePlanetStore ? $activePlanetStore.account : '',
@@ -38,16 +48,20 @@
 				}
 			];
 		}
-		metadata = [
-			{
-				key: 'Title',
-				value: ''
-			},
-			{
-				key: 'Description',
-				value: ''
-			}
-		];
+		await generateRandomProposalId();
+		// metadata = [
+		// 	{
+		// 		key: 'Title',
+		// 		value: ''
+		// 	},
+		// 	{
+		// 		key: 'Description',
+		// 		value: ''
+		// 	}
+		// ];
+		if ($page.state?.data) {
+			await updateCloneData();
+		}
 		loading = false;
 	});
 
@@ -60,6 +74,7 @@
 			)
 				.toISOString()
 				.slice(0, 16);
+			await getAccountInstance($activePlanetStore.account);
 			requested_approvals = [
 				{
 					actor: $activePlanetStore ? $activePlanetStore.account : '',
@@ -67,9 +82,51 @@
 				}
 			];
 			actions = [];
+			if ($page.state?.data) {
+				await updateCloneData();
+			}
 			await generateRandomProposalId();
 			loading = false;
 		}
+	}
+
+	async function updateCloneData() {
+		const { data } = $page.state;
+		title = data.proposal_title;
+		description = data.description;
+
+		let clone_actions = [];
+
+		for (let item of data.actions) {
+			const sc_actions = await getActionsOfSmartContract(item.contract_name);
+			let action = Object.assign(
+				{},
+				sc_actions.find((i: any) => i.name === item.action_name)
+			);
+			action.authorization = [
+				{
+					actor: $activePlanetStore ? $activePlanetStore.account : '',
+					permission: planetDAO_permissions[0] ? planetDAO_permissions[0] : ''
+				}
+			];
+
+			clone_actions.push({
+				action,
+				data: item.action_data,
+				sc_account: item.contract_name,
+				sc_actions
+			});
+		}
+		actions = clone_actions;
+	}
+
+	function autoResize(event: any) {
+		event.target.style.height = 'auto'; // Reset height to recalculate
+		event.target.style.height = event.target.scrollHeight + 'px'; // Set new height
+	}
+
+	function resetHeight(event: any) {
+		event.target.style.height = 'auto'; // Reset height to recalculate
 	}
 
 	async function generateRandomProposalId() {
@@ -131,6 +188,48 @@
 		];
 	}
 
+	async function new_transferTLM_action() {
+		actions = [
+			{
+				sc_account: AW.CONTRACT_NAME,
+				action: { name: '', fields: [], authorization: [], base: '' },
+				sc_actions: AW.ACTIONS_ABI,
+				data: {}
+			}
+		];
+		on_change_action_name('transfer', actions.length - 1);
+		actions[actions.length - 1].data = {
+			from: $activePlanetStore ? $activePlanetStore.account : '',
+			to: '',
+			quantity: '',
+			memo: ''
+		};
+	}
+
+	function new_multi_transfer_action() {
+		title = 'CWA';
+		description = 'CWA';
+		actions = [];
+		for (let custodian of $custodiansStore) {
+			actions = [
+				...actions,
+				{
+					sc_account: AW.CONTRACT_NAME,
+					action: { name: '', fields: [], authorization: [], base: '' },
+					sc_actions: AW.ACTIONS_ABI,
+					data: {}
+				}
+			];
+			on_change_action_name('transfer', actions.length - 1);
+			actions[actions.length - 1].data = {
+				from: $activePlanetStore ? $activePlanetStore.account : '',
+				to: custodian.cust_name,
+				quantity: '',
+				memo: 'CWA'
+			};
+		}
+	}
+
 	function remove_action(index: number) {
 		actions = actions.filter((_, i) => i !== index);
 	}
@@ -154,7 +253,6 @@
 			// reset action and data
 			actions[index].action = { name: '', fields: [], authorization: [], base: '' };
 			actions[index].data = {};
-			console.log(actions);
 			return;
 		}
 		let action = Object.assign(
@@ -203,40 +301,54 @@
 			return;
 		}
 
-		let actions_data = actions.map((item) => {
+		let actions_data: any = [];
+		for (let item of actions) {
 			try {
-				let abi = ABI.from({
-					structs: [
-						{
-							name: item.action.name,
-							base: item.action.base,
-							fields: item.action.fields
-						}
-					]
-				});
+				// let abi = ABI.from({
+				// 	structs: [
+				// 		{
+				// 			name: item.action.name,
+				// 			base: item.action.base,
+				// 			fields: item.action.fields
+				// 		}
+				// 	]
+				// });
 				// JSON.parse all attributes of data
-
-				Object.keys(item.data).forEach((key) => {
+				let object_data = Object.assign({}, item.data);
+				Object.keys(object_data).forEach((key) => {
 					try {
-						item.data[key] = JSON.parse(item.data[key]);
+						object_data[key] = JSON.parse(object_data[key]);
 					} catch (error) {}
 				});
-
-				let data = Serializer.encode({
-					object: item.data,
-					abi,
-					type: item.action.name
-				});
-				return {
-					account: item.sc_account,
-					name: item.action.name,
-					authorization: item.action.authorization,
-					data: data
-				};
+				// let data = Serializer.encode({
+				// 	object: object_data,
+				// 	abi,
+				// 	type: item.action.name
+				// });
+				// let abi = await getSCAbi(Name.from(item.sc_account));
+				// const typedAction = Action.from(
+				// 	{
+				// 		account: item.sc_account,
+				// 		name: item.action.name,
+				// 		authorization: item.action.authorization,
+				// 		data: object_data
+				// 	},
+				// 	abi
+				// );
+				const typedAction = await encodeAction(
+					Name.from(item.sc_account),
+					Name.from(item.action.name),
+					item.action.authorization,
+					object_data
+				);
+				actions_data.push(typedAction);
+				// return typedAction;
 			} catch (error: any) {
 				toastStore.add(`Error encoding action data: ${error.message}`, TOAST_TYPES.WARNING);
+				return;
 			}
-		});
+		}
+
 		// new_metadata with all key as lowercase
 		let new_metadata = metadata.map((item: any) => {
 			return {
@@ -244,6 +356,17 @@
 				value: item.value
 			};
 		});
+		new_metadata = [
+			{
+				key: 'title',
+				value: title
+			},
+			{
+				key: 'description',
+				value: description
+			},
+			...new_metadata
+		];
 		let tx_actions = [
 			{
 				account: AW_MSIG.CONTRACT_NAME,
@@ -283,161 +406,266 @@
 	<div class="container">
 		<PlanetMenu />
 		<div class="flex flex-row items-center justify-center">
-			<a href="/msig" class="text-indigo-500 hover:underline">
-				<ArrowLeftSolid class="h-8 w-8 text-indigo-500" />
+			<a href={`${base}/msig`}>
+				<ArrowLeftOutline class="h-14 w-14 text-indigo-400 hover:contrast-200 " />
 			</a>
 			<!-- Title of the feature -->
-			<h1 class="mx-auto my-4 text-2xl font-bold">Create A New Msig</h1>
+			<h1 class="mx-auto my-4 text-2xl font-bold text-orange-500">Create A New Msig</h1>
 		</div>
 
 		{#if $session}
-			<div class="mx-auto flex w-2/3 flex-col rounded-lg border p-5">
-				<div class="flex flex-col">
-					<label for="proposer" class="text-base font-semibold"> Proposer: </label>
-					<input
-						type="text"
-						id="proposer"
-						name="proposer"
-						bind:value={$session.actor}
-						class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
-						disabled
-					/>
-				</div>
-				<div class="mt-3 flex flex-col">
-					<label for="proposal_name" class="text-base font-semibold"> Proposal Name: </label>
-					<input
-						type="text"
-						id="proposal_name"
-						name="proposal_name"
-						bind:value={new_proposal_name}
-						class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
-						placeholder="Enter a proposal name"
-					/>
-				</div>
-				<!-- expired date at -->
-				<div class="mt-3 flex flex-col">
-					<label for="expired_at" class="text-base font-semibold"> Expired At: </label>
-					<input
-						type="datetime-local"
-						id="expired_at"
-						name="expired_at"
-						bind:value={expired_at}
-						class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
-					/>
-				</div>
-				<!-- Request Approvals -->
-				<div class="mt-3 flex flex-col">
-					<div class="flex flex-row">
-						<label for="request-approvals" class="text-base font-semibold">
-							Request Approvals:
-						</label>
-						<!-- Icon add -->
-						<button
-							on:click={() => {
-								new_request_approval();
-							}}
-						>
-							<CirclePlusSolid class="ml-2 h-6 w-6 text-indigo-500" />
-						</button>
+			<div class="mx-auto flex w-2/3 flex-col gap-y-2 rounded-lg p-5">
+				<div class="flex flex-col flex-wrap gap-4 md:flex-row">
+					<div class="flex grow flex-col">
+						<label for="title" class="text-base font-semibold"> Title </label>
+						<input
+							type="text"
+							id="title"
+							name="title"
+							bind:value={title}
+							class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+						/>
 					</div>
-					{#each requested_approvals as requested, index}
-						<div class="mt-1 flex flex-row flex-wrap">
-							<input
-								type="text"
-								bind:value={requested.actor}
-								class=" rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
-								placeholder="Account Name"
-							/>
-
-							<!-- <input
-								type="text"
-								bind:value={requested.permission}
-								class="ml-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
-								placeholder="Permission Name"
-							/> -->
-							<select
-								id={`request_approval_${index}`}
-								name={`request_approval_${index}`}
-								bind:value={requested.permission}
-								on:change={(event) => {
-									on_change_approval_permission(event?.target?.value, index);
-								}}
-								class=" ml-1 mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
-							>
-								<option value="" selected>Select a permission...</option>
-								{#each planetDAO_permissions as item}
-									<option value={item}>{item}</option>
-								{/each}
-							</select>
-
-							<button
-								on:click={() => {
-									remove_request_approval(index);
-								}}
-							>
-								<XCircleSolid class="ml-2 h-6 w-6 text-red-500" />
-							</button>
-						</div>
-					{/each}
+					<div class="flex flex-col">
+						<label for="proposer" class="text-base font-semibold"> Proposer </label>
+						<input
+							type="text"
+							id="proposer"
+							name="proposer"
+							bind:value={$session.actor}
+							class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+							disabled
+						/>
+					</div>
 				</div>
-				<!-- Metadata -->
-				<div class="mt-3 flex flex-col">
-					<div class="flex flex-row">
-						<label for="metadata" class="text-base font-semibold">Metadata: </label>
-						<!-- Icon add -->
+				<div class=" flex w-full flex-col">
+					<label for="description" class="text-base font-semibold"> Description </label>
+					<textarea
+						rows="9"
+						bind:value={description}
+						class="w-full rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+						placeholder="Enter Value"
+						on:input={autoResize}
+						on:focusin={() => autoResize(event)}
+						on:focusout={() => resetHeight(event)}
+					/>
+				</div>
+				{#if custom_metadata && metadata.length > 0}
+					<!-- Metadata -->
+					<div class="mt-1 flex flex-col">
+						{#each metadata as pair, index}
+							<div class="mt-1 flex flex-row">
+								<div class="flex w-1/3 flex-col">
+									{#if index == 0}
+										<label for="key" class="text-base font-semibold"> Key </label>
+									{/if}
+									<input
+										type="text"
+										bind:value={pair.key}
+										class=" rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+										placeholder="Key"
+									/>
+								</div>
+								<div class="flex w-1/2 flex-col">
+									{#if index == 0}
+										<label for="value" class="text-base font-semibold"> Value </label>
+									{/if}
+									<textarea
+										rows="1"
+										bind:value={pair.value}
+										class="ml-1 w-full rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+										placeholder="Value"
+										on:input={autoResize}
+										on:focusin={() => autoResize(event)}
+										on:focusout={() => resetHeight(event)}
+									/>
+								</div>
+								{#if index > 0}
+									<button
+										on:click={() => {
+											remove_metadata(index);
+										}}
+									>
+										<CloseCircleSolid class="ml-2 h-6 w-6 text-red-500" />
+									</button>
+								{/if}
+							</div>
+						{/each}
+					</div>
+				{/if}
+
+				<!-- text and checkbox to allow add custom metadata -->
+				<div class="flex h-6 flex-row items-center">
+					<label for="custom_metadata" class="text-sm italic"> Add custom metadata </label>
+					<input
+						type="checkbox"
+						id="custom_metadata"
+						name="custom_metadata"
+						class="ml-2 rounded-lg"
+						bind:checked={custom_metadata}
+						on:change={(event) => {
+							if (!event?.target?.checked) {
+								metadata = [];
+							}
+						}}
+					/>
+					{#if custom_metadata}
 						<button
+							class="ml-3 rounded-lg bg-gray-500 p-1 text-center text-xs text-white hover:bg-gray-700"
 							on:click={() => {
 								new_metadata();
 							}}
 						>
-							<CirclePlusSolid class="ml-2 h-6 w-6 text-indigo-500" />
+							Add
 						</button>
-					</div>
-					{#each metadata as pair, index}
-						<div class="mt-1 flex flex-row">
-							<input
-								type="text"
-								bind:value={pair.key}
-								class=" rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
-								placeholder="Key"
-							/>
-
-							<input
-								type="text"
-								bind:value={pair.value}
-								class="ml-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
-								placeholder="Enter Value"
-							/>
-
-							<button
-								on:click={() => {
-									remove_metadata(index);
-								}}
-							>
-								<XCircleSolid class="ml-2 h-6 w-6 text-red-500" />
-							</button>
-						</div>
-					{/each}
+					{/if}
 				</div>
+
+				<div class="flex w-full flex-row flex-wrap place-content-between">
+					<!-- Request Approvals -->
+					<div class="mt-3 flex flex-col">
+						{#each requested_approvals as requested, index}
+							<div class="mt-1 flex flex-row flex-wrap">
+								<div class="flex flex-col">
+									{#if index == 0}
+										<label for="planet" class="text-base font-semibold"> Planet </label>
+									{/if}
+									<input
+										type="text"
+										bind:value={requested.actor}
+										class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+										placeholder="Account Name"
+									/>
+								</div>
+								<div class=" flex flex-col">
+									{#if index == 0}
+										<label for="planet-permission" class="text-base font-semibold">
+											Permission
+										</label>
+									{/if}
+									<select
+										id={`request_approval_${index}`}
+										name={`request_approval_${index}`}
+										bind:value={requested.permission}
+										on:change={(event) => {
+											on_change_approval_permission(event?.target?.value, index);
+										}}
+										class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+									>
+										<option value="" selected>Select a permission...</option>
+										{#each planetDAO_permissions as item}
+											<option value={item}>{item}</option>
+										{/each}
+									</select>
+								</div>
+								{#if index > 0}
+									<button
+										on:click={() => {
+											remove_request_approval(index);
+										}}
+									>
+										<CloseCircleSolid class="ml-2 h-6 w-6 text-red-500" />
+									</button>
+								{/if}
+							</div>
+						{/each}
+					</div>
+					<!-- expired date at -->
+					<div class="mt-3 flex flex-col">
+						<label for="expired_at" class="text-base font-semibold"> Expired At </label>
+						<input
+							type="datetime-local"
+							id="expired_at"
+							name="expired_at"
+							bind:value={expired_at}
+							class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+						/>
+					</div>
+				</div>
+				<div class="flex h-6 flex-row items-center">
+					<label for="custom_requested_approvals" class=" text-sm italic">
+						Add custom approvals
+					</label>
+					<input
+						type="checkbox"
+						id="custom_requested_approvals"
+						name="custom_requested_approvals"
+						class=" ml-2 rounded-lg"
+						bind:checked={custom_requested_approvals}
+						on:change={(event) => {
+							if (!event?.target?.checked) {
+								requested_approvals = [
+									{
+										actor: $activePlanetStore ? $activePlanetStore.account : '',
+										permission: planetDAO_permissions[0] ? planetDAO_permissions[0] : ''
+									}
+								];
+							}
+						}}
+					/>
+					{#if custom_requested_approvals}
+						<button
+							class="ml-3 rounded-lg bg-gray-500 p-1 text-center text-xs text-white hover:bg-gray-700"
+							on:click={() => {
+								new_request_approval();
+							}}
+						>
+							Add
+						</button>
+					{/if}
+				</div>
+
 				<!-- Action Data -->
 				<div class="mt-3 flex flex-col">
-					<div class="flex flex-row">
-						<label for="action-data" class="text-base font-semibold">Actions: </label>
+					<div class=" flex w-full flex-row border-b border-gray-500">
+						<label for="action-data" class="text-base font-semibold">msig Action(s) </label>
 						<!-- Icon add -->
-						<button
+						<!-- <button
 							on:click={() => {
 								new_action();
 							}}
 						>
 							<CirclePlusSolid class="ml-2 h-6 w-6 text-indigo-500" />
+						</button> -->
+					</div>
+					<div class="mt-1 flex flex-row">
+						<button
+							class="rounded-lg bg-gray-500 p-1 text-center text-base text-white hover:bg-gray-700"
+							on:click={() => {
+								new_transferTLM_action();
+							}}
+						>
+							Transfer TLM
+						</button>
+						<button
+							class="ml-2 rounded-lg bg-gray-500 p-1 text-center text-base text-white hover:bg-gray-700"
+							on:click={() => {
+								new_multi_transfer_action();
+							}}
+						>
+							Multi Transfer
+						</button>
+						<button
+							class="ml-2 rounded-lg bg-gray-500 p-1 text-center text-base text-white hover:bg-gray-700"
+							on:click={() => {
+								new_action();
+							}}
+						>
+							Custom Action
 						</button>
 					</div>
 					{#each actions as action, index}
-						<div class="mt-2 flex flex-row">
+						<label
+							for="action"
+							class="mt-1 w-full border-t border-gray-500 text-base italic underline"
+						>
+							Action {index + 1}
+						</label>
+						<div class="mt-2 flex flex-row flex-wrap">
 							<input
 								type="text"
 								bind:value={action.sc_account}
-								class=" rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+								class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 								placeholder="Contract Account"
 								on:change={() => {
 									on_change_sc_account(index);
@@ -450,7 +678,7 @@
 								on:change={(event) => {
 									on_change_action_name(event?.target?.value, index);
 								}}
-								class=" ml-1 mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+								class=" m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 							>
 								<option value="" selected>Select an action...</option>
 								{#each action.sc_actions as item}
@@ -464,26 +692,32 @@
 									remove_action(index);
 								}}
 							>
-								<XCircleSolid class="ml-2 h-6 w-6 text-red-500" />
+								<CloseCircleSolid class="ml-2 h-6 w-6 text-red-500" />
 							</button>
 						</div>
 						<!-- Fields -->
 						<div class="ml-10 mt-3 flex flex-col">
 							{#if action.action.fields.length > 0}
-								<label for="fields" class="text-base font-semibold">Fields: </label>
+								<!-- <label for="fields" class="text-base font-semibold">Fields </label> -->
 								<!-- List all fields -->
 								{#each action.action.fields as field, index2}
-									<div class="mt-1 flex flex-row">
-										<input
-											type="text"
+									<label for={`field_${index}_${index2}`} class="mt-1 text-base italic underline">
+										{field.name}
+									</label>
+									<div class="flex flex-row">
+										<textarea
+											rows="1"
 											id={`field_${index}_${index2}`}
 											name={`field_${index}_${index2}`}
 											bind:value={action.data[field.name]}
-											class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+											class="mt-1 w-full resize rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 											placeholder={field.name}
+											on:input={autoResize}
+											on:focusin={() => autoResize(event)}
+											on:focusout={() => resetHeight(event)}
 										/>
 										<span
-											class="mt-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"
+											class="ml-1 mt-1 flex items-center justify-center rounded-lg bg-gray-600 px-2 text-white"
 										>
 											{field.type}
 										</span>
@@ -495,9 +729,7 @@
 						{#if action.action.authorization.length > 0}
 							<div class="mb-3 ml-10 mt-3 flex flex-col">
 								<div class="flex flex-row">
-									<label for="authorization" class="text-base font-semibold">
-										Authorization:
-									</label>
+									<label for="authorization" class="text-base font-semibold"> Authorization </label>
 									<!-- Icon add -->
 									<button
 										on:click={() => {
@@ -508,18 +740,18 @@
 									</button>
 								</div>
 								{#each action.action.authorization as auth_item, auth_index}
-									<div class="mt-1 flex flex-row">
+									<div class="mt-1 flex flex-row flex-wrap">
 										<input
 											type="text"
 											bind:value={auth_item.actor}
-											class=" rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+											class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 											placeholder="Account Name"
 										/>
 
 										<input
 											type="text"
 											bind:value={auth_item.permission}
-											class="ml-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
+											class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 											placeholder="Permission Name"
 										/>
 
@@ -528,7 +760,7 @@
 												remove_action_auth(index, auth_index);
 											}}
 										>
-											<XCircleSolid class="ml-2 h-6 w-6 text-red-500" />
+											<CloseCircleSolid class="ml-2 h-6 w-6 text-red-500" />
 										</button>
 									</div>
 								{/each}

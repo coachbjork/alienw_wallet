@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { AW_WORKER_PROPOSALS } from '$lib/constants';
-	import XSolid from 'flowbite-svelte-icons/XSolid.svelte';
+	import CloseOutline from 'flowbite-svelte-icons/CloseOutline.svelte';
 
 	export let isOpen = false;
 	export let isDelegate = false;
@@ -52,7 +52,7 @@
 					{isDelegate ? 'Delegate Vote' : 'Undelegate Vote'}
 				</h2>
 				<div class="flex-grow"></div>
-				<XSolid
+				<CloseOutline
 					class="text-red-500 hover:cursor-pointer"
 					size="lg"
 					strokeWidth="3"
@@ -113,7 +113,7 @@
 
 	.modal-content {
 		margin: auto;
-		padding: 30px;
+		padding: 15px;
 		border: 1px solid #888;
 		width: 80%;
 		max-width: 300px;
@@ -121,8 +121,7 @@
 		border-radius: 8px;
 	}
 
-	input,
-	textarea {
+	input {
 		width: 100%;
 		margin: 8px 0;
 		display: inline-block;

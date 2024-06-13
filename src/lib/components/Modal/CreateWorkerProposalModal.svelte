@@ -3,7 +3,7 @@
 	import { get_worker_proposal_by_id } from '$lib/services/awWorkerPropService';
 	import { activePlanetStore, session, toastStore } from '$lib/stores';
 	import { Spinner } from 'flowbite-svelte';
-	import XSolid from 'flowbite-svelte-icons/XSolid.svelte';
+	import CloseOutline from 'flowbite-svelte-icons/CloseOutline.svelte';
 	import { onMount } from 'svelte';
 
 	export let isOpen = false;
@@ -140,60 +140,69 @@
 		file_content = file;
 	}
 
-	async function uploadFileToIPFS() {
-		try {
-			if (!file_content) {
-				toastStore.add('Please select a file to upload', TOAST_TYPES.ERROR);
-			}
-			let formData = new FormData();
-			formData.append('file', file_content);
-			const response = await fetch('/api/ipfs/pin', {
-				method: 'POST',
-				body: formData
-			});
+	// async function uploadFileToIPFS() {
+	// 	try {
+	// 		if (!file_content) {
+	// 			toastStore.add('Please select a file to upload', TOAST_TYPES.ERROR);
+	// 		}
+	// 		let formData = new FormData();
+	// 		formData.append('file', file_content);
+	// 		const response = await fetch('/api/ipfs/pin', {
+	// 			method: 'POST',
+	// 			body: formData
+	// 		});
 
-			const { ipfsHash } = await response.json();
-			if (ipfsHash) {
-				content_hash = ipfsHash;
-			}
-		} catch (error) {
-			console.error('Error:', error);
-		}
+	// 		const { ipfsHash } = await response.json();
+	// 		if (ipfsHash) {
+	// 			content_hash = ipfsHash;
+	// 		}
+	// 	} catch (error) {
+	// 		console.error('Error:', error);
+	// 	}
+	// }
+
+	// async function removeFileFromIPFS() {
+	// 	try {
+	// 		if (content_hash) {
+	// 			const response = await fetch('/api/ipfs/unpin', {
+	// 				method: 'POST',
+	// 				body: JSON.stringify({ content_hash }),
+	// 				headers: {
+	// 					'Content-Type': 'application/json'
+	// 				}
+	// 			});
+
+	// 			const { ipfsHash } = await response.json();
+	// 			if (ipfsHash) {
+	// 				content_hash = ipfsHash;
+	// 			}
+	// 		}
+	// 	} catch (error) {
+	// 		console.error('Error:', error);
+	// 	}
+	// }
+
+	function autoResize(event: any) {
+		event.target.style.height = 'auto'; // Reset height to recalculate
+		event.target.style.height = event.target.scrollHeight + 'px'; // Set new height
 	}
 
-	async function removeFileFromIPFS() {
-		try {
-			if (content_hash) {
-				const response = await fetch('/api/ipfs/unpin', {
-					method: 'POST',
-					body: JSON.stringify({ content_hash }),
-					headers: {
-						'Content-Type': 'application/json'
-					}
-				});
-
-				const { ipfsHash } = await response.json();
-				if (ipfsHash) {
-					content_hash = ipfsHash;
-				}
-			}
-		} catch (error) {
-			console.error('Error:', error);
-		}
+	function resetHeight(event: any) {
+		event.target.style.height = 'auto'; // Reset height to recalculate
 	}
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 {#if isOpen}
-	<div class="modal" on:click={close}>
+	<div class="modal">
 		<div class="modal-content bg-background-default-lighter" on:click|stopPropagation>
 			<div class="mb-5 flex flex-row">
 				<h2 class=" text-white underline decoration-white underline-offset-4">
 					New Worker Proposal
 				</h2>
-				<div class="flex-grow"></div>
-				<XSolid
+				<div class="grow"></div>
+				<CloseOutline
 					class="text-red-500 hover:cursor-pointer"
 					size="lg"
 					strokeWidth="3"
@@ -204,7 +213,7 @@
 				<input class=" text-black" type="text" bind:value={id} placeholder="ID" />
 				
 			</div> -->
-			<div class="flex flex-row gap-5">
+			<div class="flex flex-col md:flex-row md:gap-5">
 				<!-- <input class="text-black" type="number" bind:value={category} placeholder="Category Num" /> -->
 
 				<input id="title" class="text-black" type="text" bind:value={title} placeholder="Title" />
@@ -218,7 +227,7 @@
 				/>
 			</div>
 
-			<div class="flex flex-row gap-5">
+			<div class="flex flex-col md:flex-row md:gap-5">
 				<input
 					class="text-black"
 					type="text"
@@ -229,7 +238,7 @@
 				<input class="text-black" type="text" bind:value={arbiter} placeholder="Arbiter" />
 			</div>
 
-			<div class="flex flex-row gap-5">
+			<div class="flex flex-col md:flex-row md:gap-5">
 				<input
 					class="text-black"
 					type="number"
@@ -265,7 +274,14 @@
 				/>
 			</div> -->
 
-			<textarea class="text-black" bind:value={summary} placeholder="Summary"></textarea>
+			<textarea
+				class="text-black"
+				bind:value={summary}
+				placeholder="Summary"
+				on:input={autoResize}
+				on:focusin={() => autoResize(event)}
+				on:focusout={() => resetHeight(event)}
+			></textarea>
 			<label for="file-upload" class="file-upload__label"
 				>Upload document to IPFS via <a
 					class="text-blue-500 underline"
@@ -323,7 +339,7 @@
 
 	.modal-content {
 		margin: auto;
-		padding: 30px;
+		padding: 15px;
 		border: 1px solid #888;
 		width: 80%;
 		max-width: 500px;

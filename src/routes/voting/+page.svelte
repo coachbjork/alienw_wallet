@@ -12,6 +12,7 @@
 	import type { Planet } from '$lib/types';
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import { tooltip } from '@svelte-plugins/tooltips';
+	import axios from 'axios';
 	import { Spinner } from 'flowbite-svelte';
 	import _ from 'lodash';
 	import { afterUpdate, onMount } from 'svelte';
@@ -27,48 +28,54 @@
 	let staked: string = '';
 
 	onMount(async () => {
-		await fetchCandidates();
-		loading = false;
-
-		if ($session) {
-			await fetchVotedFor();
-			await fetchStaked();
-		}
-
-		await fetchDacglobals();
+		Promise.all([fetchCandidates(), fetchDacglobals()]).then(() => {
+			loading = false;
+		});
 	});
 
 	afterUpdate(async () => {
 		if (selectedPlanet !== $activePlanetStore) {
 			selectedPlanet = $activePlanetStore;
-			loading = true;
-			selectedCandidates = [];
-			votedForCandidates = [];
-			staked = '';
-			await fetchCandidates();
-			loading = false;
-			if ($session) {
-				await fetchVotedFor();
-				await fetchStaked();
-			}
-			await fetchDacglobals();
+			await refresh();
 		}
 	});
+
+	$: $session && Promise.all([fetchVotedFor(), fetchStaked()]);
+
+	async function refresh() {
+		loading = true;
+		selectedCandidates = [];
+		votedForCandidates = [];
+		staked = '';
+		Promise.all([fetchCandidates(), fetchDacglobals()]).then(() => {
+			loading = false;
+		});
+
+		if ($session) {
+			Promise.all([fetchVotedFor(), fetchStaked()]);
+		}
+	}
 
 	async function fetchCandidates() {
 		let response = await get_candidates($activePlanetStore.name);
 		if (!response) return;
-		let api_response: any = await fetch(
-			`/api/daoaw/candidates?activePlanet=${$activePlanetStore.name}`
+		let api_response: any = await axios.get(
+			`https://api.alienw.com/custodians/${$activePlanetStore.scope}`
 		);
-		api_response = await api_response.json();
-		if (api_response) {
+		const { data } = api_response;
+
+		if (data) {
 			response = response.map((item: any) => {
 				return {
 					...item,
-					description: api_response[String(item.candidate_name)]?.description || '',
-					image: api_response[String(item.candidate_name)]?.image || '',
-					name: api_response[String(item.candidate_name)]?.name || String(item.candidate_name)
+					// description: data[String(item.candidate_name)]?.cand_desc || '',
+					// image: data[String(item.candidate_name)]?.cand_img || '',
+					// name: data[String(item.candidate_name)]?.cand_name || String(item.candidate_name)
+					description: _.find(data, { cand_acc: String(item.candidate_name) })?.cand_desc || '',
+					image: _.find(data, { cand_acc: String(item.candidate_name) })?.cand_img || '',
+					name:
+						_.find(data, { cand_acc: String(item.candidate_name) })?.cand_name ||
+						String(item.candidate_name)
 				};
 			});
 		}
@@ -139,94 +146,106 @@
 				}
 			}
 		];
-		await pushActions($session, actions);
+		await pushActions($session, actions).then(() => {
+			refresh();
+		});
 	}
 </script>
 
 <div class="main-content py-6">
-	<div class="container">
+	<div class="container relative overflow-x-hidden">
 		<PlanetMenu />
-		<table class="mt-5 w-full table-auto text-left text-2xl">
-			<thead>
-				<tr>
-					<th>#</th>
-					<th>Rank</th>
-					<th>User</th>
-					<th>Account</th>
-					<th>Vote power</th>
-					<th class="hidden md:table-cell">Voters</th>
-					<th class="hidden md:table-cell">Vote Decay</th>
-				</tr>
-			</thead>
-			<tbody class="text-2xl">
-				{#if loading}
+		<div class="mt-10 overflow-x-auto">
+			<table class="text-default w-full table-auto text-left text-lg md:text-xl">
+				<thead>
 					<tr>
-						<td colspan="7" class="text-center">
-							<Spinner color="purple" />
-						</td>
+						<th>#</th>
+						<th>Rank</th>
+						<th>User</th>
+						<th>Account</th>
+						<th>Vote Power</th>
+						<th class="">Voters</th>
+						<th class="">Vote Decay</th>
 					</tr>
-				{:else}
-					{#each candidates as candidate, i}
+				</thead>
+				<tbody class="text-lg md:text-xl">
+					{#if loading}
 						<tr>
-							<td>
-								<input
-									type="checkbox"
-									class={`rounded-md ${$session === null ? 'cursor-not-allowed bg-gray-500' : ''}`}
-									on:change={(e) => {
-										selectCandidate(e);
-									}}
-									value={candidate.candidate_name}
-									disabled={$session === null}
-									checked={_.find(votedForCandidates, { candidate_name: candidate.candidate_name })}
-								/>
+							<td colspan="7" class="text-center">
+								<Spinner color="purple" />
 							</td>
-							<td>
-								{#if i <= 4}
-									<CrownSolid color="white" />
-								{:else}
-									{i + 1}
-								{/if}</td
-							>
-							<td class="flex items-center"
-								>{candidate.name}
-								<a href={`https://waxblock.io/account/${candidate.candidate_name}`} target="_blank"
-									><ShareFromSquareRegular class="ml-2" /></a
-								>
-							</td>
-							<td>{candidate.candidate_name}</td>
-							<td>{new Intl.NumberFormat('en-US').format(candidate.total_vote_power.toFixed(0))}</td
-							>
-							<td class="hidden md:table-cell">{candidate.number_voters}</td>
-							<td
-								class={`hidden md:table-cell ${
-									candidate.vote_decay > 50
-										? 'vote6'
-										: candidate.vote_decay > 40
-											? 'vote5'
-											: candidate.vote_decay > 30
-												? 'vote4'
-												: candidate.vote_decay > 20
-													? 'vote3'
-													: candidate.vote_decay > 10
-														? 'vote2'
-														: candidate.vote_decay > 0
-															? 'vote1'
-															: ''
-								}`}
-								use:tooltip={{
-									content: `${new Intl.NumberFormat('en-US').format(
-										candidate.current_vote_power.toFixed(0)
-									)}`,
-									position: 'right',
-									style: { 'background-color': '#1f2937', 'border-radius': '5px' },
-									animation: 'puff'
-								}}>-{candidate.vote_decay}%</td
-							>
 						</tr>
-					{/each}
-				{/if}
-			</tbody>
-		</table>
+					{:else}
+						{#each candidates as candidate, i}
+							<tr class="odd:backdrop-brightness-150">
+								<td>
+									<input
+										type="checkbox"
+										class={`rounded-md ${$session === null ? 'cursor-not-allowed bg-gray-500' : ''}`}
+										on:change={(e) => {
+											selectCandidate(e);
+										}}
+										value={candidate.candidate_name}
+										disabled={$session === null}
+										checked={_.find(votedForCandidates, {
+											candidate_name: candidate.candidate_name
+										})}
+									/>
+								</td>
+								<td>
+									{#if i <= 4}
+										<CrownSolid color="white" />
+									{:else}
+										{i + 1}
+									{/if}</td
+								>
+								<td class="flex items-center"
+									>{candidate.name}
+									<a
+										href={`https://waxblock.io/account/${candidate.candidate_name}`}
+										target="_blank"><ShareFromSquareRegular class="ml-2" /></a
+									>
+								</td>
+								<td>{candidate.candidate_name}</td>
+								<td
+									>{new Intl.NumberFormat('en-US').format(
+										candidate.total_vote_power.toFixed(0)
+									)}</td
+								>
+								<td class="">{candidate.number_voters}</td>
+								<td
+									class={` ${
+										candidate.vote_decay > 50
+											? 'vote6'
+											: candidate.vote_decay > 40
+												? 'vote5'
+												: candidate.vote_decay > 30
+													? 'vote4'
+													: candidate.vote_decay > 20
+														? 'vote3'
+														: candidate.vote_decay > 10
+															? 'vote2'
+															: candidate.vote_decay > 0
+																? 'vote1'
+																: ''
+									}`}
+									use:tooltip={{
+										content: `${new Intl.NumberFormat('en-US').format(
+											candidate.current_vote_power.toFixed(0)
+										)}`,
+										position: 'right',
+										style: { 'background-color': '#1f2937', 'border-radius': '5px' },
+										animation: 'puff'
+									}}>-{candidate.vote_decay}%</td
+								>
+								<!-- TODO: fix tooltip position bugs -->
+							</tr>
+						{/each}
+					{/if}
+				</tbody>
+			</table>
+		</div>
+
 		{#if !loading}
 			<!-- Vote button -->
 			<div class="mt-5 flex justify-center">
@@ -241,14 +260,33 @@
 		{/if}
 	</div>
 </div>
-<div class="left-side">
+<div class="left-side hidden md:flex">
 	{#if $session}
 		<VotedFor custodians={votedForCandidates} {staked} />
 	{/if}
 </div>
-<div class="right-side"></div>
+<div class="right-side hidden md:flex"></div>
 
 <style>
+	/* .container {
+		max-width: 100%;
+		overflow-x: hidden;
+	} */
+	/* Table */
+	table tbody tr {
+		@apply border-y border-solid border-gray-500;
+	}
+
+	table td {
+		@apply p-2;
+		/* padding: 0.75rem 0.75rem;
+		color: #b5b7bb; */
+	}
+
+	table th {
+		@apply pb-3 pl-3 pr-3 pt-0 text-left text-lg font-bold;
+	}
+
 	.vote1 {
 		color: #69b34c;
 	}

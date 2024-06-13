@@ -1,7 +1,7 @@
 <script lang="ts">
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import ArticleModal from '$lib/components/Modal/ArticleModal.svelte';
-	import ArticleAction from '$lib/components/SidePanel/ArticleAction.svelte';
+	import ArticleAction from '$lib/components/SidePanel/Actions/ArticleAction.svelte';
 	import {
 		get_article_cursor,
 		get_articles,
@@ -10,9 +10,9 @@
 	import { activePlanetStore, session } from '$lib/stores';
 	import type { Planet } from '$lib/types';
 	import { Spinner } from 'flowbite-svelte';
-	import { LabelSolid } from 'flowbite-svelte-icons';
 	import moment from 'moment';
 	import { afterUpdate, onMount } from 'svelte';
+	import CrosshairsSolid from 'svelte-awesome-icons/CrosshairsSolid.svelte';
 
 	let selectedPlanet: Planet = $activePlanetStore;
 	let loading = true;
@@ -69,26 +69,32 @@
 </script>
 
 <div class="main-content py-6">
-	<div class="container">
+	<div class="container relative overflow-x-hidden">
 		<PlanetMenu />
-		<div class="pt-10">
+		<div class="mt-10 overflow-x-auto">
 			{#if loading}
-				<div class="flex justify-center">
+				<div class="my-4 flex justify-center md:my-5">
 					<Spinner color="purple" />
 				</div>
 			{:else if articles.length == 0}
-				<div class="flex justify-center">No Data</div>
+				<div class="my-4 flex justify-center md:my-5">No Data</div>
 			{:else}
-				<div class="flex flex-col gap-6">
+				<div class="my-4 flex flex-col gap-6 md:my-5">
 					{#each articles as article}
 						<button class="flex flex-row" on:click={() => selectArticle(article)}>
 							<div class="w-8 flex-none place-self-center">
 								{#if selectedArticle && selectedArticle.article_id == article?.article_id}
-									<LabelSolid class="text-stone-300 h-5 w-5 " />
+									<CrosshairsSolid color="#ecc94b" size="24" />
 								{/if}
 							</div>
 							<div
-								class={`flex-grow rounded-2xl border border-solid border-gray-700 p-5 shadow-md shadow-gray-700  `}
+								class={`flex-grow whitespace-normal break-words break-all
+								rounded-2xl border border-solid border-gray-700 p-5 shadow-md shadow-gray-700  
+								${
+									article?.article_id == selectedArticle?.article_id
+										? 'backdrop-brightness-200'
+										: 'backdrop-brightness-125'
+								}`}
 							>
 								<div class="flex flex-row flex-wrap">
 									<div class="flex flex-none basis-2/12 flex-col text-start">
@@ -139,8 +145,8 @@
 		</div>
 	</div>
 </div>
-<div class="left-side"></div>
-<div class="right-side">
+<div class="left-side md:flex"></div>
+<div class="right-side md:flex">
 	<ArticleAction
 		{selectedArticle}
 		{user_identity}
