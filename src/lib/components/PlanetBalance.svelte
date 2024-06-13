@@ -5,12 +5,11 @@
 	let className;
 	export { className as class };
 
-	let planet_balance =
-		$awSummaryStore?.planet_balances[$activePlanetStore.scope][$activePlanetStore.account]?.TLM ||
-		0;
-	$: console.log($awSummaryStore);
-	$: console.log($activePlanetStore);
-	$: console.log($page.url.pathname);
+	let planet_balance = 0;
+	$: $awSummaryStore &&
+		(planet_balance =
+			$awSummaryStore?.planet_balances[$activePlanetStore.scope][$activePlanetStore.account]?.TLM ||
+			0);
 </script>
 
 <div class={className}>
