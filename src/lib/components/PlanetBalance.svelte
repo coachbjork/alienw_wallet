@@ -8,8 +8,10 @@
 	let planet_balance = 0;
 	$: $awSummaryStore &&
 		(planet_balance =
-			$awSummaryStore?.planet_balances[$activePlanetStore.scope][$activePlanetStore.account]?.TLM ||
-			0);
+			$activePlanetStore.scope == 'testa'
+				? 0
+				: $awSummaryStore?.planet_balances[$activePlanetStore.scope][$activePlanetStore.account]
+						?.TLM || 0);
 </script>
 
 <div class={className}>
