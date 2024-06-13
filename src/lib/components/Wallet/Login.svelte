@@ -101,11 +101,12 @@
 	}
 </script>
 
-<div class="p-2">
+<div class=" p-2">
 	{#if $session}
 		<div class="wallet-dropdown-container">
 			<button on:click={activeDropdown}>
-				<span class=" rounded-lg border border-indigo-500 px-4 py-1"
+				<span
+					class="flex flex-nowrap items-center overflow-hidden rounded-lg border border-indigo-500 px-4 py-1"
 					>{$session.actor}
 					<!-- <Icon data={caretDown} /> -->
 					<AngleDownOutline class="pointer-events-none inline-block" size="sm" />
