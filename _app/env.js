@@ -1,1 +1,1 @@
-export const env={"PUBLIC_PINATA_GATEWAY_KEY":"wDMKqd4HX-0QgnjRJ2CUALFi8Tza0pwZqCZAMX1o8Qdu-kfGLCLTILIvM3yE5Nhp","PUBLIC_PINATA_GATEWAY":"https://sapphire-written-octopus-904.mypinata.cloud"}
+export const env={"PUBLIC_PINATA_GATEWAY_KEY":"wDMKqd4HX-0QgnjRJ2CUALFi8Tza0pwZqCZAMX1o8Qdu-kfGLCLTILIvM3yE5Nhp","PUBLIC_PINATA_GATEWAY":"https://sapphire-written-octopus-904.mypinata.cloud","PUBLIC_ALIEN_WALLET_API":"https://api.alienw.com"}

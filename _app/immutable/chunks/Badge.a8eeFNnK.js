@@ -1,5 +1,0 @@
-import{s as u,I as c,e as _,c as m,a as d,d as r,m as f,i as p,J as h,K as g,L as y}from"./scheduler.Dqo5rXz3.js";import{S as $,i as b,d as S,t as j}from"./index.Y2-_4oLG.js";function v(l){let s,i,n;const o=l[2].default,t=c(o,l,l[1],null);return{c(){s=_("span"),t&&t.c(),this.h()},l(e){s=m(e,"SPAN",{class:!0});var a=d(s);t&&t.l(a),a.forEach(r),this.h()},h(){f(s,"class",i=`inline-flex items-center justify-center
-    rounded-lg px-3 py-0.5 font-medium 
-            bg-${l[0]}-400 text-${l[0]}-800`)},m(e,a){p(e,s,a),t&&t.m(s,null),n=!0},p(e,[a]){t&&t.p&&(!n||a&2)&&h(t,o,e,e[1],n?y(o,e[1],a,null):g(e[1]),null),(!n||a&1&&i!==(i=`inline-flex items-center justify-center
-    rounded-lg px-3 py-0.5 font-medium 
-            bg-${e[0]}-400 text-${e[0]}-800`))&&f(s,"class",i)},i(e){n||(S(t,e),n=!0)},o(e){j(t,e),n=!1},d(e){e&&r(s),t&&t.d(e)}}}function B(l,s,i){let{$$slots:n={},$$scope:o}=s,{color:t="gray"}=s;return l.$$set=e=>{"color"in e&&i(0,t=e.color),"$$scope"in e&&i(1,o=e.$$scope)},[t,o,n]}class C extends ${constructor(s){super(),b(this,s,B,v,u,{color:0})}}export{C as B};
