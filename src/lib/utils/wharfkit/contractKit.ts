@@ -75,22 +75,29 @@ const unpackTransaction = async (packed_trx: any) => {
 }
 
 const getContractInstance = async (contract: string) => {
-    const contractKit = new ContractKit({
-        client: new APIClient({ url: get(bpRPCStore) }),
-    });
-    const contractLocalIns = contractInsStore.findContract(contract);
-    let contractInstance: any;
-    if ((!contractLocalIns)) {
-        contractInstance = await contractKit.load(contract);
-        contractInsStore.setContract({ abi: contractInstance.abi, account: String(contractInstance.account) });
-    } else {
-        contractInstance = new Contract({
-            abi: contractLocalIns.abi,
-            account: Name.from(contractLocalIns.account),
-            client: new APIClient({ url: get(bpRPCStore) })
+    try {
+        const contractKit = new ContractKit({
+            client: new APIClient({ url: get(bpRPCStore) }),
         });
+        const contractLocalIns = contractInsStore.findContract(contract);
+        let contractInstance: any;
+        if ((!contractLocalIns)) {
+            contractInstance = await contractKit.load(contract).catch((error) => { console.log(error) });
+            if (!contractInstance) return undefined;
+            contractInsStore.setContract({ abi: contractInstance.abi, account: String(contractInstance.account) });
+        } else {
+            contractInstance = new Contract({
+                abi: contractLocalIns.abi,
+                account: Name.from(contractLocalIns.account),
+                client: new APIClient({ url: get(bpRPCStore) })
+            });
+        }
+        return contractInstance;
+    } catch (error) {
+        console.log("Error", error);
+        return undefined;
     }
-    return contractInstance;
+
 }
 
 // const main = async () => {

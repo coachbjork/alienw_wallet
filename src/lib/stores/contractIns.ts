@@ -3,7 +3,7 @@ import { LOCAL_STORAGE_KEYS } from '$lib/constants';
 import { get, writable } from 'svelte/store';
 
 const defaultValue: any = [];
-
+// TODO: update contract abi if getting error
 function createContractInsStore() {
     const { subscribe, set, update } = writable<any[]>(defaultValue);
 
