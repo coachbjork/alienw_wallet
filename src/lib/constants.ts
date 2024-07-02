@@ -361,6 +361,7 @@ const LOCAL_STORAGE_KEYS = {
     ACTIVE_PLANET: "activePlanetStore",
     CUSTODIANS: "custodiansStore",
     BP_RPC: "bpRPCStore",
+    CONTRACT_INS: "contractInsStore",
 };
 
 export {

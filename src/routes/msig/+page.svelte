@@ -4,8 +4,8 @@
 	import MsigProposalAction from '$lib/components/SidePanel/Actions/MsigProposalAction.svelte';
 	import Badge from '$lib/components/Text/Badge.svelte';
 	import { AW_MSIG } from '$lib/constants';
-	import { get_msig_cursor, get_msigs } from '$lib/services/awMsigPropService';
 	import { get_dacglobals } from '$lib/services/awdaoService';
+	import { get_msig_cursor, get_msigs } from '$lib/services/awMsigPropService';
 	import { activePlanetStore } from '$lib/stores';
 	import type { Planet } from '$lib/types';
 	import { Spinner } from 'flowbite-svelte';

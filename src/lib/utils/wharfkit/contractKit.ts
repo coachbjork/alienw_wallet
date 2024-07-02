@@ -1,15 +1,12 @@
-import { bpRPCStore } from '$lib/stores';
+import { bpRPCStore, contractInsStore } from '$lib/stores';
 import { Action, APIClient, Bytes, Name, PackedTransaction, Serializer } from "@wharfkit/antelope";
-import { ContractKit } from "@wharfkit/contract";
+import { Contract, ContractKit } from "@wharfkit/contract";
 import { get } from 'svelte/store';
 
 
 const getSingleData = async (contract: string, scope: string, table: string, key_value: any = undefined, params: any = {}) => {
     try {
-        const contractKit = new ContractKit({
-            client: new APIClient({ url: get(bpRPCStore) }),
-        });
-        const contractInstance = await contractKit.load(contract);
+        const contractInstance: any = await getContractInstance(contract);
         const tableInstance = contractInstance.table(table, scope);
         const data = await tableInstance.get(key_value, params);
         return data;
@@ -20,10 +17,7 @@ const getSingleData = async (contract: string, scope: string, table: string, key
 }
 
 const getMultiDataCursor = async (contract: string, scope: string, table: string, params: any = {}) => {
-    const contractKit = new ContractKit({
-        client: new APIClient({ url: get(bpRPCStore) }),
-    });
-    const contractInstance = await contractKit.load(contract);
+    const contractInstance: any = await getContractInstance(contract);
     return contractInstance.table(table, scope).query(params);
 }
 
@@ -38,28 +32,25 @@ const cursorReset = async (cursor: any) => {
 }
 
 const getActionsOfSmartContract = async (account: string) => {
-    const client = new APIClient({ url: get(bpRPCStore) });
-    const res: any = await client.v1.chain.get_abi(account).catch((e) => { });
-    if (!res) return [];
-    const actions = res.abi.actions.map((action: any) => {
+
+    const abi: any = await getSCAbi(Name.from(account));
+    if (!abi) return [];
+    const actions = abi.actions.map((action: any) => {
         // get action.type and find the type in abi.structs
-        const struct = res.abi.structs.find((struct: any) => struct.name === action.type);
+        const struct = abi.structs.find((struct: any) => struct.name === action.type);
         return { name: action.name, fields: struct.fields, base: struct.base };
     });
     return actions;
 }
 
 const decodeAction = async (account: Name, action: Name, data: Bytes) => {
-    const client = new APIClient({ url: get(bpRPCStore) });
-    const { abi } = await client.v1.chain.get_abi(account);
+    const abi = await getSCAbi(account);
     const decoded = Serializer.decode({ data, abi, type: String(action) });
     return decoded;
 }
 
 const encodeAction = async (account: Name, action: Name, authorization: any, object: any) => {
-    const client = new APIClient({ url: get(bpRPCStore) });
-    const { abi } = await client.v1.chain.get_abi(account);
-
+    const abi = await getSCAbi(account);
     const typedAction = Action.from(
         {
             account: account,
@@ -69,13 +60,11 @@ const encodeAction = async (account: Name, action: Name, authorization: any, obj
         },
         abi
     );
-    // const encoded = Serializer.encode({ object, abi, type: String(action) });
     return typedAction;
 }
 
 const getSCAbi = async (account: Name) => {
-    const client = new APIClient({ url: get(bpRPCStore) });
-    const { abi } = await client.v1.chain.get_abi(account);
+    const { abi } = await getContractInstance(String(account));
     return abi;
 }
 
@@ -83,6 +72,25 @@ const unpackTransaction = async (packed_trx: any) => {
     const packedTransaction = PackedTransaction.from({ packed_trx });
     const transaction = packedTransaction.getTransaction();
     return transaction;
+}
+
+const getContractInstance = async (contract: string) => {
+    const contractKit = new ContractKit({
+        client: new APIClient({ url: get(bpRPCStore) }),
+    });
+    const contractLocalIns = contractInsStore.findContract(contract);
+    let contractInstance: any;
+    if ((!contractLocalIns)) {
+        contractInstance = await contractKit.load(contract);
+        contractInsStore.setContract({ abi: contractInstance.abi, account: String(contractInstance.account) });
+    } else {
+        contractInstance = new Contract({
+            abi: contractLocalIns.abi,
+            account: Name.from(contractLocalIns.account),
+            client: new APIClient({ url: get(bpRPCStore) })
+        });
+    }
+    return contractInstance;
 }
 
 // const main = async () => {
