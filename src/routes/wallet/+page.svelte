@@ -6,9 +6,11 @@
 	import MiniMenu from '$lib/components/SidePanel/MiniMenu/MiniMenu.svelte';
 	import DaoCandidate from '$lib/components/Wallet/DaoCandidate.svelte';
 	import Tokens from '$lib/components/Wallet/Tokens.svelte';
+	import TransferTokens from '$lib/components/Wallet/TransferTokens.svelte';
 	import { session } from '$lib/stores';
 	import { Asset } from '@wharfkit/antelope';
 	import { afterUpdate, onMount } from 'svelte';
+	import ArrowsLeftRightSolid from 'svelte-awesome-icons/ArrowsLeftRightSolid.svelte';
 	import CoinsSolid from 'svelte-awesome-icons/CoinsSolid.svelte';
 	import PeopleGroupSolid from 'svelte-awesome-icons/PeopleGroupSolid.svelte';
 
@@ -19,9 +21,16 @@
 	let daoCandidateModal: any;
 	let selectedBalance: any;
 	let tokensRef: any;
+	let transferTokensRef: any;
 	let daoCandidateRef: any;
 	const menuItems: any = [
-		{ id: 'tokens', icon: CoinsSolid, label: 'Tokens', logMessage: 'Tokens' },
+		{ id: 'aw-tokens', icon: CoinsSolid, label: 'AW Tokens', logMessage: 'AW Tokens' },
+		{
+			id: 'tokens-transfer',
+			icon: ArrowsLeftRightSolid,
+			label: 'Transfer Tokens',
+			logMessage: 'Transfer Tokens'
+		},
 		{
 			id: 'dao-candidate',
 			icon: PeopleGroupSolid,
@@ -29,7 +38,7 @@
 			logMessage: 'Dao Candidate'
 		}
 	];
-	let selectedMenuId = 'tokens';
+	let selectedMenuId = 'aw-tokens';
 
 	onMount(async () => {});
 
@@ -45,11 +54,16 @@
 			daoCandidateRef.refresh();
 		}
 	}
+	async function refreshTransferTokens() {
+		if ($session) {
+			transferTokensRef.refresh();
+		}
+	}
 </script>
 
 <div class="main-content py-6">
 	<div class="container relative overflow-x-hidden">
-		{#if selectedMenuId === 'tokens'}
+		{#if selectedMenuId === 'aw-tokens'}
 			<Tokens
 				on:selectedBalance={(data) => {
 					selectedBalance = data.detail;
@@ -69,13 +83,25 @@
 				}}
 				bind:this={daoCandidateRef}
 			/>
+		{:else if selectedMenuId === 'tokens-transfer'}
+			<TransferTokens
+				on:selectedBalance={(data) => {
+					selectedBalance = data.detail;
+				}}
+				on:memberInfo={(data) => {
+					memberInfo = data.detail;
+				}}
+				on:tlmBalance={(data) => {
+					tlm_balance = data.detail;
+				}}
+				bind:this={transferTokensRef}
+			/>
 		{/if}
 		<MiniMenu
 			class="block w-full md:hidden"
 			{menuItems}
 			on:selectedItem={(data) => {
 				selectedMenuId = data.detail.id;
-				// console.log('selected: ', selectedMenuId);
 			}}
 		/>
 	</div>
@@ -90,7 +116,7 @@
 	/>
 </div>
 <div class="right-side md:flex">
-	{#if $session && selectedMenuId === 'tokens'}
+	{#if $session && selectedMenuId === 'aw-tokens'}
 		<TokensAction
 			selectedItem={selectedBalance}
 			{memberInfo}
@@ -99,9 +125,8 @@
 			on:refresh={refreshTokens}
 		/>
 	{/if}
-	<!-- on:stakeTime={(data) => stakeModal.setModalOpen(true, data)} -->
 </div>
-{#if selectedMenuId === 'tokens'}
+{#if selectedMenuId === 'aw-tokens'}
 	<StakeModal bind:this={stakeModal} on:refresh={refreshTokens} {tlm_balance} />
 	<StakeTimeModal bind:this={stakeTimeModal} on:refresh={refreshTokens} />
 {/if}

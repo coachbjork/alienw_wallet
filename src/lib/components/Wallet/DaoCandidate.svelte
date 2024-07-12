@@ -87,7 +87,7 @@
 			`${PUBLIC_ALIEN_WALLET_API}/custodians?account=${String($session?.actor)}`
 		);
 		// const res: any = await axios.get(`${PUBLIC_ALIEN_WALLET_API}/custodians?account=anyo.cabal`);
-		// const res: any = await axios.get(`${PUBLIC_ALIEN_WALLET_API}/custodians?account=appmo.c.wam`);
+
 		if (!res) return [];
 		return res.data;
 	}
@@ -153,7 +153,9 @@
 	}
 </script>
 
-<h1 class="mb-6 ml-3 text-start text-2xl font-bold md:ml-0 md:text-center">Candidate Profile</h1>
+<h1 class="mb-6 ml-3 text-start text-2xl font-bold text-orange-500 md:ml-0 md:text-center">
+	Candidate Profile
+</h1>
 <div class="mt-10 overflow-x-auto">
 	{#if loading}
 		<div class="flex items-center justify-center">

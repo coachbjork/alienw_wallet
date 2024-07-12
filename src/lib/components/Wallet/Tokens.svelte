@@ -17,12 +17,6 @@
 
 	afterUpdate(async () => {});
 
-	$: $session &&
-		Promise.all([fetchBalance()]).then(async () => {
-			await fetchMemberInfo();
-			loading = false;
-		});
-
 	export async function refresh() {
 		if ($session) {
 			Promise.all([fetchBalance()]).then(async () => {
@@ -31,6 +25,12 @@
 			});
 		}
 	}
+
+	$: $session &&
+		Promise.all([fetchBalance()]).then(async () => {
+			await fetchMemberInfo();
+			loading = false;
+		});
 
 	async function fetchBalance() {
 		loading = true;
@@ -63,10 +63,12 @@
 	}
 </script>
 
-<h1 class="mb-6 ml-3 text-start text-2xl font-bold md:ml-0 md:text-center">Tokens</h1>
+<h1 class="mb-6 ml-3 text-start text-2xl font-bold text-orange-500 md:ml-0 md:text-center">
+	Tokens
+</h1>
 <div class="text-default ml-3 flex flex-row text-lg">
 	<p class="">TLM balance:</p>
-	<p class="ml-3 font-medium">{String(tlm_balance)}</p>
+	<p class="ml-3 font-medium text-indigo-400">{String(tlm_balance)}</p>
 </div>
 <div class="mt-10 overflow-x-auto">
 	<table class="text-default w-full table-auto text-nowrap text-left text-lg md:text-xl">
