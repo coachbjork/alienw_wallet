@@ -5,7 +5,7 @@
 	import { pushActions } from '$lib/utils/wharfkit/session';
 	import axios from 'axios';
 	import { afterUpdate, onMount } from 'svelte';
-	import { fade, slide } from 'svelte/transition';
+	import { slide } from 'svelte/transition';
 
 	let loading = true;
 	let userTokens: any[] = [];
@@ -122,11 +122,11 @@
 </h1>
 
 {#if $session}
-	<div class="text-default ml-3 flex flex-row text-lg">
-		<p class="">Liquid balance:</p>
-		<p class="ml-3 font-medium text-indigo-400">{selectedToken.amount}</p>
-	</div>
-	<div class="mx-auto flex w-2/4 flex-col gap-y-2 rounded-lg p-5">
+	<div class="mx-auto flex flex-col gap-y-2 rounded-lg p-5 md:w-2/4">
+		<div class="text-default flex flex-row text-lg">
+			<p class="">Liquid balance:</p>
+			<p class="ml-3 font-medium text-indigo-400">{selectedToken.amount}</p>
+		</div>
 		<div class=" flex w-full flex-col">
 			<label for="recipient" class="text-base font-semibold"> Send To: </label>
 			<input
@@ -136,8 +136,8 @@
 				class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
 			/>
 		</div>
-		<div class="flex flex-col flex-wrap gap-4 md:flex-row">
-			<div class="flex grow flex-col">
+		<div class="flex flex-col md:flex-row md:flex-wrap md:gap-4">
+			<div class="flex flex-col md:grow">
 				<label for="quantity" class="text-base font-semibold">Quantity:</label>
 				<input
 					type="text"
@@ -157,8 +157,8 @@
 				</div>
 			</div>
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<div class=" flex size-1/3 flex-col">
-				<label for="planet-permission" class="text-base font-semibold"> Token Symbol </label>
+			<div class=" mt-2 flex flex-col md:mt-0 md:size-1/3">
+				<label for="token-symbol" class="text-base font-semibold"> Token Symbol </label>
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				{#if isCustomToken}
@@ -167,7 +167,8 @@
 						bind:value={customTokenSymbol}
 						placeholder="Token Symbol"
 						class="mt-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
-						in:fade={{ duration: 450, delay: 0 }}
+						in:slide={{ duration: 450, delay: 0 }}
+						out:slide={{ duration: 450, delay: 0 }}
 					/>
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
 					<div
@@ -175,6 +176,8 @@
 						on:click={() => {
 							isCustomToken = false;
 						}}
+						in:slide={{ duration: 450, delay: 0 }}
+						out:slide={{ duration: 450, delay: 0 }}
 					>
 						Don't use custom token
 					</div>
@@ -185,7 +188,8 @@
 							// on_change_approval_permission(event?.target?.value, index);
 						}}
 						class="m-1 rounded-lg border-2 border-gray-300 bg-gray-200 text-black"
-						in:fade={{ duration: 450, delay: 0 }}
+						in:slide={{ duration: 450, delay: 0 }}
+						out:slide={{ duration: 450, delay: 0 }}
 					>
 						<option value="Token" selected>Select Token</option>
 
@@ -200,6 +204,8 @@
 						on:click={() => {
 							isCustomToken = true;
 						}}
+						in:slide={{ duration: 450, delay: 0 }}
+						out:slide={{ duration: 450, delay: 0 }}
 					>
 						Use custom token
 					</div>
