@@ -69,7 +69,7 @@
 					return voter;
 				});
 				voterDetails = data;
-				// split to 100
+				// split to top 100
 				data = data.slice(0, 100);
 				filteredVoterDetails = data;
 			}
@@ -109,7 +109,7 @@
 			<tbody class="text-nowrap text-sm md:text-base">
 				{#if loading}
 					<tr>
-						<td colspan="7" class="text-center">
+						<td colspan="8" class="text-center">
 							<Spinner color="purple" />
 						</td>
 					</tr>
