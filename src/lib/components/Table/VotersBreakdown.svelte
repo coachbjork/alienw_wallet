@@ -87,7 +87,7 @@
 		</h1>
 		<input
 			type="text"
-			class="mr-4 basis-1/3 justify-end rounded-md border border-gray-500 p-2 text-black focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600"
+			class="mr-4 basis-1/3 justify-end rounded-xl border border-gray-500 p-2 text-black focus:border-transparent focus:outline-none focus:ring-2 focus:ring-purple-600"
 			placeholder="Search by candidate"
 			bind:value={searchQuery}
 		/>
