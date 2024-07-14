@@ -1,9 +1,9 @@
 <script lang="ts">
+	import MiniMenu from '$lib/components/Menu/MiniMenu.svelte';
 	import DaoCandidateModal from '$lib/components/Modal/DaoCandidateModal.svelte';
 	import StakeModal from '$lib/components/Modal/StakeModal.svelte';
 	import StakeTimeModal from '$lib/components/Modal/StakeTimeModal.svelte';
 	import TokensAction from '$lib/components/SidePanel/Actions/TokensAction.svelte';
-	import MiniMenu from '$lib/components/SidePanel/MiniMenu/MiniMenu.svelte';
 	import DaoCandidate from '$lib/components/Wallet/DaoCandidate.svelte';
 	import Tokens from '$lib/components/Wallet/Tokens.svelte';
 	import TransferTokens from '$lib/components/Wallet/TransferTokens.svelte';

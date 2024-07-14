@@ -2,6 +2,7 @@
 	import { PUBLIC_ALIEN_WALLET_API } from '$env/static/public';
 	import PlanetMenu from '$lib/components/Menu/PlanetMenu.svelte';
 	import VotedFor from '$lib/components/SidePanel/VotedFor.svelte';
+	import VotersBreakdown from '$lib/components/Table/VotersBreakdown.svelte';
 	import { AW_DAO, TOAST_TYPES } from '$lib/constants';
 	import {
 		get_candidates,
@@ -155,9 +156,10 @@
 
 <div class="main-content py-6">
 	<div class="container relative overflow-x-hidden">
+		<h1 class="text-center text-2xl font-bold text-orange-500">Tokens</h1>
 		<PlanetMenu />
-		<div class="mt-10 overflow-x-auto">
-			<table class="text-default w-full table-auto text-left text-lg md:text-xl">
+		<div class="mt-5 overflow-x-auto">
+			<table class="text-default w-full table-auto text-left text-base md:text-lg">
 				<thead>
 					<tr>
 						<th>#</th>
@@ -259,6 +261,8 @@
 				</button>
 			</div>
 		{/if}
+
+		<VotersBreakdown />
 	</div>
 </div>
 <div class="left-side hidden md:flex">
