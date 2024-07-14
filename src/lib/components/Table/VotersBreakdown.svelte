@@ -14,7 +14,7 @@
 	let filteredVoterDetails: any = [];
 	let selectedPlanet: Planet = $activePlanetStore;
 	let loading = true;
-	let staked: string = '';
+
 	const className = '';
 	export { className as class };
 
@@ -40,7 +40,9 @@
 
 	async function refresh() {
 		loading = true;
-		staked = '';
+
+		voterDetails = [];
+		filteredVoterDetails = [];
 		Promise.all([fetchVoterDetails()]).then(() => {
 			loading = false;
 		});
