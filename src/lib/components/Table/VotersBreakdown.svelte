@@ -31,10 +31,12 @@
 		}
 	});
 
-	$: filteredVoterDetails = voterDetails.filter((voter: any) => {
-		if (!searchQuery) return true;
-		return voter.candidates.toLowerCase().includes(searchQuery.toLowerCase());
-	});
+	$: filteredVoterDetails = voterDetails
+		.filter((voter: any) => {
+			if (!searchQuery) return true;
+			return voter.candidates.toLowerCase().includes(searchQuery.toLowerCase());
+		})
+		.slice(0, 100);
 
 	async function refresh() {
 		loading = true;
@@ -70,9 +72,6 @@
 				// split to 100
 				data = data.slice(0, 100);
 				filteredVoterDetails = data;
-
-				console.log(voterDetails);
-				console.log(filteredVoterDetails);
 			}
 		} catch (error) {
 			console.error(error);
