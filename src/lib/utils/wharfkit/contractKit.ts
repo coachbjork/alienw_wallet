@@ -1,4 +1,5 @@
-import { bpRPCStore, contractInsStore } from '$lib/stores';
+import { TOAST_TYPES } from '$lib/constants';
+import { bpRPCStore, contractInsStore, toastStore } from '$lib/stores';
 import { Action, APIClient, Bytes, Name, PackedTransaction, Serializer } from "@wharfkit/antelope";
 import { Contract, ContractKit } from "@wharfkit/contract";
 import { get } from 'svelte/store';
@@ -10,8 +11,13 @@ const getSingleData = async (contract: string, scope: string, table: string, key
         const tableInstance = contractInstance.table(table, scope);
         const data = await tableInstance.get(key_value, params);
         return data;
-    } catch (error) {
-        console.log("Error", error);
+    } catch (error: any) {
+        console.error("Error", error.message);
+        if (error?.message == "Failed to fetch") {
+            toastStore.add("RPC error, Please go to setting and choose another Blockchain Node!", TOAST_TYPES.ERROR);
+        } else {
+            toastStore.add(error.message, TOAST_TYPES.ERROR);
+        }
         return undefined;
     }
 }
@@ -93,8 +99,13 @@ const getContractInstance = async (contract: string) => {
             });
         }
         return contractInstance;
-    } catch (error) {
+    } catch (error: any) {
         console.log("Error", error);
+        if (error?.message == "Failed to fetch") {
+            toastStore.add("RPC error, Please go to setting and choose another Blockchain Node!", TOAST_TYPES.ERROR);
+        } else {
+            toastStore.add(error.message, TOAST_TYPES.ERROR);
+        }
         return undefined;
     }
 
